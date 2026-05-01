@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use HealthChain in your research, please cite it using the metadata below."
+type: software
+title: "HealthChain"
+abstract: >
+  HealthChain is a lightweight, AI-forward Python SDK for integrating clinical AI models
+  into hospital systems. It provides a clean interface for building CDS Hooks services,
+  NLP pipelines, and other clinical AI workflows without boilerplate infrastructure overhead.
+version: "0.14.2"
+date-released: "2026-04-30"
+url: "https://github.com/healthchainai/HealthChain"
+repository-code: "https://github.com/healthchainai/HealthChain"
+license: Apache 2.0
+keywords:
+  - clinical AI
+  - healthcare
+  - Python SDK
+  - FHIR
+  - CDS Hooks
+  - NLP
+  - electronic health records
+  - open source
+authors:
+  - family-names: "Jiang-Kells"
+    given-names: "Jennifer"
+    orcid: "https://orcid.org/0000-0003-0379-1306"
+    email: "jenniferjiangkells@gmail.com"
+identifiers:
+  - type: doi
+    value: "[Zenodo DOI — auto-populated after Zenodo integration]"
+    description: "The versioned DOI for this release, archived via Zenodo"
+preferred-citation:
+  type: software
+  title: "HealthChain: A Python SDK for Clinical AI Integration"
+  authors:
+    - family-names: "Jiang-Kells"
+      given-names: "Jennifer"
+      orcid: "https://orcid.org/0000-0003-0379-1306"
+  url: "https://github.com/healthchainai/HealthChain"
+  year: 2024

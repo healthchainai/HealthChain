@@ -39,6 +39,10 @@ jobs:
           uv run ruff check
         continue-on-error: true
 
+      - name: Check for vulnerabilities
+        if: matrix.python-version == '3.12'
+        run: uv run pip-audit
+
       - name: Run tests
         run: uv run pytest
 

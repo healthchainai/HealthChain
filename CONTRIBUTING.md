@@ -59,15 +59,19 @@ uv sync --group docs
 uv run mkdocs serve
 ```
 
-### Writing cookbooks
+## 🍳 Writing cookbooks
 
-Cookbooks are often the first thing a developer runs. These principles keep them effective:
+A good cookbook is grounded in a **real clinical workflow** — discharge summarisation, ICD coding, sepsis alerting, triage, medication reconciliation, and so on. It uses HealthChain as the primary SDK for the integration layer, is reproducible using synthetic or publicly available data, and includes a brief clinical context section explaining _why_ the workflow matters, not just how the code works. Research prototypes and academic pilots are as welcome as production integrations.
+
+**No real patient data.** Ever.
+
+These principles keep cookbooks effective:
 
 - **Reduce time-to-running**: Every prerequisite you can eliminate is a developer you don't lose. Pre-bake demo data and models; collapse advanced setup into `??? details` blocks.
 - **Lead with the problem**: The intro should say what pain it solves — "you trained a model on CSVs, now you need to deploy against FHIR data" — not just what the code does.
 - **Show HealthChain's unique value**: Each cookbook should have a moment that would be 50+ lines of custom code without HealthChain. Don't bury it.
 
-#### Cookbook structure
+### Cookbook structure
 
 Start from the templates — copy and fill them in:
 
@@ -76,7 +80,7 @@ Start from the templates — copy and fill them in:
 
 Each cookbook has three parts:
 
-1. **A runnable Python script** in `cookbook/` — e.g. `cookbook/my_use_case.py`. Pre-bake any data or setup so it works out of the box.
+1. **A runnable Python script** in `cookbook/` — e.g. `cookbook/my_use_case.py`. Pre-bake any data or setup so it works out of the box. Put sample or synthetic data in `cookbook/data/`.
 2. **A documentation page** in `docs/cookbook/` — e.g. `docs/cookbook/my_use_case.md`. The narrative page on the docs site, walking through what the script does and why.
 3. **Two registration steps** so it appears on the docs site:
 
