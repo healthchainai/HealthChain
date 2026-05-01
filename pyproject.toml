@@ -67,13 +67,15 @@ healthchain = "healthchain.cli:main"
 [dependency-groups]
 dev = [
     "ruff>=0.5.3",
-    "pytest>=8.2.0,<9",
+    "pytest>=9.0.3",
     "pre-commit>=3.5.0,<4",
-    "pytest-asyncio>=0.24.0,<0.25",
+    "pytest-asyncio>=0.25",
     "pytest-codeblocks>=0.17.0,<0.18",
     "ipykernel>=6.29.5,<7",
     "pytest-cov>=7.1.0",
     "typer>=0.24.1",
+    "pip-audit>=2.10.0",
+    "pygments>=2.20.0",
 ]
 scripts = [
     "scikit-learn>=1.7.2",
