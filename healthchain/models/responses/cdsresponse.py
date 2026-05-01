@@ -72,9 +72,9 @@ class Link(BaseModel):
     @model_validator(mode="after")
     def validate_link(self) -> Self:
         if self.appContext:
-            assert (
-                self.type == LinkTypeEnum.smart
-            ), "'type' must be 'smart' for appContext to be valued."
+            assert self.type == LinkTypeEnum.smart, (
+                "'type' must be 'smart' for appContext to be valued."
+            )
 
         return self
 
@@ -108,13 +108,13 @@ class Action(BaseModel):
     @model_validator(mode="after")
     def validate_action_type(self) -> Self:
         if self.type in [ActionTypeEnum.create, ActionTypeEnum.update]:
-            assert (
-                self.resource
-            ), f"'resource' must be provided when type is '{self.type.value}'"
+            assert self.resource, (
+                f"'resource' must be provided when type is '{self.type.value}'"
+            )
         else:
-            assert (
-                self.resourceId
-            ), f"'resourceId' must be provided when type is '{self.type.value}'"
+            assert self.resourceId, (
+                f"'resourceId' must be provided when type is '{self.type.value}'"
+            )
 
         return self
 
@@ -171,7 +171,9 @@ class Card(BaseModel):
     @model_validator(mode="after")
     def validate_suggestions(self) -> Self:
         if self.suggestions is not None:
-            assert self.selectionBehavior, f"'selectionBehavior' must be given if 'suggestions' is present! Choose from {[v for v in SelectionBehaviorEnum.value]}"
+            assert self.selectionBehavior, (
+                f"'selectionBehavior' must be given if 'suggestions' is present! Choose from {[v for v in SelectionBehaviorEnum.value]}"
+            )
         return self
 
 
