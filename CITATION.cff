@@ -3,9 +3,9 @@ message: "If you use HealthChain in your research, please cite it using the meta
 type: software
 title: "HealthChain"
 abstract: >
-  HealthChain is a lightweight, AI-forward Python SDK for integrating clinical AI models
-  into hospital systems. It provides a clean interface for building CDS Hooks services,
-  NLP pipelines, and other clinical AI workflows without boilerplate infrastructure overhead.
+  HealthChain is a lightweight Python SDK for integrating clinical AI models into hospital
+  systems. It provides a clean interface for building CDS Hooks services, NLP pipelines,
+  and other clinical AI workflows without boilerplate infrastructure overhead.
 version: "0.14.2"
 date-released: "2026-04-30"
 url: "https://github.com/healthchainai/HealthChain"

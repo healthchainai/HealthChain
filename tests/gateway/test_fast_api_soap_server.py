@@ -228,9 +228,9 @@ class TestProcessDocument:
         # Decode base64 content
         if doc_element.text:
             decoded = base64.b64decode(doc_element.text).decode("utf-8")
-            assert (
-                "Processed:" in decoded
-            ), f"Expected 'Processed:' in decoded document, got: {decoded}"
+            assert "Processed:" in decoded, (
+                f"Expected 'Processed:' in decoded document, got: {decoded}"
+            )
             assert plain_document in decoded, "Expected original document in response"
 
     def test_handler_returns_error(self):
@@ -374,9 +374,9 @@ class TestServiceConfiguration:
         assert response.status_code == 200
 
         # When use_events=False, emit_event should not be called
-        assert (
-            len(events_emitted) == 0
-        ), f"Expected 0 events when disabled, got {len(events_emitted)}"
+        assert len(events_emitted) == 0, (
+            f"Expected 0 events when disabled, got {len(events_emitted)}"
+        )
 
 
 class TestDocumentCoercion:
