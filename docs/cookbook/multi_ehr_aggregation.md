@@ -227,7 +227,7 @@ Example uses Epic patient `eIXesllypH3M9tAA5WdJftQ3`; see [Epic sandbox](https:/
 
 Example output when querying Linda Ross (Epic patient `eIXesllypH3M9tAA5WdJftQ3`):
 
-```
+```text
 ✓ Patient: Ross, Linda Jane
 ✓ Conditions retrieved: 2
 

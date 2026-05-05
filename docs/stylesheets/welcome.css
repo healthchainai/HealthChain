@@ -215,6 +215,7 @@
 
 .card.card-healthtech .card-icon svg path {
   fill: var(--persona-healthtech);
+  stroke: var(--persona-healthtech);
 }
 
 .card.card-genai {
@@ -224,6 +225,7 @@
 
 .card.card-genai .card-icon svg path {
   fill: var(--persona-genai);
+  stroke: var(--persona-genai);
 }
 
 .card.card-ml {
@@ -233,6 +235,7 @@
 
 .card.card-ml .card-icon svg path {
   fill: var(--persona-ml);
+  stroke: var(--persona-ml);
 }
 
 /* Featured Card (Primary Persona) */

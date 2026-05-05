@@ -25,7 +25,7 @@ By the end of this tutorial, you'll have a working CDS Hooks service that integr
 
 We'll build a Pipeline that processes clinical text from an EHR and a Service that wraps around it to return Clinical Alert Cards.
 
-```
+```text
 ┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
 │   EHR System    │─────>│  Your CDS       │─────>│  Clinical       │
 │   (Epic, etc.)  │      │  Service        │      │  Alert Cards    │

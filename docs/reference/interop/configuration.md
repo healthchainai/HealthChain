@@ -100,7 +100,7 @@ CDA configurations primarily concern the extraction and rendering processes on t
 
 Configs are loaded from the `configs/interop/cda/` directory and loaded in the `ConfigManager` with the folder and filenames as keys. e.g. given the following directory structure:
 
-```
+```text
 configs/
   interop/
     cda/

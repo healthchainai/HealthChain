@@ -40,7 +40,7 @@ healthchain seed medplum ./cookbook/data/qa_patient.json
 
 Note the printed patient ID — you'll use it when testing the `/qa` endpoint:
 
-```
+```text
 ✓ DEMO_PATIENT_ID=<id>
 ```
 

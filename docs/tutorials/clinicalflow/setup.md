@@ -65,7 +65,7 @@ Run it:
 
 You should see the following output:
 
-```
+```text
 Created document with 38 characters
 ```
 
