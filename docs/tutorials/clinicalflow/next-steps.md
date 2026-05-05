@@ -12,13 +12,11 @@ In this tutorial, you:
 - Created a CDS Hooks gateway service
 - Tested with the sandbox and synthetic data
 
-
 ## What to Do Next
 
 ### Improve the NLP
 
 The NLP was hard coded in our example but HealthChain has simple pipeline integrations for spacy, huggingface and Langchain. Try to replace keyword matching with trained models.
-
 
 ### Add FHIR Output
 
@@ -34,8 +32,7 @@ pipeline.add_node(FHIRProblemListExtractor())
 
 ## Learn More
 
-Explore HealthChain's [cookbook](../../../cookbook/index.md) documentation, we have a variety of cookbooks that will let you build upon the basics from this tutorial.
-
+Explore HealthChain's [cookbook](../../cookbook/index.md) documentation, we have a variety of cookbooks that will let you build upon the basics from this tutorial.
 
 ## Congratulations!
 

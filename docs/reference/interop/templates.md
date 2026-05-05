@@ -6,7 +6,7 @@ The HealthChain interoperability module uses a template system based on [**Liqui
 
 Templates are stored in the `configs/templates` directory by default. The directory structure follows a convention based on format and resource type:
 
-```
+```text
 templates/
 ├── cda_fhir/
 │   ├── document.liquid

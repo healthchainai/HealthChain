@@ -254,7 +254,7 @@ healthchain seed medplum ./cookbook/data/mimic_demo_patients/
 
 The command accepts any FHIR transaction Bundle, resource array, or single resource. It prints the server-assigned Patient ID(s) after upload:
 
-```
+```text
 ◆ Seeding Medplum  qa_patient.json
 
   ✓ DEMO_PATIENT_ID=abc123

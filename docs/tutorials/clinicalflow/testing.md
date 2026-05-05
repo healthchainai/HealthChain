@@ -160,7 +160,7 @@ Then in another terminal, run the test:
 
 Expected output:
 
-```
+```text
 Cards returned: 4
   [INFO] Condition detected: Hypertension
   [INFO] Condition detected: Diabetes mellitus

@@ -28,15 +28,6 @@ jobs:
         uvx --from=toml-cli toml set --toml-path=pyproject.toml project.version "${VERSION#v}"
         sed -i "s/^version: .*/version: \"${VERSION#v}\"/" CITATION.cff
         sed -i "s/^date-released: .*/date-released: \"$(date -u +%Y-%m-%d)\"/" CITATION.cff
-    - name: Commit updated CITATION.cff
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add CITATION.cff
-        git diff --cached --quiet || git commit -m "chore: update CITATION.cff for ${VERSION#v}"
-        git push origin HEAD:main
-      env:
-        VERSION: ${{ github.ref_name }}
     - name: Build a binary wheel and a source tarball
       run: uv build
     - name: Store the distribution packages

@@ -10,7 +10,7 @@ The HealthChain Interop Engine provides a robust and customizable framework for 
 
 The interoperability module is built around a central `InteropEngine` that coordinates format conversion through specialized parsers and generators:
 
-```
+```text
                     ┌───────────────┐
                     │ InteropEngine │
                     └───────┬───────┘

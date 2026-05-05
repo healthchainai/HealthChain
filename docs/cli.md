@@ -29,7 +29,7 @@ healthchain new my-app -t fhir-gateway        # shorthand
 
 Creates:
 
-```
+```text
 my-app/
 ├── app.py              # application entry point (populated for cds-hooks / fhir-gateway)
 ├── healthchain.yaml    # project configuration
@@ -77,7 +77,7 @@ healthchain status
 
 Example output:
 
-```
+```text
 HealthChain — my-sepsis-app v1.0.0
 -----------------------------------
 
@@ -145,7 +145,7 @@ healthchain sandbox run \
 
 Example output:
 
-```
+```text
 Sandbox — http://localhost:8000/cds/cds-services/my-service
 workflow: patient-view
 Generating 3 synthetic request(s)...
@@ -183,7 +183,7 @@ healthchain seed medplum ./cookbook/data/mimic_demo_patients/
 
 Example output:
 
-```
+```text
 ◆ Seeding Medplum  qa_patient.json
 
   ✓ DEMO_PATIENT_ID=abc123
@@ -191,7 +191,7 @@ Example output:
 
 For a directory:
 
-```
+```text
 ◆ Seeding Medplum  mimic_demo_patients/
 
   ✓ high_risk_bundle      →  PATIENT_ID=702e11e8-...
