@@ -1,10 +1,10 @@
 # Core Concepts
 
-HealthChain has three main components that work together to connect your AI applications to healthcare systems:
+HealthChain has two core components and one optional module:
 
-- **Gateway:** Connect to multiple healthcare systems with a single API.
-- **Pipelines:** Easily build data processing pipelines for both clinical text and [FHIR](https://www.hl7.org/fhir/) data.
-- **InteropEngine:** Seamlessly convert between data formats like [FHIR](https://www.hl7.org/fhir/), [HL7 CDA](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=7), and [HL7v2](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=185).
+- **Gateway:** Connect to multiple FHIR sources and healthcare systems with a single API.
+- **Pipelines:** Build data processing pipelines for healthcare NLP and ML tasks with automatic FHIR output.
+- **InteropEngine** *(optional)*: Convert between healthcare data formats like [FHIR](https://www.hl7.org/fhir/) and [HL7 CDA](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=7) for legacy system bridging.
 
 
 ## Gateway
@@ -143,7 +143,7 @@ output = pipeline.process_request(cda_request)
 
 ## Interoperability
 
-The HealthChain Interoperability module provides tools for converting between different healthcare data formats, including FHIR, CDA, and HL7v2 messages.
+The HealthChain Interoperability module provides tools for converting between healthcare data formats, including FHIR and CDA.
 
 [(Full Documentation on Interoperability Engine)](./interop/interop.md)
 

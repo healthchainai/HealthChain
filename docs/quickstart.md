@@ -3,16 +3,16 @@
 After [installing HealthChain](installation.md), get up to speed quickly with the core components before diving further into the [full documentation](reference/index.md)!
 HealthChain has three main components:
 
-- **Gateway:** Connect to multiple healthcare systems with a single API.
-- **Pipelines:** Easily build data processing pipelines for both clinical text and [FHIR](https://www.hl7.org/fhir/) data.
-- **InteropEngine:** Seamlessly convert between data formats like [FHIR](https://www.hl7.org/fhir/), [HL7 CDA](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=7), and [HL7v2](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=185).
+- **Gateway:** Connect to multiple FHIR sources and healthcare systems with a single API.
+- **Pipelines:** Build data processing pipelines for healthcare NLP and ML tasks with automatic FHIR output.
+- **InteropEngine:** Convert between healthcare data formats like [FHIR](https://www.hl7.org/fhir/) and [HL7 CDA](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=7).
 
 
 ## Core Components 🧩
 
 ### Gateway 🔌
 
-The [**HealthChainAPI**](./reference/gateway/api.md) provides a unified interface for connecting your AI application and models to multiple healthcare systems through a single API. It automatically handles [FHIR API](https://www.hl7.org/fhir/http.html), [CDS Hooks](https://cds-hooks.org/), and [SOAP/CDA protocols](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=7) with [OAuth2 authentication](https://oauth.net/2/).
+The [**HealthChainAPI**](./reference/gateway/api.md) provides a unified interface for connecting your AI application and models to multiple FHIR sources and healthcare systems with [OAuth2 authentication](https://oauth.net/2/).
 
 [(Full Documentation on Gateway)](./reference/gateway/gateway.md)
 
@@ -153,7 +153,7 @@ output = pipeline.process_request(cda_request)
 
 ### Interoperability 🔄
 
-The HealthChain Interoperability module provides tools for converting between different healthcare data formats, including FHIR, CDA, and HL7v2 messages.
+The HealthChain Interoperability module provides tools for converting between healthcare data formats, including FHIR and CDA.
 
 [(Full Documentation on Interoperability Engine)](./reference/interop/interop.md)
 
