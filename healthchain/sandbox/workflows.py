@@ -40,7 +40,7 @@ def validate_workflow(use_case: UseCaseMapping):
                 workflow = kwargs.get("workflow")
             else:
                 for arg in args:
-                    if type(arg) == Workflow:
+                    if isinstance(arg, Workflow):
                         workflow = arg
             if not is_valid_workflow(use_case, workflow):
                 raise ValueError(f"Invalid workflow {workflow} for UseCase {use_case}")
