@@ -14,9 +14,9 @@ Scaffold a new project directory.
 
 ```bash
 healthchain new my-app                        # empty stub
-healthchain new my-app --type cds-hooks       # working CDS Hooks service
 healthchain new my-app --type fhir-gateway    # working FHIR Gateway service
-healthchain new my-app -t cds-hooks           # shorthand
+healthchain new my-app --type cds-hooks       # working CDS Hooks service
+healthchain new my-app -t fhir-gateway        # shorthand
 ```
 
 **`--type` / `-t`** options:
@@ -24,8 +24,8 @@ healthchain new my-app -t cds-hooks           # shorthand
 | Type | Description |
 |------|-------------|
 | *(default)* | Empty `app.py` stub — choose your own starting point |
-| `cds-hooks` | Working CDS Hooks service with a `patient-view` hook |
 | `fhir-gateway` | Working FHIR Gateway that aggregates conditions from multiple EHR sources |
+| `cds-hooks` | Working CDS Hooks service with a `patient-view` hook |
 
 Creates:
 

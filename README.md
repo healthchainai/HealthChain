@@ -24,7 +24,7 @@
 
 <div align="center">
 
-HealthChain is an open-source Python SDK for connecting AI models to live clinical systems. The models aren't the bottleneck — the integration is. Get **built-in FHIR support**, **real-time EHR connectivity**, and **healthcare deployment tooling** without building it from scratch.
+HealthChain is an open-source Python SDK for connecting AI models to live clinical systems. The models aren't the bottleneck — the integration is. Get **built-in FHIR support**, **real-time EHR connectivity**, and **production-ready deployment tooling** without building it from scratch.
 
 </div>
 
@@ -55,7 +55,7 @@ See the [CLI reference](https://healthchainai.github.io/HealthChain/cli/) for al
 
 ## Core Features
 
-The quickest way for AI developers and researchers connecting models to live healthcare systems, without building everything from scratch.
+The quickest way for AI developers and researchers to ship healthcare AI — everything you need out of the box, built to scale with you.
 
 <table>
   <tr>
@@ -110,9 +110,9 @@ The quickest way for AI developers and researchers connecting models to live hea
 
 ## Why HealthChain?
 
-**Every serious healthcare AI project builds the same integration infrastructure from scratch.** Whether you're deploying a logistic regression or a 70B parameter model, the wall between a trained model and a live clinical system is the same: real FHIR APIs, multi-site deployments, auditable governance. No off-the-shelf solution exists, and engineers who understand both AI and healthcare protocols are scarce and hard to retain.
+Every serious healthcare AI project builds the same integration infrastructure from scratch. Whether you're deploying a logistic regression or a 70B parameter model, the wall between a trained model and a live clinical system is the same: real FHIR APIs, multi-site deployments, auditable governance. No off-the-shelf solution exists, and engineers who understand both AI and healthcare protocols are scarce and hard to retain.
 
-HealthChain is the shared infrastructure layer that teams shouldn't have to build themselves. In healthcare, getting the infrastructure wrong has real consequences — broken data pipelines, missing audit trails, misconfigured security. HealthChain handles that complexity so developers can build with confidence and focus on what actually matters: the model and the clinical outcome.
+HealthChain handles that complexity so you can focus on what actually matters: the model and the patient.
 
 - **Optimized for real-time** - Connect to live FHIR APIs and integration points instead of stale data exports
 - **Automatic validation** - Type-safe FHIR models prevent broken healthcare data
@@ -189,22 +189,6 @@ print(f"Entities: {[(ent.text, ent.label_) for ent in spacy_doc.ents]}")
 print(f"FHIR conditions: {result.fhir.problem_list}")  # Auto-converted to FHIR Bundle
 ```
 
-### Testing with Sandbox [[Docs](https://healthchainai.github.io/HealthChain/reference/utilities/sandbox)]
-
-```python
-from healthchain.gateway import HealthChainAPI, CDSHooksService
-
-cds = CDSHooksService()
-app = HealthChainAPI(title="Discharge Summarizer")
-app.register_service(cds, path="/cds")
-
-# Server lifecycle handled automatically
-with app.sandbox("discharge-summary") as client:
-    client.load_from_path("./data/patients", pattern="*_patient.json")
-    responses = client.send_requests()
-    client.save_results("./output/")
-```
-
 ## 🛣️ What we're building towards
 
 - [ ] 🔒 **Production security and compliance** — API authentication, audit logging, and configurable security for NHS/HIPAA deployments
@@ -215,7 +199,7 @@ with app.sandbox("discharge-summary") as client:
 
 ## 🤝 Contributing
 
-HealthChain is built by and for the next generation of healthcare developers — researchers moving models from retrospective data into live systems, clinician-engineers frustrated by the integration gap, and AI developers who don't want to spend months learning FHIR before they can ship anything. The best contributions come from people who have hit a real problem and have something specific to say about it.
+HealthChain is built by and for the next generation of healthcare developers — researchers moving models from retrospective data into live systems, AI developers who don't want to spend months learning FHIR before they can ship anything. The best contributions come from people who have hit a real problem and have something specific to say about it.
 
 **Get started:**
 

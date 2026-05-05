@@ -7,7 +7,7 @@ hide:
 
 # Welcome to HealthChain
 
-HealthChain is an open-source Python toolkit that streamlines productionizing healthcare AI. Built for AI/ML practitioners, it simplifies the complexity of real-time EHR integrations by providing seamless FHIR integration, unified data pipelines, and production-ready deployment.
+HealthChain is the shared infrastructure layer for healthcare AI: built-in FHIR support, real-time EHR connectivity, and production-ready deployment tooling. Stop building integration from scratch and focus on what actually matters: the model and the patient.
 
 [ :fontawesome-brands-discord: Join our Discord](https://discord.gg/UQC6uAepUz){ .md-button .md-button--primary }
 &nbsp;&nbsp;&nbsp;&nbsp;
@@ -17,29 +17,29 @@ HealthChain is an open-source Python toolkit that streamlines productionizing he
 
 <div class="grid cards" markdown>
 
--   :material-tools:{ .lg .middle } __FHIR-native Pipelines__
+-   :material-console:{ .lg .middle } __CLI & Deployment__
 
     ---
 
-    Create custom pipelines or use pre-built ones for healthcare NLP and ML tasks with automatic FHIR output
+    Scaffold, configure, and serve healthcare AI apps with `healthchain new`, `healthchain.yaml`, and `healthchain serve`
 
-    [:octicons-arrow-right-24: Pipeline](reference/pipeline/pipeline.md)
+    [:octicons-arrow-right-24: CLI](cli.md)
 
 -   :material-connection:{ .lg .middle } __Multi-EHR Gateway__
 
     ---
 
-    Connect to multiple healthcare systems with unified API supporting FHIR, CDS Hooks, and SOAP/CDA protocols
+    Connect to multiple FHIR sources and healthcare systems with a unified API
 
     [:octicons-arrow-right-24: Gateway](reference/gateway/gateway.md)
 
--   :material-database:{ .lg .middle } __Healthcare Data Conversion__
+-   :material-robot:{ .lg .middle } __LLM & AI Model Integrations__
 
     ---
 
-    Convert between FHIR, CDA, and HL7v2 formats using configuration-driven InteropEngine
+    Wire up any model — LangChain, HuggingFace, spaCy — to FHIR data pipelines with automatic output conversion
 
-    [:octicons-arrow-right-24: Interoperability](reference/interop/interop.md)
+    [:octicons-arrow-right-24: Pipeline](reference/pipeline/pipeline.md)
 
 -   :material-fire:{ .lg .middle } __Developer Utilities__
 
@@ -53,7 +53,7 @@ HealthChain is an open-source Python toolkit that streamlines productionizing he
 
 ## Getting Started with Healthcare AI
 
-HealthChain is production-ready healthcare AI infrastructure: built-in FHIR support, real-time EHR connectivity, and deployment tooling for healthcare AI/ML systems. Skip months of custom integration work. Whether you're building clinical decision support tools, processing medical documents, or creating multi-system integrations, these docs will guide you through:
+Whether you're processing medical documents, deploying models as FHIR APIs, or connecting to multiple EHRs, these docs will guide you through:
 
 - **🔧 Core concepts** - Understand FHIR resources, pipelines, and gateway patterns
 - **📚 Real examples** - Step-by-step tutorials for common healthcare AI use cases
@@ -64,18 +64,15 @@ HealthChain is production-ready healthcare AI infrastructure: built-in FHIR supp
 
 |   | Use Case                              | Description                                                                 |
 |---|---------------------------------------|-----------------------------------------------------------------------------|
-| 🚨 | **CDS alerts for discharge summaries** | Generate clinical recommendations directly in Epic workflows                |
-| 📋 | **Automatic medical coding**          | Extract ICD-10 or SNOMED-CT codes from physician notes with confidence scores|
 | 🔗 | **Multi-EHR patient aggregation**     | Combine patient records from Epic, Cerner, and specialty systems            |
 | 🤖 | **ML model deployment**               | Serve your trained healthcare models as FHIR-compliant APIs                 |
-| 🔄 | **Legacy document conversion**        | Transform CDA documents to modern FHIR resources                            |
+| 📋 | **Automatic medical coding**          | Extract ICD-10 or SNOMED-CT codes from physician notes with confidence scores|
+| 🚨 | **CDS alerts for discharge summaries** | Generate clinical recommendations directly in Epic workflows                |
 
 **New to healthcare AI?** Start with our [Quickstart Guide](quickstart.md) to build your first medical NLP pipeline in under 10 minutes.
 
-**Ready to integrate with EHRs?** Jump to our [Cookbook](cookbook/index.md) for complete examples including CDS Hooks and FHIR integration.
+**Ready to integrate with EHRs?** Jump to our [Cookbook](cookbook/index.md) for complete examples.
 
 ---
 
-HealthChain is made by a small team with experience in software engineering, machine learning, and healthcare NLP. We understand that good data science is about more than just building models, and that good engineering is about more than just building systems. This rings especially true in healthcare, where people, processes, and technology all play a role in making an impact.
-
-For inquiries and collaborations, please get [in touch](mailto:jenniferjiangkells@gmail.com)!
+Built by developers who have hit the same integration wall. For inquiries and collaborations, [get in touch](mailto:jenniferjiangkells@gmail.com).

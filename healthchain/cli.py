@@ -250,11 +250,6 @@ service:
   type: {service_type}
   port: 8000
 
-# Data paths used by your app and sandbox
-data:
-  patients_dir: ./data
-  output_dir: ./output
-
 # Security controls
 security:
   auth: none              # none | api-key (planned) | smart-on-fhir (planned)
@@ -428,12 +423,10 @@ def sandbox_run(
     no_save: bool,
 ):
     """Fire test requests at a running HealthChain service."""
-    from healthchain.config.appconfig import AppConfig
     from healthchain.sandbox import SandboxClient
 
-    config = AppConfig.load()
-    resolved_output = output or (config.data.output_dir if config else "./output")
-    resolved_from_path = from_path or (config.data.patients_dir if config else None)
+    resolved_output = output or "./output"
+    resolved_from_path = from_path or None
 
     print(f"\n{_BOLD}{_CYAN}◆ Sandbox{_RST}  {_DIM}{url}{_RST}")
     print(f"  {_CYAN}workflow  {_RST}{workflow}")

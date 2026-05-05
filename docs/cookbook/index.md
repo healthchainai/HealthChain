@@ -108,19 +108,6 @@ Hands-on, production-ready examples for building healthcare AI applications with
   </div>
 </a>
 
-<a href="format_conversion/" class="cookbook-card" data-tags="interop intermediate zero-setup">
-  <div class="cookbook-card-icon">🔄</div>
-  <div class="cookbook-card-title">Convert Between Healthcare Data Formats</div>
-  <div class="cookbook-card-description">
-    Convert between CDA, HL7v2, and FHIR formats using the interoperability engine. Handle bidirectional conversion for integrating legacy systems with modern FHIR applications.
-  </div>
-  <div class="cookbook-tags">
-    <span class="tag tag-intermediate">Intermediate</span>
-    <span class="tag tag-interop">Interop</span>
-    <span class="tag tag-zerosetup">Zero Setup</span>
-  </div>
-</a>
-
 <div class="no-results hidden" id="noResults">
   No cookbooks match the selected filters. <a href="#" onclick="clearAllFilters(); return false;">Clear filters</a>
 </div>

@@ -75,11 +75,6 @@ class ServiceConfig(BaseModel):
     port: int = 8000
 
 
-class DataConfig(BaseModel):
-    patients_dir: str = "./data"
-    output_dir: str = "./output"
-
-
 class TLSConfig(BaseModel):
     enabled: bool = False
     cert_path: str = "./certs/server.crt"
@@ -131,7 +126,6 @@ class AppConfig(BaseModel):
     name: str = "my-healthchain-app"
     version: str = "1.0.0"
     service: ServiceConfig = ServiceConfig()
-    data: DataConfig = DataConfig()
     security: SecurityConfig = SecurityConfig()
     compliance: ComplianceConfig = ComplianceConfig()
     eval: EvalConfig = EvalConfig()
