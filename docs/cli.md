@@ -90,7 +90,7 @@ Site
   name         General Hospital NHS Trust
 
 Security
-  auth         smart-on-fhir
+  auth         api-key
   TLS          enabled
   origins      https://fhir.epic.com
 

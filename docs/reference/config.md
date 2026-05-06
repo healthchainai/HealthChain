@@ -76,14 +76,14 @@ site:
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `auth` | string | `none` | Authentication method — `none`, `api-key` (planned), or `smart-on-fhir` (planned) |
+| `auth` | string | `none` | Authentication method — `none` or `api-key` |
 | `tls.enabled` | bool | `false` | Enable TLS — passes cert/key to uvicorn automatically |
 | `tls.cert_path` | path | `./certs/server.crt` | Path to TLS certificate |
 | `tls.key_path` | path | `./certs/server.key` | Path to TLS private key |
 | `allowed_origins` | list | `["*"]` | CORS allowed origins — passed directly to FastAPI's CORS middleware |
 
-!!! note "Authentication is planned, not yet active"
-    Setting `auth: api-key` or `auth: smart-on-fhir` is accepted by the config but not yet enforced at runtime. Authentication middleware is on the roadmap. `allowed_origins` is functional — it controls which origins are permitted by the CORS middleware.
+!!! note "API key authentication"
+    Setting `auth: api-key` enforces authentication on all routes except `/health`, `/docs`, `/redoc`, and `/openapi.json`. Set `HEALTHCHAIN_API_KEY` in your `.env` file — the service logs a warning at startup if the env var is missing. `allowed_origins` controls which origins are permitted by the CORS middleware.
 
 ---
 
