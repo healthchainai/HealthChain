@@ -19,7 +19,7 @@ _DOCKERFILE = """\
 #
 # Usage:
 #   Build:  docker build -t my-healthcare-app .
-#   Run:    docker run -p 8000:8000 --env-file .env my-healthcare-app
+#   Run:    docker run -p 8000:8000 --env-file .env -v ./logs:/app/logs my-healthcare-app
 #
 # Required environment variables (set in .env or pass via -e):
 #   APP_MODULE   Python module path to your app, e.g. "myapp:app" (default: "app:app")
@@ -61,6 +61,9 @@ RUN useradd -m appuser && chown -R appuser /app
 USER appuser
 
 EXPOSE $PORT
+
+# Mount this path to persist audit logs outside the container
+VOLUME ["/app/logs"]
 
 CMD uvicorn $APP_MODULE --host 0.0.0.0 --port $PORT
 """
@@ -262,18 +265,7 @@ security:
 
 # Compliance settings
 compliance:
-  hipaa: false            # set true to activate audit logging
   audit_log: ./logs/audit.jsonl
-
-# Evaluation and model monitoring
-eval:
-  enabled: false
-  provider: mlflow        # mlflow | langfuse | none
-  tracking_uri: ./mlruns
-  track:
-    - model_inference
-    - cds_card_returned
-    - card_feedback
 
 # Site / deployment metadata
 site:
@@ -600,20 +592,10 @@ def status():
     print(f"{_key('origins     ')}{_DIM}{origins}{_RST}")
 
     print(_section("Compliance"))
-    hipaa_val = (
-        _val_on("enabled") if config.compliance.hipaa else f"{_DIM}disabled{_RST}"
-    )
-    print(f"{_key('HIPAA       ')}{hipaa_val}")
-    if config.compliance.hipaa:
+    if config.compliance.audit_log:
         print(f"{_key('audit log   ')}{_BOLD}{config.compliance.audit_log}{_RST}")
-
-    print(_section("Eval"))
-    if config.eval.enabled:
-        print(f"{_key('provider    ')}{config.eval.provider}")
-        print(f"{_key('tracking    ')}{_BOLD}{config.eval.tracking_uri}{_RST}")
-        print(f"{_key('events      ')}{_DIM}{', '.join(config.eval.track)}{_RST}")
     else:
-        print(f"  {_DIM}disabled{_RST}")
+        print(f"{_key('audit log   ')}{_DIM}disabled{_RST}")
 
     if config.sources:
         print(_section("Sources"))

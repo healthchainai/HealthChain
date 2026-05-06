@@ -42,8 +42,7 @@ def test_appconfig_missing_fields_use_defaults(tmp_path):
     assert config.service.type == "cds-hooks"
     assert config.security.auth == "none"
     assert config.security.tls.enabled is False
-    assert config.compliance.hipaa is False
-    assert config.eval.enabled is False
+    assert config.compliance.audit_log is None
     assert config.site.environment == "development"
 
 
@@ -182,24 +181,3 @@ def test_appconfig_sources_defaults_to_empty(tmp_path):
     config = AppConfig.from_yaml(tmp_path / "healthchain.yaml")
 
     assert config.sources == {}
-
-
-def test_appconfig_eval_track_events_parsed(tmp_path):
-    """AppConfig parses eval.track list correctly."""
-    config_file = tmp_path / "healthchain.yaml"
-    config_file.write_text(
-        """
-eval:
-  enabled: true
-  provider: langfuse
-  track:
-    - model_inference
-    - card_feedback
-"""
-    )
-    config = AppConfig.from_yaml(config_file)
-
-    assert config.eval.enabled is True
-    assert config.eval.provider == "langfuse"
-    assert "model_inference" in config.eval.track
-    assert "card_feedback" in config.eval.track

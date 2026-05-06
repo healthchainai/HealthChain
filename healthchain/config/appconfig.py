@@ -96,15 +96,7 @@ class SecurityConfig(BaseModel):
 
 
 class ComplianceConfig(BaseModel):
-    hipaa: bool = False
-    audit_log: str = "./logs/audit.jsonl"
-
-
-class EvalConfig(BaseModel):
-    enabled: bool = False
-    provider: str = "mlflow"
-    tracking_uri: str = "./mlruns"
-    track: List[str] = ["model_inference", "cds_card_returned", "card_feedback"]
+    audit_log: Optional[str] = None
 
 
 class SiteConfig(BaseModel):
@@ -128,7 +120,6 @@ class AppConfig(BaseModel):
     service: ServiceConfig = ServiceConfig()
     security: SecurityConfig = SecurityConfig()
     compliance: ComplianceConfig = ComplianceConfig()
-    eval: EvalConfig = EvalConfig()
     site: SiteConfig = SiteConfig()
     sources: Dict[str, SourceConfig] = {}
     llm: Optional[LLMConfig] = None

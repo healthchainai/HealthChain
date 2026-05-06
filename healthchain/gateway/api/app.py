@@ -89,12 +89,6 @@ def _val_auth(auth: str) -> str:
     return f"\033[38;2;0;255;135m{auth}\033[0m"
 
 
-def _val_eval(enabled: bool, provider: str) -> str:
-    if enabled:
-        return f"\033[38;2;0;255;135m✓ {provider}\033[0m"
-    return "\033[2m✗ disabled\033[0m"
-
-
 def _status_row(key: str, value: str) -> str:
     return f"\033[1m\033[38;2;0;255;135m{key}\033[0m  {value}"
 
@@ -133,9 +127,7 @@ def _print_startup_banner(
     site = config.site.name if config else None
     auth = config.security.auth if config else "none"
     tls = config.security.tls.enabled if config else False
-    hipaa = config.compliance.hipaa if config else False
-    eval_enabled = config.eval.enabled if config else False
-    eval_provider = config.eval.provider if config else "mlflow"
+    audit_log = config.compliance.audit_log if config else None
     # Check registered gateways first, then fall back to env var presence
     fhir_configured = any(
         hasattr(gw, "connection_manager")
@@ -163,8 +155,7 @@ def _print_startup_banner(
             else "\033[38;2;255;200;50m✗ not set\033[0m",
         ),
         _status_row("tls:        ", _val_bool(tls)),
-        _status_row("hipaa:      ", _val_bool(hipaa)),
-        _status_row("eval:       ", _val_eval(eval_enabled, eval_provider)),
+        _status_row("audit log:  ", _val_bool(bool(audit_log))),
         "",
         _status_row("config:     ", f"\033[1m{config_path or '(none)'}\033[0m"),
         _status_row("docs:       ", f"\033[1mhttp://localhost:{port}{docs_url}\033[0m"),
@@ -299,10 +290,11 @@ class HealthChainAPI(FastAPI):
             self.event_dispatcher.init_app(self)
 
         # Setup middleware
-        if enable_cors:
-            from healthchain.config.appconfig import AppConfig
+        from healthchain.config.appconfig import AppConfig
 
-            _config = AppConfig.load()
+        _config = AppConfig.load()
+
+        if enable_cors:
             origins = _config.security.allowed_origins if _config else ["*"]
             self.add_middleware(
                 CORSMiddleware,
@@ -310,6 +302,13 @@ class HealthChainAPI(FastAPI):
                 allow_credentials=True,
                 allow_methods=["*"],
                 allow_headers=["*"],
+            )
+
+        if _config and _config.compliance.audit_log:
+            from healthchain.gateway.api.middleware import AuditLogMiddleware
+
+            self.add_middleware(
+                AuditLogMiddleware, audit_log_path=_config.compliance.audit_log
             )
 
         # Add global exception handler
