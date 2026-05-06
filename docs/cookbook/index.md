@@ -179,4 +179,4 @@ app = HealthChainAPI(title="My App")
 Credentials (API keys, client secrets) always stay in `.env` — never in `healthchain.yaml`.
 
 !!! tip "Configuration reference"
-    See the [configuration reference](../reference/config.md) for all available settings — security, compliance, eval, and more.
+    See the [configuration reference](../reference/config.md) for all available settings — security, compliance, and more.

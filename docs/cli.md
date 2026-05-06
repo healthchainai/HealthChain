@@ -95,13 +95,7 @@ Security
   origins      https://fhir.epic.com
 
 Compliance
-  HIPAA        enabled
   audit log    ./logs/audit.jsonl
-
-Eval
-  provider     mlflow
-  tracking     ./mlruns
-  events       model_inference, cds_card_returned, card_feedback
 ```
 
 ---
