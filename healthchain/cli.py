@@ -97,6 +97,9 @@ _ENV_EXAMPLE_CDS_HOOKS = """\
 
 # For JWT assertion flow (e.g. Epic SMART on FHIR)
 # CLIENT_SECRET_PATH=/path/to/private_key.pem
+
+# API key authentication (set security.auth: api-key in healthchain.yaml to enforce)
+# HEALTHCHAIN_API_KEY=your-key-here
 """
 
 _ENV_EXAMPLE_FHIR_GATEWAY = """\
@@ -113,6 +116,9 @@ EPIC_CLIENT_SECRET=
 CERNER_BASE_URL=https://fhir-open.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d
 # Cerner open sandbox requires no credentials
 
+# API key authentication (set security.auth: api-key in healthchain.yaml to enforce)
+# HEALTHCHAIN_API_KEY=your-key-here
+
 # See docs: https://healthchainai.github.io/HealthChain/reference/gateway/fhir_gateway/
 """
 
@@ -124,6 +130,9 @@ CLIENT_SECRET=
 
 # For JWT assertion flow (e.g. Epic SMART on FHIR)
 # CLIENT_SECRET_PATH=/path/to/private_key.pem
+
+# API key authentication (set security.auth: api-key in healthchain.yaml to enforce)
+# HEALTHCHAIN_API_KEY=your-key-here
 """
 
 _REQUIREMENTS = "healthchain\n"

@@ -89,7 +89,7 @@ class SecurityConfig(BaseModel):
     @field_validator("auth")
     @classmethod
     def validate_auth(cls, v: str) -> str:
-        allowed = {"none", "api-key", "smart-on-fhir"}
+        allowed = {"none", "api-key"}
         if v not in allowed:
             raise ValueError(f"auth must be one of: {', '.join(sorted(allowed))}")
         return v
