@@ -10,12 +10,8 @@ service:
   type: cds-hooks
   port: 8000
 
-data:
-  patients_dir: ./data
-  output_dir: ./output
-
 security:
-  auth: none
+  auth: none              # none | api-key
   tls:
     enabled: false
     cert_path: ./certs/server.crt
@@ -24,17 +20,7 @@ security:
     - "*"
 
 compliance:
-  hipaa: false
   audit_log: ./logs/audit.jsonl
-
-eval:
-  enabled: false
-  provider: mlflow
-  tracking_uri: ./mlruns
-  track:
-    - model_inference
-    - cds_card_returned
-    - card_feedback
 
 site:
   name: ""
@@ -63,27 +49,18 @@ site:
 
 ---
 
-## `data`
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `patients_dir` | path | `./data` | Directory for patient data files |
-| `output_dir` | path | `./output` | Directory for sandbox results |
-
----
-
 ## `security`
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `auth` | string | `none` | Authentication method — `none`, `api-key` (planned), or `smart-on-fhir` (planned) |
+| `auth` | string | `none` | Authentication method — `none` or `api-key` |
 | `tls.enabled` | bool | `false` | Enable TLS — passes cert/key to uvicorn automatically |
 | `tls.cert_path` | path | `./certs/server.crt` | Path to TLS certificate |
 | `tls.key_path` | path | `./certs/server.key` | Path to TLS private key |
 | `allowed_origins` | list | `["*"]` | CORS allowed origins — passed directly to FastAPI's CORS middleware |
 
-!!! note "Authentication is planned, not yet active"
-    Setting `auth: api-key` or `auth: smart-on-fhir` is accepted by the config but not yet enforced at runtime. Authentication middleware is on the roadmap. `allowed_origins` is functional — it controls which origins are permitted by the CORS middleware.
+!!! note "API key authentication"
+    Setting `auth: api-key` enforces authentication on all routes except `/health`, `/docs`, `/redoc`, and `/openapi.json`. Set `HEALTHCHAIN_API_KEY` in your `.env` file — the service logs a warning at startup if the env var is missing. `allowed_origins` controls which origins are permitted by the CORS middleware.
 
 ---
 
@@ -91,33 +68,10 @@ site:
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `hipaa` | bool | `false` | Mark service as HIPAA-scoped — displayed in startup banner and `healthchain status` |
-| `audit_log` | path | `./logs/audit.jsonl` | Destination for audit log events (planned) |
+| `audit_log` | path | `null` | Path to write audit log entries — one JSON line per request |
 
-!!! note "Audit logging is planned, not yet active"
-    Setting `hipaa: true` currently marks the service as HIPAA-scoped in the CLI and startup banner. Structured audit logging (PHI access events written to `audit_log`) is on the roadmap but not yet implemented.
-
----
-
-## `eval`
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `enabled` | bool | `false` | Enable model evaluation tracking |
-| `provider` | string | `mlflow` | Eval backend — `mlflow`, `langfuse`, or `none` |
-| `tracking_uri` | path | `./mlruns` | MLFlow tracking directory |
-| `track` | list | see below | Events to capture |
-
-Default tracked events:
-
-- `model_inference` — input features and prediction for each request
-- `cds_card_returned` — which card was shown to the clinician
-- `card_feedback` — whether the clinician accepted, overrode, or ignored the card
-
-The `card_feedback` event closes the evaluation loop — it provides implicit ground truth for model performance regardless of whether your model is an ML classifier, NLP pipeline, or LLM.
-
-!!! note
-    MLFlow integration is on the roadmap. Setting `eval.enabled: true` prepares your project for when it ships.
+!!! note "Audit logging"
+    When `audit_log` is set, every request is appended as a JSONL entry containing `timestamp`, `method`, `path`, `status_code`, `duration_ms`, `request_id`, and `user`. The log directory is created automatically if missing. When `api-key` auth is also enabled, `user` records the authenticated identity.
 
 ---
 

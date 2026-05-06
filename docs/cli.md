@@ -90,18 +90,12 @@ Site
   name         General Hospital NHS Trust
 
 Security
-  auth         smart-on-fhir
+  auth         api-key
   TLS          enabled
   origins      https://fhir.epic.com
 
 Compliance
-  HIPAA        enabled
   audit log    ./logs/audit.jsonl
-
-Eval
-  provider     mlflow
-  tracking     ./mlruns
-  events       model_inference, cds_card_returned, card_feedback
 ```
 
 ---

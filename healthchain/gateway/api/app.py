@@ -311,6 +311,11 @@ class HealthChainAPI(FastAPI):
                 AuditLogMiddleware, audit_log_path=_config.compliance.audit_log
             )
 
+        if _config and _config.security.auth == "api-key":
+            from healthchain.gateway.api.middleware import APIKeyMiddleware
+
+            self.add_middleware(APIKeyMiddleware)
+
         # Add global exception handler
         self.add_exception_handler(Exception, self._exception_handler)
 

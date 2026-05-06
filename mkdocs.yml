@@ -34,6 +34,7 @@ nav:
   - Docs:
       - Welcome: reference/index.md
       - Configuration: reference/config.md
+      - Security & Compliance: security.md
       - Gateway:
         - Overview: reference/gateway/gateway.md
         - HealthChainAPI: reference/gateway/api.md
