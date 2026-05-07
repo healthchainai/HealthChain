@@ -8,7 +8,7 @@ import json
 import logging
 import random
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 from fhir.resources.R4B.bundle import Bundle
 
@@ -154,32 +154,13 @@ class SyntheaFHIRPatientLoader(DatasetLoader):
         for resource_type, resources in resources_by_type.items():
             bundles[resource_type.lower()] = Bundle(
                 type="collection",
-                entry=[{"resource": self._normalize_resource(r)} for r in resources],
+                entry=[{"resource": resource} for resource in resources],
             )
             log.info(
                 f"Loaded {len(resources)} {resource_type} resource(s) from {patient_file_path.name}"
             )
 
         return bundles
-
-    @staticmethod
-    def _normalize_resource(resource: Dict[str, Any]) -> Dict[str, Any]:
-        """Normalize raw Synthea resource dicts to match the R4B schema.
-
-        Synthea uses the R5-style `medication` field on MedicationStatement;
-        R4B expects `medicationCodeableConcept` or `medicationReference`.
-        """
-        normalized: Dict[str, Any] = dict(resource)
-
-        if normalized.get("resourceType") == "MedicationStatement":
-            medication = normalized.pop("medication", None)
-            if medication is not None:
-                if isinstance(medication, dict) and "concept" in medication:
-                    normalized["medicationCodeableConcept"] = medication["concept"]
-                else:
-                    normalized["medicationCodeableConcept"] = medication
-
-        return normalized
 
     def _find_patient_file(
         self,
