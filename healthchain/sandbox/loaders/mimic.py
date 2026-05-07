@@ -166,7 +166,9 @@ class MimicOnFHIRLoader(DatasetLoader):
         if as_dict:
             all_entries = []
             for resources in resources_by_type.values():
-                all_entries.extend([{"resource": r} for r in resources])
+                all_entries.extend(
+                    [{"resource": self._normalize_resource(r)} for r in resources]
+                )
 
             return {"type": "collection", "entry": all_entries}
 
@@ -175,10 +177,29 @@ class MimicOnFHIRLoader(DatasetLoader):
         for fhir_type, resources in resources_by_type.items():
             bundles[fhir_type.lower()] = Bundle(
                 type="collection",
-                entry=[{"resource": resource} for resource in resources],
+                entry=[{"resource": self._normalize_resource(r)} for r in resources],
             )
 
         return bundles
+
+    @staticmethod
+    def _normalize_resource(resource: Dict[str, Any]) -> Dict[str, Any]:
+        """Normalize raw MIMIC resource dicts to match the R4B schema.
+
+        MIMIC-on-FHIR uses the R5-style `medication` field on MedicationStatement;
+        R4B expects `medicationCodeableConcept` or `medicationReference`.
+        """
+        normalized: Dict[str, Any] = dict(resource)
+
+        if normalized.get("resourceType") == "MedicationStatement":
+            medication = normalized.pop("medication", None)
+            if medication is not None:
+                if isinstance(medication, dict) and "concept" in medication:
+                    normalized["medicationCodeableConcept"] = medication["concept"]
+                else:
+                    normalized["medicationCodeableConcept"] = medication
+
+        return normalized
 
     def _load_resource_file(
         self, data_dir: Path, resource_type: str, sample_size: Optional[int] = None
