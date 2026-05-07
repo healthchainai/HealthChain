@@ -14,6 +14,7 @@
 [![Python Versions][python-versions-badge]][pypi]
 [![Build Status][build-badge]][build]
 [![AI-Assisted Development][ai-badge]][claude-md]
+[![DOI](https://zenodo.org/badge/785158333.svg)](https://doi.org/10.5281/zenodo.20056729)
 
 [![Substack][substack-badge]][substack]
 [![Discord][discord-badge]][discord]

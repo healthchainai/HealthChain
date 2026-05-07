@@ -5,12 +5,13 @@ and reading data from FHIR resources.
 """
 
 import logging
-import importlib
 import re
 
 from typing import Optional, Dict, Any, List
 from fhir.resources.resource import Resource
 from fhir.resources.R4B.documentreference import DocumentReference
+
+from healthchain.fhir.version import get_fhir_resource
 
 logger = logging.getLogger(__name__)
 
@@ -64,10 +65,7 @@ def create_resource_from_dict(
         Optional[Resource]: FHIR resource instance or None if creation failed
     """
     try:
-        resource_module = importlib.import_module(
-            f"fhir.resources.R4B.{resource_type.lower()}"
-        )
-        resource_class = getattr(resource_module, resource_type)
+        resource_class = get_fhir_resource(resource_type)
         return resource_class(**resource_dict)
     except Exception as e:
         logger.error(f"Failed to create FHIR resource: {str(e)}")
@@ -136,10 +134,7 @@ def convert_prefetch_to_fhir_objects(
                 try:
                     # Fix timezone-naive datetimes before validation
                     fixed_data = _fix_timezone_naive_datetimes(resource_data)
-                    resource_module = importlib.import_module(
-                        f"fhir.resources.R4B.{resource_type.lower()}"
-                    )
-                    resource_class = getattr(resource_module, resource_type)
+                    resource_class = get_fhir_resource(resource_type)
                     result[key] = resource_class(**fixed_data)
                 except Exception as e:
                     logger.warning(
