@@ -1,0 +1,43 @@
+# Scheduled dependency vulnerability audit. This is the *blocking* pip-audit gate:
+# a failed run notifies repo admins. It runs off the PR critical path so a newly
+# published advisory in a transitive dep can't block unrelated PRs (those get an
+# advisory-only run in ci.yml).
+
+name: security-audit
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Mondays 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Audit dependencies
+        # Keep this ignore list in sync with the advisory-only run in ci.yml.
+        # starlette advisories — fixes are in 1.x, outside our fastapi/starlette
+        #   pins; tracked for a coordinated upgrade in #223.
+        # PYSEC-2026-196: pip — affects the runner's bundled pip, not a project dep.
+        run: >-
+          uv run pip-audit
+          --ignore-vuln PYSEC-2026-161
+          --ignore-vuln CVE-2026-48818
+          --ignore-vuln CVE-2026-48817
+          --ignore-vuln CVE-2026-54283
+          --ignore-vuln CVE-2026-54282
+          --ignore-vuln PYSEC-2026-196
