@@ -103,11 +103,11 @@ theme:
     repo: fontawesome/brands/github
   features:
     - content.code.copy
-    - navigation.expand
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.sections
     - navigation.footer
+    - toc.integrate
     - navigation.instant
     - header.autohide
     - announce.dismiss
@@ -121,7 +121,7 @@ theme:
         icon: material/white-balance-sunny
         name: Switch to dark mode
     - scheme: slate
-      primary: custom
+      primary: black
       accent: blue
       toggle:
         icon: material/weather-night
@@ -150,7 +150,7 @@ markdown_extensions:
       line_spans: __span
       pygments_lang_class: true
       noclasses: True
-      pygments_style: material
+      pygments_style: gruvbox-dark
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
@@ -177,6 +177,7 @@ plugins:
             show_submodules: true
             heading_level: 2
             docstring_section_style: spacy
+            show_source: false
   - search
   # - section-index
   # - social:

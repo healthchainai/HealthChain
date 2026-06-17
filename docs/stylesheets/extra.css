@@ -5,8 +5,8 @@
    Light Mode (Default)
    ============================================ */
 :root {
-  --md-code-bg-color: #2E3440;
-  --md-code-fg-color: #FFFFFF;
+  --md-code-bg-color: #282828;
+  --md-code-fg-color: #ebdbb2;
   --md-text-font-family: "Roboto";
   --md-code-font: "Source Code Pro", monospace;
   --hc-heading-color: #1a1a1a;
@@ -14,8 +14,12 @@
   --hc-inline-code-color: #1a1a1a;
   --hc-code-shadow: #D8DEE9;
   --hc-nav-active-bg: #ECEFF4;
-  --hc-link-color: #ed4e80;
-  --hc-link-hover-color: #2e78d8;
+  --hc-link-color: #723524;
+  --hc-link-hover-color: #9a5238;
+  /* Brand accent (russet) — aligned with dotimplement.ai. Used for heading
+     rules, buttons, and other accents throughout the docs. */
+  --hc-accent: #723524;
+  --hc-accent-strong: #5c2a1d;
 }
 
 /* ============================================
@@ -32,8 +36,11 @@
   --hc-inline-code-color: #e5e7eb;
   --hc-code-shadow: transparent;
   --hc-nav-active-bg: #374151;
-  --hc-link-color: #f472b6;
-  --hc-link-hover-color: #60a5fa;
+  --hc-link-color: #bd6b46;
+  --hc-link-hover-color: #d68b66;
+  /* Russet lifted for contrast on dark backgrounds (grounded terracotta) */
+  --hc-accent: #bd6b46;
+  --hc-accent-strong: #a35a39;
 }
 
 /* ============================================
@@ -49,10 +56,10 @@
 }
 
 .md-typeset pre>code {
-  border-radius: .2rem;
-  box-shadow: 10px 5px 5px #D8DEE9;
-  background-color: #2E3440;
-  color: #FFFFFF;
+  border-radius: .3rem;
+  box-shadow: 0 1px 2px rgba(25, 26, 28, 0.16);
+  background-color: #282828;
+  color: #ebdbb2;
 }
 
 [data-md-color-scheme="slate"] .md-typeset pre>code {
@@ -95,8 +102,16 @@ h2.subtitle {
 }
 
 .md-typeset {
-  line-height: 24px;
+  line-height: 1.7;
   font-weight: 400;
+}
+
+/* Cap prose line length for readability; code, tables and images stay full-width.
+   :not([class]) leaves styled paragraphs (landing hero, cards) untouched. */
+.md-typeset p:not([class]),
+.md-typeset li,
+.md-typeset blockquote {
+  max-width: 76ch;
 }
 
 .md-typeset h1,
@@ -180,7 +195,7 @@ code {
 /* Header styling */
 .md-header {
   padding-left: 24px;
-  border-radius: 0px 0px 12px 12px;
+  border-radius: 0;
 }
 
 .md-header--shadow {
@@ -228,39 +243,22 @@ code {
 /* Accent color for headings */
 .md-typeset h1 {
   color: #1a1a1a;
-  border-bottom: 3px solid #e59875;
+  border-bottom: 3px solid var(--hc-accent);
   padding-bottom: 0.4rem;
   display: inline-block;
 }
 
-/* H2 section styling - left accent border for visual anchoring */
+/* H2 section spacing (no left accent bar — keep heading furniture calm) */
 .md-typeset h2 {
-  border-left: 3px solid #e59875;
-  padding-left: 0.75rem;
   margin-top: 2.5rem;
 }
 
-/* Colored left border for admonitions */
-.md-typeset .admonition {
-  border-left: 4px solid #79a8a9;
-}
-
-.md-typeset .admonition.note {
-  border-left-color: #79a8a9;
-}
-
-.md-typeset .admonition.tip {
-  border-left-color: #e59875;
-}
-
-.md-typeset .admonition.warning {
-  border-left-color: #f59e0b;
-}
+/* Admonitions use Material's native per-type colors — no custom left border. */
 
 /* Accent color for blockquotes */
 .md-typeset blockquote {
-  border-left: 4px solid #e59875;
-  background-color: #fef7f4;
+  border-left: 4px solid var(--hc-accent);
+  background-color: #f4eeec;
   padding: 1rem 1.5rem;
   margin: 1.5rem 0;
 }
@@ -268,17 +266,17 @@ code {
 /* Table header accent */
 .md-typeset table:not([class]) th {
   background-color: #f8f4f2;
-  border-bottom: 2px solid #e59875;
+  border-bottom: 2px solid var(--hc-accent);
 }
 
 /* Sidebar accent - active item */
 .md-nav__link--active {
-  color: #e59875 !important;
+  color: var(--hc-accent) !important;
   font-weight: 600;
 }
 
 .md-nav__item--active > .md-nav__link {
-  color: #e59875;
+  color: var(--hc-accent);
 }
 
 /* Search bar styling */
@@ -292,25 +290,25 @@ code {
 
 /* Button/CTA accent colors */
 .md-typeset .md-button {
-  background-color: #e59875;
-  border-color: #e59875;
+  background-color: var(--hc-accent);
+  border-color: var(--hc-accent);
   color: #ffffff;
 }
 
 .md-typeset .md-button:hover {
-  background-color: #d4845f;
-  border-color: #d4845f;
+  background-color: var(--hc-accent-strong);
+  border-color: var(--hc-accent-strong);
 }
 
 .md-typeset .md-button--primary {
-  background-color: #e59875;
-  border-color: #e59875;
+  background-color: var(--hc-accent);
+  border-color: var(--hc-accent);
 }
 
 /* Code block header accent */
 .md-typeset .highlight > .filename {
   background-color: #f8f4f2;
-  border-bottom: 2px solid #e59875;
+  border-bottom: 2px solid var(--hc-accent);
 }
 
 /* ============================================
@@ -318,28 +316,24 @@ code {
    ============================================ */
 [data-md-color-scheme="slate"] .md-typeset h1 {
   color: #ffffff;
-  border-bottom-color: #e59875;
-}
-
-[data-md-color-scheme="slate"] .md-typeset h2 {
-  border-left-color: #e59875;
+  border-bottom-color: var(--hc-accent);
 }
 
 [data-md-color-scheme="slate"] .md-typeset blockquote {
   background-color: #1f2937;
-  border-left-color: #e59875;
+  border-left-color: var(--hc-accent);
 }
 
 [data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
   background-color: #1f2937;
-  border-bottom-color: #e59875;
+  border-bottom-color: var(--hc-accent);
 }
 
 [data-md-color-scheme="slate"] .md-nav__link--active {
-  color: #e59875 !important;
+  color: var(--hc-accent) !important;
 }
 
 [data-md-color-scheme="slate"] .md-typeset .highlight > .filename {
   background-color: #1f2937;
-  border-bottom-color: #e59875;
+  border-bottom-color: var(--hc-accent);
 }
