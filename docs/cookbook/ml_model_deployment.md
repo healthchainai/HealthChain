@@ -33,7 +33,7 @@ python cookbook/sepsis_cds_hooks.py
 
 That's it. The script starts a local CDS Hooks service, fires test requests against it using three pre-extracted MIMIC patients, and prints risk scores:
 
-```
+```text
 Processed 3 requests
   Patient 1: Sepsis Risk: HIGH (85%)
   Patient 2: Sepsis Risk: MODERATE (52%)
@@ -118,7 +118,7 @@ dataset = Dataset.from_fhir_bundle(bundle, schema=SCHEMA_PATH)
 
 Use CDS Hooks when you need **instant alerts** during clinical workflows. The EHR triggers your service and pushes patient data via prefetch — no server queries needed.
 
-```
+```text
 Clinician opens chart → EHR fires patient-view hook → Your service runs prediction → CDS card appears in EHR
 ```
 
@@ -201,7 +201,7 @@ with app.sandbox("sepsis-risk") as client:
 
 Use the FHIR Gateway when you need to **screen multiple patients** from a FHIR server. Unlike CDS Hooks (ephemeral alerts), this pattern **persists predictions back to the FHIR server** as RiskAssessment resources, making them available for dashboards, reports, and downstream workflows.
 
-```
+```text
 Query patients from FHIR server → Run predictions → Write RiskAssessment back to FHIR server
 ```
 
@@ -279,7 +279,7 @@ for patient_id in DEMO_PATIENT_IDS:
 
 ### Expected Output
 
-```
+```text
 === Screening patients from Medplum ===
   702e11e8-...: HIGH (85%) → RiskAssessment/abc123
   3b0da7e9-...: MODERATE (52%) → RiskAssessment/def456

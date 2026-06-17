@@ -226,9 +226,7 @@ def test_status_displays_config_fields(mock_load):
     mock_config.security.auth = "none"
     mock_config.security.tls.enabled = False
     mock_config.security.allowed_origins = ["*"]
-    mock_config.compliance.hipaa = True
     mock_config.compliance.audit_log = "./logs/audit.jsonl"
-    mock_config.eval.enabled = False
     mock_load.return_value = mock_config
 
     with patch("builtins.print") as mock_print:
@@ -239,7 +237,7 @@ def test_status_displays_config_fields(mock_load):
     assert "cds-hooks" in print_output
     assert "production" in print_output
     assert "Test Hospital" in print_output
-    assert "enabled" in print_output
+    assert "audit.jsonl" in print_output
 
 
 @pytest.mark.parametrize(

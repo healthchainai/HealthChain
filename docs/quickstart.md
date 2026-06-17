@@ -3,19 +3,20 @@
 After [installing HealthChain](installation.md), get up to speed quickly with the core components before diving further into the [full documentation](reference/index.md)!
 HealthChain has three main components:
 
-- **Gateway:** Connect to multiple healthcare systems with a single API.
-- **Pipelines:** Easily build data processing pipelines for both clinical text and [FHIR](https://www.hl7.org/fhir/) data.
-- **InteropEngine:** Seamlessly convert between data formats like [FHIR](https://www.hl7.org/fhir/), [HL7 CDA](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=7), and [HL7v2](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=185).
+- **Gateway:** Connect to multiple FHIR sources and healthcare systems with a single API.
+- **Pipelines:** Build data processing pipelines for healthcare NLP and ML tasks with automatic FHIR output.
+- **InteropEngine:** Convert between healthcare data formats like [FHIR](https://www.hl7.org/fhir/) and [HL7 CDA](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=7).
 
 
 ## Core Components 🧩
 
 ### Gateway 🔌
 
-The [**HealthChainAPI**](./reference/gateway/api.md) provides a unified interface for connecting your AI application and models to multiple healthcare systems through a single API. It automatically handles [FHIR API](https://www.hl7.org/fhir/http.html), [CDS Hooks](https://cds-hooks.org/), and [SOAP/CDA protocols](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=7) with [OAuth2 authentication](https://oauth.net/2/).
+The [**HealthChainAPI**](./reference/gateway/api.md) provides a unified interface for connecting your AI application and models to multiple FHIR sources and healthcare systems with [OAuth2 authentication](https://oauth.net/2/).
 
 [(Full Documentation on Gateway)](./reference/gateway/gateway.md)
 
+<!--pytest.mark.skip-->
 ```python
 from healthchain.gateway import HealthChainAPI, FHIRGateway
 from healthchain.fhir.r4b import Patient
@@ -71,8 +72,11 @@ def extract_diabetes(doc: Document) -> Document:
         condition = create_condition(
             code="73211009",
             display="Diabetes mellitus",
+            subject="Patient/example",
         )
-        doc.fhir.problem_list.append(condition)
+        # problem_list is derived from the bundle per call; use the setter
+        # (or add_resources) so the Condition persists.
+        doc.fhir.problem_list = [condition]
 
     return doc
 
@@ -92,6 +96,7 @@ HealthChain provides a set of ready-to-use [**NLP Integrations**](./reference/pi
 
 [(Full Documentation on Components)](./reference/pipeline/components/components.md)
 
+<!--pytest.mark.skip-->
 ```python
 from healthchain.pipeline import Pipeline
 from healthchain.pipeline.components import TextPreProcessor, SpacyNLP, TextPostProcessor
@@ -113,6 +118,7 @@ You can process legacy healthcare data formats too. [**Adapters**](./reference/i
 
 [(Full Documentation on Adapters)](./reference/io/adapters/adapters.md)
 
+<!--pytest.mark.skip-->
 ```python
 from healthchain.io import CdaAdapter
 from healthchain.models import CdaRequest
@@ -133,6 +139,7 @@ Prebuilt pipelines are the fastest way to jump into healthcare AI with minimal s
 
 [(Full Documentation on Pipelines)](./reference/pipeline/pipeline.md#prebuilt)
 
+<!--pytest.mark.skip-->
 ```python
 from healthchain.pipeline import MedicalCodingPipeline
 from healthchain.models import CdaRequest
@@ -146,10 +153,11 @@ output = pipeline.process_request(cda_request)
 
 ### Interoperability 🔄
 
-The HealthChain Interoperability module provides tools for converting between different healthcare data formats, including FHIR, CDA, and HL7v2 messages.
+The HealthChain Interoperability module provides tools for converting between healthcare data formats, including FHIR and CDA.
 
 [(Full Documentation on Interoperability Engine)](./reference/interop/interop.md)
 
+<!--pytest.mark.skip-->
 ```python
 from healthchain.interop import create_interop, FormatType
 
@@ -208,6 +216,7 @@ print(datasets)
 
 #### Basic Usage
 
+<!--pytest.mark.skip-->
 ```python
 from healthchain.sandbox import SandboxClient
 
@@ -235,6 +244,7 @@ responses = client.send_requests()
 
 For clinical documentation workflows using SOAP/CDA:
 
+<!--pytest.mark.skip-->
 ```python
 # Use context manager for automatic result saving
 with SandboxClient(

@@ -8,7 +8,7 @@ Expose your pipeline as a CDS Hooks service that EHRs can call.
 
 The flow:
 
-```
+```text
 ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
 │  Clinician  │────────>│    EHR      │────────>│  Your CDS   │
 │  opens      │         │  (Epic,     │  HTTP   │  Service    │

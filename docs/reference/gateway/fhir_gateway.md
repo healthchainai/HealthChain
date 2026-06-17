@@ -122,7 +122,7 @@ gateway.add_source(
 
 Connection strings use the `fhir://` scheme with query parameters:
 
-```
+```text
 fhir://hostname:port/path?param1=value1&param2=value2
 ```
 

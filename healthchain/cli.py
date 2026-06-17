@@ -19,7 +19,7 @@ _DOCKERFILE = """\
 #
 # Usage:
 #   Build:  docker build -t my-healthcare-app .
-#   Run:    docker run -p 8000:8000 --env-file .env my-healthcare-app
+#   Run:    docker run -p 8000:8000 --env-file .env -v ./logs:/app/logs my-healthcare-app
 #
 # Required environment variables (set in .env or pass via -e):
 #   APP_MODULE   Python module path to your app, e.g. "myapp:app" (default: "app:app")
@@ -62,6 +62,9 @@ USER appuser
 
 EXPOSE $PORT
 
+# Mount this path to persist audit logs outside the container
+VOLUME ["/app/logs"]
+
 CMD uvicorn $APP_MODULE --host 0.0.0.0 --port $PORT
 """
 
@@ -94,6 +97,9 @@ _ENV_EXAMPLE_CDS_HOOKS = """\
 
 # For JWT assertion flow (e.g. Epic SMART on FHIR)
 # CLIENT_SECRET_PATH=/path/to/private_key.pem
+
+# API key authentication (set security.auth: api-key in healthchain.yaml to enforce)
+# HEALTHCHAIN_API_KEY=your-key-here
 """
 
 _ENV_EXAMPLE_FHIR_GATEWAY = """\
@@ -110,6 +116,9 @@ EPIC_CLIENT_SECRET=
 CERNER_BASE_URL=https://fhir-open.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d
 # Cerner open sandbox requires no credentials
 
+# API key authentication (set security.auth: api-key in healthchain.yaml to enforce)
+# HEALTHCHAIN_API_KEY=your-key-here
+
 # See docs: https://healthchainai.github.io/HealthChain/reference/gateway/fhir_gateway/
 """
 
@@ -121,6 +130,9 @@ CLIENT_SECRET=
 
 # For JWT assertion flow (e.g. Epic SMART on FHIR)
 # CLIENT_SECRET_PATH=/path/to/private_key.pem
+
+# API key authentication (set security.auth: api-key in healthchain.yaml to enforce)
+# HEALTHCHAIN_API_KEY=your-key-here
 """
 
 _REQUIREMENTS = "healthchain\n"
@@ -250,14 +262,9 @@ service:
   type: {service_type}
   port: 8000
 
-# Data paths used by your app and sandbox
-data:
-  patients_dir: ./data
-  output_dir: ./output
-
 # Security controls
 security:
-  auth: none              # none | api-key (planned) | smart-on-fhir (planned)
+  auth: none              # none | api-key
   tls:
     enabled: false
     cert_path: ./certs/server.crt
@@ -267,18 +274,7 @@ security:
 
 # Compliance settings
 compliance:
-  hipaa: false            # set true to activate audit logging
   audit_log: ./logs/audit.jsonl
-
-# Evaluation and model monitoring
-eval:
-  enabled: false
-  provider: mlflow        # mlflow | langfuse | none
-  tracking_uri: ./mlruns
-  track:
-    - model_inference
-    - cds_card_returned
-    - card_feedback
 
 # Site / deployment metadata
 site:
@@ -315,7 +311,7 @@ def new_project(name: str, template: str):
         "fhir-gateway": _ENV_EXAMPLE_FHIR_GATEWAY,
         "default": _ENV_EXAMPLE_DEFAULT,
     }
-    service_type = template if template != "default" else "cds-hooks"
+    service_type = template if template != "default" else "fhir-gateway"
 
     (project_dir / "app.py").write_text(_app_py[template])
     (project_dir / "healthchain.yaml").write_text(
@@ -428,12 +424,10 @@ def sandbox_run(
     no_save: bool,
 ):
     """Fire test requests at a running HealthChain service."""
-    from healthchain.config.appconfig import AppConfig
     from healthchain.sandbox import SandboxClient
 
-    config = AppConfig.load()
-    resolved_output = output or (config.data.output_dir if config else "./output")
-    resolved_from_path = from_path or (config.data.patients_dir if config else None)
+    resolved_output = output or "./output"
+    resolved_from_path = from_path or None
 
     print(f"\n{_BOLD}{_CYAN}◆ Sandbox{_RST}  {_DIM}{url}{_RST}")
     print(f"  {_CYAN}workflow  {_RST}{workflow}")
@@ -607,20 +601,10 @@ def status():
     print(f"{_key('origins     ')}{_DIM}{origins}{_RST}")
 
     print(_section("Compliance"))
-    hipaa_val = (
-        _val_on("enabled") if config.compliance.hipaa else f"{_DIM}disabled{_RST}"
-    )
-    print(f"{_key('HIPAA       ')}{hipaa_val}")
-    if config.compliance.hipaa:
+    if config.compliance.audit_log:
         print(f"{_key('audit log   ')}{_BOLD}{config.compliance.audit_log}{_RST}")
-
-    print(_section("Eval"))
-    if config.eval.enabled:
-        print(f"{_key('provider    ')}{config.eval.provider}")
-        print(f"{_key('tracking    ')}{_BOLD}{config.eval.tracking_uri}{_RST}")
-        print(f"{_key('events      ')}{_DIM}{', '.join(config.eval.track)}{_RST}")
     else:
-        print(f"  {_DIM}disabled{_RST}")
+        print(f"{_key('audit log   ')}{_DIM}disabled{_RST}")
 
     if config.sources:
         print(_section("Sources"))

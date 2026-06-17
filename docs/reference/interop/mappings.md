@@ -16,7 +16,7 @@ The system supports several types of mappings:
 
 Mappings are stored in YAML files in the `configs/mappings/` directory, organized by the formats they translate between:
 
-```
+```text
 configs/mappings/
 ├── cda_fhir/
 │   ├── systems.yaml

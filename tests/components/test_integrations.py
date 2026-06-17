@@ -70,9 +70,9 @@ def test_huggingface_component(test_empty_document):
             **kwargs,
         )
 
-        assert result.models.get_output(
-            "huggingface", "sentiment-analysis"
-        ), "HFTransformer failed with kwargs"
+        assert result.models.get_output("huggingface", "sentiment-analysis"), (
+            "HFTransformer failed with kwargs"
+        )
         mock_pipeline.reset_mock()
 
 

@@ -14,9 +14,9 @@ Scaffold a new project directory.
 
 ```bash
 healthchain new my-app                        # empty stub
-healthchain new my-app --type cds-hooks       # working CDS Hooks service
 healthchain new my-app --type fhir-gateway    # working FHIR Gateway service
-healthchain new my-app -t cds-hooks           # shorthand
+healthchain new my-app --type cds-hooks       # working CDS Hooks service
+healthchain new my-app -t fhir-gateway        # shorthand
 ```
 
 **`--type` / `-t`** options:
@@ -24,12 +24,12 @@ healthchain new my-app -t cds-hooks           # shorthand
 | Type | Description |
 |------|-------------|
 | *(default)* | Empty `app.py` stub — choose your own starting point |
-| `cds-hooks` | Working CDS Hooks service with a `patient-view` hook |
 | `fhir-gateway` | Working FHIR Gateway that aggregates conditions from multiple EHR sources |
+| `cds-hooks` | Working CDS Hooks service with a `patient-view` hook |
 
 Creates:
 
-```
+```text
 my-app/
 ├── app.py              # application entry point (populated for cds-hooks / fhir-gateway)
 ├── healthchain.yaml    # project configuration
@@ -77,7 +77,7 @@ healthchain status
 
 Example output:
 
-```
+```text
 HealthChain — my-sepsis-app v1.0.0
 -----------------------------------
 
@@ -90,18 +90,12 @@ Site
   name         General Hospital NHS Trust
 
 Security
-  auth         smart-on-fhir
+  auth         api-key
   TLS          enabled
   origins      https://fhir.epic.com
 
 Compliance
-  HIPAA        enabled
   audit log    ./logs/audit.jsonl
-
-Eval
-  provider     mlflow
-  tracking     ./mlruns
-  events       model_inference, cds_card_returned, card_feedback
 ```
 
 ---
@@ -145,7 +139,7 @@ healthchain sandbox run \
 
 Example output:
 
-```
+```text
 Sandbox — http://localhost:8000/cds/cds-services/my-service
 workflow: patient-view
 Generating 3 synthetic request(s)...
@@ -183,7 +177,7 @@ healthchain seed medplum ./cookbook/data/mimic_demo_patients/
 
 Example output:
 
-```
+```text
 ◆ Seeding Medplum  qa_patient.json
 
   ✓ DEMO_PATIENT_ID=abc123
@@ -191,7 +185,7 @@ Example output:
 
 For a directory:
 
-```
+```text
 ◆ Seeding Medplum  mimic_demo_patients/
 
   ✓ high_risk_bundle      →  PATIENT_ID=702e11e8-...

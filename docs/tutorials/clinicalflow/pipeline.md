@@ -108,7 +108,7 @@ Run it:
 
 Expected output:
 
-```
+```text
 Extracted conditions:
   - Hypertension (SNOMED: 38341003)
   - Diabetes mellitus (SNOMED: 73211009)
@@ -120,7 +120,7 @@ Extracted conditions:
 
 Your pipeline now follows this flow:
 
-```
+```text
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │  Clinical   │────>│  Preprocess │────>│  Extract    │
 │  Text       │     │  Text       │     │  Conditions │

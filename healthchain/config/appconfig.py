@@ -64,18 +64,15 @@ class LLMConfig(BaseModel):
         elif self.provider == "huggingface":
             from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 
-            llm = HuggingFaceEndpoint(repo_id=self.model, max_new_tokens=self.max_tokens)
+            llm = HuggingFaceEndpoint(
+                repo_id=self.model, max_new_tokens=self.max_tokens
+            )
             return ChatHuggingFace(llm=llm)
 
 
 class ServiceConfig(BaseModel):
-    type: str = "cds-hooks"
+    type: str = "fhir-gateway"
     port: int = 8000
-
-
-class DataConfig(BaseModel):
-    patients_dir: str = "./data"
-    output_dir: str = "./output"
 
 
 class TLSConfig(BaseModel):
@@ -92,22 +89,14 @@ class SecurityConfig(BaseModel):
     @field_validator("auth")
     @classmethod
     def validate_auth(cls, v: str) -> str:
-        allowed = {"none", "api-key", "smart-on-fhir"}
+        allowed = {"none", "api-key"}
         if v not in allowed:
             raise ValueError(f"auth must be one of: {', '.join(sorted(allowed))}")
         return v
 
 
 class ComplianceConfig(BaseModel):
-    hipaa: bool = False
-    audit_log: str = "./logs/audit.jsonl"
-
-
-class EvalConfig(BaseModel):
-    enabled: bool = False
-    provider: str = "mlflow"
-    tracking_uri: str = "./mlruns"
-    track: List[str] = ["model_inference", "cds_card_returned", "card_feedback"]
+    audit_log: Optional[str] = None
 
 
 class SiteConfig(BaseModel):
@@ -129,10 +118,8 @@ class AppConfig(BaseModel):
     name: str = "my-healthchain-app"
     version: str = "1.0.0"
     service: ServiceConfig = ServiceConfig()
-    data: DataConfig = DataConfig()
     security: SecurityConfig = SecurityConfig()
     compliance: ComplianceConfig = ComplianceConfig()
-    eval: EvalConfig = EvalConfig()
     site: SiteConfig = SiteConfig()
     sources: Dict[str, SourceConfig] = {}
     llm: Optional[LLMConfig] = None
