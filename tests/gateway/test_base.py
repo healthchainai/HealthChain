@@ -89,8 +89,8 @@ async def test_protocol_handler_supports_sync_and_async_handlers():
     )
 
     # Test both handler types
-    sync_result = await handler.handle("sync_op", data="test_sync")
-    async_result = await handler.handle("async_op", data="test_async")
+    sync_result = await handler.dispatch("sync_op", data="test_sync")
+    async_result = await handler.dispatch("async_op", data="test_async")
 
     assert sync_result == {"sync_result": "test_sync"}
     assert async_result == {"async_result": "test"}
@@ -121,11 +121,11 @@ async def test_protocol_handler_error_handling_behavior(
 
     if expected_behavior["raises"]:
         with pytest.raises(ValueError, match="Unsupported operation"):
-            await handler.handle(
+            await handler.dispatch(
                 "test_op" if operation_exists else "missing_op", data="test"
             )
     else:
-        result = await handler.handle(
+        result = await handler.dispatch(
             "test_op" if operation_exists else "missing_op", data="test"
         )
 
@@ -144,13 +144,13 @@ async def test_protocol_handler_exception_handling_in_handlers():
     handler_raise.register_handler("failing_op", lambda: 1 / 0)
 
     with pytest.raises(ValueError, match="Error during operation execution"):
-        await handler_raise.handle("failing_op")
+        await handler_raise.dispatch("failing_op")
 
     # Test with return_errors=True (should return error dict)
     handler_return = ConcreteProtocolHandler(config=GatewayConfig(return_errors=True))
     handler_return.register_handler("failing_op", lambda: 1 / 0)
 
-    result = await handler_return.handle("failing_op")
+    result = await handler_return.dispatch("failing_op")
     assert "error" in result
     assert "Error during operation execution" in result["error"]
 

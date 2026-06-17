@@ -30,14 +30,7 @@ jobs:
 
       - name: Audit dependencies
         # Keep this ignore list in sync with the advisory-only run in ci.yml.
-        # starlette advisories — fixes are in 1.x, outside our fastapi/starlette
-        #   pins; tracked for a coordinated upgrade in #223.
         # PYSEC-2026-196: pip — affects the runner's bundled pip, not a project dep.
         run: >-
           uv run pip-audit
-          --ignore-vuln PYSEC-2026-161
-          --ignore-vuln CVE-2026-48818
-          --ignore-vuln CVE-2026-48817
-          --ignore-vuln CVE-2026-54283
-          --ignore-vuln CVE-2026-54282
           --ignore-vuln PYSEC-2026-196

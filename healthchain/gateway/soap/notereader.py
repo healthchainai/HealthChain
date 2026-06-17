@@ -138,12 +138,12 @@ class NoteReaderService(BaseProtocolHandler[CdaRequest, CdaResponse]):
 
         return decorator
 
-    def handle(self, operation: str, **params) -> Union[CdaResponse, Dict]:
+    def dispatch(self, operation: str, **params) -> Union[CdaResponse, Dict]:
         """
         Process a SOAP request using registered handlers.
 
         This method provides backward compatibility for existing code
-        that calls handle() directly instead of going through the SOAP router.
+        that calls dispatch() directly instead of going through the SOAP router.
 
         Args:
             operation: The SOAP method name e.g. ProcessDocument

@@ -226,7 +226,7 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
         hook_type = request.hook
 
         # Process the request using the appropriate handler
-        response = self.handle(hook_type, request=request)
+        response = self.dispatch(hook_type, request=request)
 
         # If we have an event dispatcher, emit an event for the hook execution
         if self.events.dispatcher and self.use_events:
@@ -246,7 +246,7 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
 
         Args:
             operation: The hook type e.g. "patient-view"
-            params: The parameters passed to handle
+            params: The parameters passed to dispatch
 
         Returns:
             CDSRequest object or None if request couldn't be constructed
@@ -273,7 +273,7 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
             logger.warning(f"Error constructing CDSRequest: {str(e)}", exc_info=True)
             return None
 
-    def handle(self, operation: str, **params) -> Union[CDSResponse, Dict]:
+    def dispatch(self, operation: str, **params) -> Union[CDSResponse, Dict]:
         """
         Process a CDS Hooks request using registered handlers.
 
