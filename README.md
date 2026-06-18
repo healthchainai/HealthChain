@@ -21,11 +21,11 @@
 
 </div>
 
-<h2 align="center" style="border-bottom: none">Open-Source SDK for Healthcare AI Integration</h2>
+<h2 align="center" style="border-bottom: none">Open-Source SDK for Healthcare AI</h2>
 
 <div align="center">
 
-HealthChain is an open-source Python SDK for connecting AI models to live clinical systems. The models aren't the bottleneck — the integration is. Get **built-in FHIR support**, **real-time EHR connectivity**, and **production-ready deployment tooling** without building it from scratch.
+HealthChain is an open-source Python SDK for building healthcare AI on real clinical data. The model is the easy part — HealthChain gives your models and agents tools they can trust: **type-safe FHIR resources**, **real-time EHR connectivity**, and **production-ready deployment**. So what you build holds up outside the demo.
 
 </div>
 
@@ -111,13 +111,13 @@ The quickest way for AI developers and researchers to ship healthcare AI — eve
 
 ## Why HealthChain?
 
-Every serious healthcare AI project builds the same integration infrastructure from scratch. Whether you're deploying a logistic regression or a 70B parameter model, the wall between a trained model and a live clinical system is the same: real FHIR APIs, multi-site deployments, auditable governance. No off-the-shelf solution exists, and engineers who understand both AI and healthcare protocols are scarce and hard to retain.
+Every serious healthcare AI project builds the same integration infrastructure from scratch. Whether you're deploying a logistic regression, a 70B-parameter model, or an agentic workflow, the wall between a trained model and a live clinical system is the same: real FHIR APIs, multi-site deployments, auditable governance. No off-the-shelf solution exists, and engineers who understand both AI and healthcare protocols are scarce and hard to retain.
 
 HealthChain handles that complexity so you can focus on what actually matters: the model and the patient.
 
 - **Optimized for real-time** - Connect to live FHIR APIs and integration points instead of stale data exports
 - **Automatic validation** - Type-safe FHIR models prevent broken healthcare data
-- **Native LLM + ML support** - Wire up any model, from LLMs to scikit-learn, and output results as FHIR
+- **Native LLM, agent & ML support** - Wire up any model or agent — LLMs, LangChain, scikit-learn — and output results as FHIR
 - **Works with your existing stack** - Integrates with FastAPI, LangChain, HuggingFace, and spaCy
 - **Production-ready foundations** - Dockerized deployment, configurable security, and an architecture built for NHS and HIPAA environments
 
@@ -197,7 +197,7 @@ print(f"FHIR conditions: {result.fhir.problem_list}")  # Auto-converted to FHIR 
 - [ ] 📋 **Governance as config** — clinical safety, data access agreements, and compliance standards as a first-class deployment artifact in `healthchain.yaml`
 - [ ] 🔌 **Deeper EHR connectivity** — more FHIR sources, live data patterns, and real-world integration examples from pilot deployments
 - [ ] 📊 **Observability** — deployment telemetry and audit trails for healthcare systems
-- [ ] 🤖 **Agentic integrations** — support for AI agent frameworks and agentic healthcare workflows
+- [ ] 🤖 **A toolkit for clinical AI agents** — typed FHIR tools, validation loops, and evals so agents can work with clinical data reliably
 
 ## 🤝 Contributing
 

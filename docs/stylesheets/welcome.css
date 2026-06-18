@@ -1,43 +1,68 @@
 /* HealthChain Welcome Page Styles
-   Adapted from Kedro's documentation pattern */
+   Palette/type aligned with dotimplement.ai (paper & ink, russet signal).
+   Landing page only — fonts are scoped to .welcome-* / landing selectors. */
+
+@import url('https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap');
 
 /* CSS Variables for theming */
 :root {
-  --welcome-page-bg-color: #ffffff;
-  --cards-section-bg-color: #f8f9fa;
+  /* Match the docs pages exactly — one flat off-white surface, no section
+     strips, so the landing reads as the same page as the rest of the site. */
+  --welcome-page-bg-color: #fdfcfb;
+  --cards-section-bg-color: #fdfcfb;
   --card-bg-color: #ffffff;
-  --card-border-color: #e0e0e0;
-  --card-featured-border-color: #e59875;
-  --card-featured-bg-color: #fef7f4;
-  --text-primary-color: #1a1a1a;
-  --text-secondary-color: #666666;
-  --accent-color: #e59875;
-  --accent-secondary: #79a8a9;
-  /* Persona accent colors */
-  --persona-healthtech: #e59875;
-  --persona-healthtech-bg: #fef7f4;
-  --persona-healthtech-border: #e59875;
-  --persona-genai: #5c9ead;
-  --persona-genai-bg: #f0f7f9;
-  --persona-genai-border: #5c9ead;
-  --persona-ml: #7c6fb0;
-  --persona-ml-bg: #f5f3fa;
-  --persona-ml-border: #7c6fb0;
+  --card-border-color: #d9d3ca;
+  --card-featured-border-color: #723524;
+  --card-featured-bg-color: #f4eeec;
+  --text-primary-color: #191a1c;
+  --text-secondary-color: #66686e;
+  --accent-color: #723524;
+  --accent-secondary: #46586a;
+  /* Persona accents — muted, rationed: icon + label only, no flood fills */
+  --persona-healthtech: #46586a;
+  --persona-healthtech-bg: #ffffff;
+  --persona-healthtech-border: #d9d3ca;
+  --persona-genai: #57674f;
+  --persona-genai-bg: #ffffff;
+  --persona-genai-border: #d9d3ca;
+  --persona-ml: #7d6770;
+  --persona-ml-bg: #ffffff;
+  --persona-ml-border: #d9d3ca;
+  /* Social/brand accents — muted to the same softness as the persona palette
+     (brand hue preserved, just desaturated) rather than full-strength logo
+     colors, which read as too aggressive next to the muted cards. */
+  --brand-discord: #6d6e9c;
+  --brand-github: #6e7074;
+  --brand-substack: #bd8254;
+  /* Type & shape */
+  --hc-font-display: 'Switzer', 'Helvetica Neue', system-ui, sans-serif;
+  --hc-font-mono: 'Geist Mono', ui-monospace, 'Source Code Pro', monospace;
+  --hc-card-radius: 8px;
 }
 
 [data-md-color-scheme="slate"] {
-  --welcome-page-bg-color: #1a1a1a;
-  --cards-section-bg-color: #1f2937;
-  --card-bg-color: #2d2d2d;
-  --card-border-color: #404040;
-  --card-featured-border-color: #e59875;
-  --card-featured-bg-color: #2d2d2d;
+  /* Match the docs pages exactly (one flat warm near-black surface). */
+  --welcome-page-bg-color: #1c1b1a;
+  --cards-section-bg-color: #1c1b1a;
+  --card-bg-color: #242220;
+  --card-border-color: #423c36;
+  --card-featured-border-color: #bd6b46;
+  --card-featured-bg-color: #262729;
   --text-primary-color: #ffffff;
   --text-secondary-color: #d1d5db;
-  /* Dark mode persona colors - neutral backgrounds with colored left borders */
-  --persona-healthtech-bg: #2d2d2d;
-  --persona-genai-bg: #2d2d2d;
-  --persona-ml-bg: #2d2d2d;
+  /* Russet lifted for contrast on dark (grounded terracotta); persona accents lightened */
+  --accent-color: #bd6b46;
+  --persona-healthtech: #8c9bad;
+  --persona-genai: #93a087;
+  --persona-ml: #b09aa5;
+  --persona-healthtech-bg: #262729;
+  --persona-genai-bg: #262729;
+  --persona-ml-bg: #262729;
+  /* Social/brand accents lightened for dark mode, matching persona softness */
+  --brand-discord: #9396c5;
+  --brand-github: #b9bcc2;
+  --brand-substack: #d49d72;
 }
 
 /* Target welcome page container and parent elements */
@@ -78,17 +103,29 @@
   padding: 0 16px;
 }
 
+.welcome-eyebrow {
+  margin: 80px 0 0 0;
+  font-family: var(--hc-font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+}
+
 .welcome-title {
-  margin-top: 80px !important;
+  margin-top: 16px !important;
   margin-bottom: 20px !important;
+  font-family: var(--hc-font-display);
   font-weight: 700 !important;
   font-size: 3.25rem !important;
   color: var(--text-primary-color);
-  line-height: 1.15;
+  line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
 .welcome-subtitle {
+  font-family: var(--hc-font-display);
   font-size: 1.25rem;
   color: var(--text-secondary-color);
   max-width: 640px;
@@ -105,21 +142,42 @@
 .explore-link a {
   display: inline-flex;
   align-items: center;
-  padding: 16px 32px;
+  padding: 15px 30px;
   background-color: var(--accent-color);
-  color: #ffffff !important;
+  color: #f4f5f7 !important;
   text-decoration: none !important;
-  border-radius: 10px;
+  border: 2px solid var(--text-primary-color);
+  border-radius: var(--hc-card-radius);
   font-weight: 600;
-  font-size: 1.1rem;
-  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 14px -4px rgba(229, 152, 117, 0.5);
+  font-size: 1.05rem;
+  box-shadow: 4px 4px 0 var(--text-primary-color);
+  transition: transform 0.12s steps(2), box-shadow 0.12s steps(2), background-color 0.15s;
 }
 
 .explore-link a:hover {
-  background-color: #d4845f;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px -4px rgba(229, 152, 117, 0.6);
+  background-color: #5c2a1d;
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--text-primary-color);
+}
+
+/* Dark mode: the stepped ink shadow is a light-mode (paper) device — on dark it
+   reads as a harsh white block. Use a clean clay button with dark text instead. */
+[data-md-color-scheme="slate"] .explore-link a {
+  color: #1a1a1a !important;
+  border-color: #bd6b46;
+  box-shadow: none;
+}
+
+[data-md-color-scheme="slate"] .explore-link a:hover {
+  background-color: #d68b66;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Dark mode card hover should lighten (not darken toward the page bg) */
+[data-md-color-scheme="slate"] .card:hover {
+  border-color: var(--accent-color);
+  background-color: #2f3033;
 }
 
 .explore-link .arrow {
@@ -158,13 +216,15 @@
 
 /* Section Titles */
 .section-title {
-  font-weight: 600;
-  font-size: 1.35rem;
+  font-family: var(--hc-font-mono);
+  font-weight: 500;
+  font-size: 0.82rem;
   text-align: center;
   margin-bottom: 36px !important;
   margin-top: 0;
-  color: var(--text-primary-color);
-  letter-spacing: -0.01em;
+  color: var(--text-secondary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
 }
 
 /* Card Grid */
@@ -185,9 +245,9 @@
 .card {
   background-color: var(--card-bg-color);
   border: 2px solid var(--card-border-color);
-  border-radius: 16px;
+  border-radius: var(--hc-card-radius);
   padding: 28px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
   text-decoration: none !important;
   display: flex;
   flex-direction: column;
@@ -195,8 +255,8 @@
 }
 
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.15);
+  border-color: var(--accent-color);
+  background-color: var(--welcome-page-bg-color);
 }
 
 /* Persona cards get larger padding */
@@ -238,6 +298,52 @@
   stroke: var(--persona-ml);
 }
 
+/* Get Started cards: recolor the grey #989898 icons with the muted persona
+   palette, cycling per column of three. Targeting the #989898 value preserves
+   each icon's outline-vs-solid nature (outline icons set stroke, solid glyphs
+   set fill). Persona vars are mode-aware, so dark mode follows automatically.
+   The social grid is excluded — it gets platform brand colors below. */
+.card-grid:not(.card-grid--social) .card:nth-child(3n+1) .card-icon svg path[stroke="#989898"] {
+  stroke: var(--persona-healthtech);
+}
+.card-grid:not(.card-grid--social) .card:nth-child(3n+1) .card-icon svg path[fill="#989898"] {
+  fill: var(--persona-healthtech);
+}
+.card-grid:not(.card-grid--social) .card:nth-child(3n+2) .card-icon svg path[stroke="#989898"] {
+  stroke: var(--persona-genai);
+}
+.card-grid:not(.card-grid--social) .card:nth-child(3n+2) .card-icon svg path[fill="#989898"] {
+  fill: var(--persona-genai);
+}
+.card-grid:not(.card-grid--social) .card:nth-child(3n+3) .card-icon svg path[stroke="#989898"] {
+  stroke: var(--persona-ml);
+}
+.card-grid:not(.card-grid--social) .card:nth-child(3n+3) .card-icon svg path[fill="#989898"] {
+  fill: var(--persona-ml);
+}
+
+/* Join the Community cards: each icon in a muted version of its platform's
+   brand hue (Discord purple, GitHub grey, Substack orange). Order in the markup
+   is Discord, GitHub, Substack. Vars are mode-aware, so dark mode follows. */
+.card-grid--social .card:nth-child(1) .card-icon svg path[stroke="#989898"] {
+  stroke: var(--brand-discord);
+}
+.card-grid--social .card:nth-child(1) .card-icon svg path[fill="#989898"] {
+  fill: var(--brand-discord);
+}
+.card-grid--social .card:nth-child(2) .card-icon svg path[stroke="#989898"] {
+  stroke: var(--brand-github);
+}
+.card-grid--social .card:nth-child(2) .card-icon svg path[fill="#989898"] {
+  fill: var(--brand-github);
+}
+.card-grid--social .card:nth-child(3) .card-icon svg path[stroke="#989898"] {
+  stroke: var(--brand-substack);
+}
+.card-grid--social .card:nth-child(3) .card-icon svg path[fill="#989898"] {
+  fill: var(--brand-substack);
+}
+
 /* Featured Card (Primary Persona) */
 .card.card-featured {
   border-color: var(--card-featured-border-color);
@@ -256,11 +362,12 @@
   font-weight: 600;
   padding: 6px 16px;
   border-radius: 14px;
-  box-shadow: 0 3px 10px -2px rgba(229, 152, 117, 0.5);
+  box-shadow: 0 3px 10px -2px rgba(114, 53, 36, 0.4);
   letter-spacing: 0.01em;
 }
 
-/* Card Icon */
+/* Card Icon — a near-invisible tile on the card surface, the same treatment for
+   every card (matching the persona icons) rather than a visible greige square. */
 .card-icon {
   margin-bottom: 18px;
   width: 56px;
@@ -268,20 +375,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--cards-section-bg-color);
-  border-radius: 14px;
-}
-
-/* Persona cards have white icon backgrounds */
-.card.card-healthtech .card-icon,
-.card.card-genai .card-icon,
-.card.card-ml .card-icon {
   background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
 }
 
-[data-md-color-scheme="slate"] .card.card-healthtech .card-icon,
-[data-md-color-scheme="slate"] .card.card-genai .card-icon,
-[data-md-color-scheme="slate"] .card.card-ml .card-icon {
+[data-md-color-scheme="slate"] .card-icon {
   background-color: rgba(0, 0, 0, 0.2);
 }
 
@@ -294,21 +392,21 @@
 }
 
 [data-md-color-scheme="slate"] .card.card-healthtech {
-  border-left-color: #e59875;
+  border-left-color: #8c9bad;
 }
 
 [data-md-color-scheme="slate"] .card.card-genai {
-  border-left-color: #5c9ead;
+  border-left-color: #93a087;
 }
 
 [data-md-color-scheme="slate"] .card.card-ml {
-  border-left-color: #7c6fb0;
+  border-left-color: #b09aa5;
 }
 
 /* Dark mode featured card styling */
 [data-md-color-scheme="slate"] .card.card-featured {
-  border: 1px solid #404040;
-  border-left: 3px solid #e59875;
+  border: 1px solid #3a3b3e;
+  border-left: 3px solid #bd6b46;
 }
 
 /* Dark mode text contrast - WCAG AAA compliance */
@@ -345,7 +443,29 @@
 }
 
 .card-icon svg path {
-  fill: var(--accent-color);
+  fill: var(--text-primary-color);
+}
+
+/* Line icons (svg fill="none") are stroke-based — color the stroke, don't
+   flood the open paths with fill. */
+.card-icon svg[fill="none"] path {
+  fill: none;
+  stroke: var(--text-primary-color);
+}
+
+.card.card-healthtech .card-icon svg[fill="none"] path {
+  fill: none;
+  stroke: var(--persona-healthtech);
+}
+
+.card.card-genai .card-icon svg[fill="none"] path {
+  fill: none;
+  stroke: var(--persona-genai);
+}
+
+.card.card-ml .card-icon svg[fill="none"] path {
+  fill: none;
+  stroke: var(--persona-ml);
 }
 
 /* Card Content */
@@ -356,6 +476,7 @@
 }
 
 .card-title {
+  font-family: var(--hc-font-display);
   font-size: 1.15rem !important;
   font-weight: 600 !important;
   color: var(--text-primary-color);
@@ -470,8 +591,12 @@
     height: 28px;
   }
 
+  .welcome-eyebrow {
+    margin-top: 48px;
+  }
+
   .welcome-title {
-    margin-top: 48px !important;
+    margin-top: 12px !important;
     font-size: 2rem !important;
   }
 
@@ -603,140 +728,47 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+  background-color: #e9eaee;
+  color: #5c5e64;
 }
 
-/* Persona tags */
-.tag-healthtech {
-  background-color: #fef3e7;
-  color: #c76a15;
+[data-md-color-scheme="slate"] .tag {
+  background-color: #2b2d31;
+  color: #b0b2b8;
 }
 
-.tag-genai {
-  background-color: #e8f4f8;
-  color: #1976a2;
-}
+/* Category, feature and persona tags inherit the neutral .tag style above —
+   color is rationed so cookbook cards read calm. */
 
-.tag-ml {
-  background-color: #f3e8f8;
-  color: #7b1fa2;
-}
-
-/* Feature tags */
-.tag-gateway {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-}
-
-.tag-pipeline {
-  background-color: #fff3e0;
-  color: #e65100;
-}
-
-.tag-interop {
-  background-color: #e3f2fd;
-  color: #1565c0;
-}
-
-.tag-sandbox {
-  background-color: #fce4ec;
-  color: #c2185b;
-}
-
-.tag-fhirgateway {
-  background-color: #f1f8e9;
-  color: #558b2f;
-}
-
-.tag-cdshooks {
-  background-color: #fff8e1;
-  color: #ff8f00;
-}
-
-.tag-zerosetup {
-  background-color: #e8eaf6;
-  color: #3949ab;
-}
-
-/* Difficulty tags */
+/* Difficulty tags — muted; the one axis worth scanning at a glance */
 .tag-beginner {
-  background-color: #e8f5e9;
-  color: #2e7d32;
+  background-color: #e6ede6;
+  color: #4f6249;
 }
 
 .tag-intermediate {
-  background-color: #fff8e1;
-  color: #f57f17;
+  background-color: #efe9da;
+  color: #756134;
 }
 
 .tag-advanced {
-  background-color: #fce4ec;
-  color: #c62828;
+  background-color: #eee0dc;
+  color: #7a4a3f;
 }
 
-/* Dark mode tag adjustments */
 [data-md-color-scheme="slate"] .tag-beginner {
-  background-color: #1b3d1f;
-  color: #81c784;
+  background-color: #243026;
+  color: #8fb088;
 }
 
 [data-md-color-scheme="slate"] .tag-intermediate {
-  background-color: #3d3010;
-  color: #ffd54f;
+  background-color: #322c1d;
+  color: #c9b27a;
 }
 
 [data-md-color-scheme="slate"] .tag-advanced {
-  background-color: #3d1a1a;
-  color: #ef9a9a;
-}
-
-[data-md-color-scheme="slate"] .tag-healthtech {
-  background-color: #3d2d1f;
-  color: #ffb74d;
-}
-
-[data-md-color-scheme="slate"] .tag-genai {
-  background-color: #1a3a4a;
-  color: #4fc3f7;
-}
-
-[data-md-color-scheme="slate"] .tag-ml {
-  background-color: #2d1f3d;
-  color: #ce93d8;
-}
-
-[data-md-color-scheme="slate"] .tag-gateway {
-  background-color: #1b3d1f;
-  color: #81c784;
-}
-
-[data-md-color-scheme="slate"] .tag-pipeline {
-  background-color: #3d2a1a;
-  color: #ffb74d;
-}
-
-[data-md-color-scheme="slate"] .tag-interop {
-  background-color: #1a2d3d;
-  color: #64b5f6;
-}
-
-[data-md-color-scheme="slate"] .tag-sandbox {
-  background-color: #3d1a2a;
-  color: #f48fb1;
-}
-
-[data-md-color-scheme="slate"] .tag-fhirgateway {
-  background-color: #2a3d1a;
-  color: #aed581;
-}
-
-[data-md-color-scheme="slate"] .tag-cdshooks {
-  background-color: #3d3a1a;
-  color: #ffd54f;
-}
-
-[data-md-color-scheme="slate"] .tag-zerosetup {
-  background-color: #1a1d3d;
-  color: #9fa8da;
+  background-color: #322321;
+  color: #c79a8f;
 }
 
 [data-md-color-scheme="slate"] .cookbook-card {
@@ -781,7 +813,8 @@
 
 .tag-filter.active {
   opacity: 1;
-  box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px currentColor;
+  color: var(--accent-color);
+  box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px var(--accent-color);
 }
 
 /* Clear filter button */
