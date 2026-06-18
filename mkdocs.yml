@@ -149,8 +149,6 @@ markdown_extensions:
       anchor_linenums: true
       line_spans: __span
       pygments_lang_class: true
-      noclasses: True
-      pygments_style: gruvbox-dark
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences

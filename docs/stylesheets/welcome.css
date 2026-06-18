@@ -7,10 +7,12 @@
 
 /* CSS Variables for theming */
 :root {
-  --welcome-page-bg-color: #f4f5f7;
-  --cards-section-bg-color: #e9eaee;
+  /* Match the docs pages exactly — one flat off-white surface, no section
+     strips, so the landing reads as the same page as the rest of the site. */
+  --welcome-page-bg-color: #fdfcfb;
+  --cards-section-bg-color: #fdfcfb;
   --card-bg-color: #ffffff;
-  --card-border-color: #191a1c;
+  --card-border-color: #d9d3ca;
   --card-featured-border-color: #723524;
   --card-featured-bg-color: #f4eeec;
   --text-primary-color: #191a1c;
@@ -20,13 +22,19 @@
   /* Persona accents — muted, rationed: icon + label only, no flood fills */
   --persona-healthtech: #46586a;
   --persona-healthtech-bg: #ffffff;
-  --persona-healthtech-border: #191a1c;
+  --persona-healthtech-border: #d9d3ca;
   --persona-genai: #57674f;
   --persona-genai-bg: #ffffff;
-  --persona-genai-border: #191a1c;
+  --persona-genai-border: #d9d3ca;
   --persona-ml: #7d6770;
   --persona-ml-bg: #ffffff;
-  --persona-ml-border: #191a1c;
+  --persona-ml-border: #d9d3ca;
+  /* Social/brand accents — muted to the same softness as the persona palette
+     (brand hue preserved, just desaturated) rather than full-strength logo
+     colors, which read as too aggressive next to the muted cards. */
+  --brand-discord: #6d6e9c;
+  --brand-github: #6e7074;
+  --brand-substack: #bd8254;
   /* Type & shape */
   --hc-font-display: 'Switzer', 'Helvetica Neue', system-ui, sans-serif;
   --hc-font-mono: 'Geist Mono', ui-monospace, 'Source Code Pro', monospace;
@@ -34,10 +42,11 @@
 }
 
 [data-md-color-scheme="slate"] {
-  --welcome-page-bg-color: #1a1a1a;
-  --cards-section-bg-color: #202124;
-  --card-bg-color: #262729;
-  --card-border-color: #3a3b3e;
+  /* Match the docs pages exactly (one flat warm near-black surface). */
+  --welcome-page-bg-color: #1c1b1a;
+  --cards-section-bg-color: #1c1b1a;
+  --card-bg-color: #242220;
+  --card-border-color: #423c36;
   --card-featured-border-color: #bd6b46;
   --card-featured-bg-color: #262729;
   --text-primary-color: #ffffff;
@@ -50,6 +59,10 @@
   --persona-healthtech-bg: #262729;
   --persona-genai-bg: #262729;
   --persona-ml-bg: #262729;
+  /* Social/brand accents lightened for dark mode, matching persona softness */
+  --brand-discord: #9396c5;
+  --brand-github: #b9bcc2;
+  --brand-substack: #d49d72;
 }
 
 /* Target welcome page container and parent elements */
@@ -285,6 +298,52 @@
   stroke: var(--persona-ml);
 }
 
+/* Get Started cards: recolor the grey #989898 icons with the muted persona
+   palette, cycling per column of three. Targeting the #989898 value preserves
+   each icon's outline-vs-solid nature (outline icons set stroke, solid glyphs
+   set fill). Persona vars are mode-aware, so dark mode follows automatically.
+   The social grid is excluded — it gets platform brand colors below. */
+.card-grid:not(.card-grid--social) .card:nth-child(3n+1) .card-icon svg path[stroke="#989898"] {
+  stroke: var(--persona-healthtech);
+}
+.card-grid:not(.card-grid--social) .card:nth-child(3n+1) .card-icon svg path[fill="#989898"] {
+  fill: var(--persona-healthtech);
+}
+.card-grid:not(.card-grid--social) .card:nth-child(3n+2) .card-icon svg path[stroke="#989898"] {
+  stroke: var(--persona-genai);
+}
+.card-grid:not(.card-grid--social) .card:nth-child(3n+2) .card-icon svg path[fill="#989898"] {
+  fill: var(--persona-genai);
+}
+.card-grid:not(.card-grid--social) .card:nth-child(3n+3) .card-icon svg path[stroke="#989898"] {
+  stroke: var(--persona-ml);
+}
+.card-grid:not(.card-grid--social) .card:nth-child(3n+3) .card-icon svg path[fill="#989898"] {
+  fill: var(--persona-ml);
+}
+
+/* Join the Community cards: each icon in a muted version of its platform's
+   brand hue (Discord purple, GitHub grey, Substack orange). Order in the markup
+   is Discord, GitHub, Substack. Vars are mode-aware, so dark mode follows. */
+.card-grid--social .card:nth-child(1) .card-icon svg path[stroke="#989898"] {
+  stroke: var(--brand-discord);
+}
+.card-grid--social .card:nth-child(1) .card-icon svg path[fill="#989898"] {
+  fill: var(--brand-discord);
+}
+.card-grid--social .card:nth-child(2) .card-icon svg path[stroke="#989898"] {
+  stroke: var(--brand-github);
+}
+.card-grid--social .card:nth-child(2) .card-icon svg path[fill="#989898"] {
+  fill: var(--brand-github);
+}
+.card-grid--social .card:nth-child(3) .card-icon svg path[stroke="#989898"] {
+  stroke: var(--brand-substack);
+}
+.card-grid--social .card:nth-child(3) .card-icon svg path[fill="#989898"] {
+  fill: var(--brand-substack);
+}
+
 /* Featured Card (Primary Persona) */
 .card.card-featured {
   border-color: var(--card-featured-border-color);
@@ -307,7 +366,8 @@
   letter-spacing: 0.01em;
 }
 
-/* Card Icon */
+/* Card Icon — a near-invisible tile on the card surface, the same treatment for
+   every card (matching the persona icons) rather than a visible greige square. */
 .card-icon {
   margin-bottom: 18px;
   width: 56px;
@@ -315,20 +375,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--cards-section-bg-color);
+  background-color: rgba(255, 255, 255, 0.7);
   border-radius: 6px;
 }
 
-/* Persona cards have white icon backgrounds */
-.card.card-healthtech .card-icon,
-.card.card-genai .card-icon,
-.card.card-ml .card-icon {
-  background-color: rgba(255, 255, 255, 0.7);
-}
-
-[data-md-color-scheme="slate"] .card.card-healthtech .card-icon,
-[data-md-color-scheme="slate"] .card.card-genai .card-icon,
-[data-md-color-scheme="slate"] .card.card-ml .card-icon {
+[data-md-color-scheme="slate"] .card-icon {
   background-color: rgba(0, 0, 0, 0.2);
 }
 
