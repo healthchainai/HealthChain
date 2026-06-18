@@ -193,9 +193,9 @@ class BaseProtocolHandler(ABC, Generic[T, R]):
         self._handlers[operation] = handler
         return self
 
-    async def handle(self, operation: str, **params) -> Union[R, Dict[str, Any]]:
+    async def dispatch(self, operation: str, **params) -> Union[R, Dict[str, Any]]:
         """
-        Handle an operation using registered handlers.
+        Dispatch an operation using registered handlers.
         Supports both synchronous and asynchronous handlers.
 
         Args:

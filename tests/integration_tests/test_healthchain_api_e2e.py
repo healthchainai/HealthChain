@@ -7,7 +7,7 @@ def test_notereader_service_processes_through_pipeline(
     note_service, test_cda_request, test_cda_response, mock_coding_pipeline
 ):
     """NoteReader service integrates with medical coding pipeline for document processing."""
-    response = note_service.handle("ProcessDocument", request=test_cda_request)
+    response = note_service.dispatch("ProcessDocument", request=test_cda_request)
 
     # Verify pipeline was invoked and response matches
     mock_coding_pipeline.process_request.assert_called_once_with(test_cda_request)
@@ -24,7 +24,7 @@ def test_cds_service_processes_through_pipeline(
         context={"patientId": "123", "userId": "Practitioner/1"},
     )
 
-    response = cds_service.handle("encounter-discharge", request=cds_request)
+    response = cds_service.dispatch("encounter-discharge", request=cds_request)
 
     # Verify pipeline was invoked and cards generated
     mock_summarization_pipeline.process_request.assert_called_once_with(cds_request)
@@ -64,10 +64,10 @@ def test_healthchain_app_integrates_multiple_service_types(configured_app):
 
     # Verify services are operational by checking they have required methods
     note_service = configured_app.services["NoteReaderService"]
-    assert hasattr(note_service, "handle")
+    assert hasattr(note_service, "dispatch")
 
     cds_service = configured_app.services["CDSHooksService"]
-    assert hasattr(cds_service, "handle")
+    assert hasattr(cds_service, "dispatch")
 
     fhir_gateway = configured_app.gateways["FHIRGateway"]
     assert hasattr(fhir_gateway, "_resource_handlers")

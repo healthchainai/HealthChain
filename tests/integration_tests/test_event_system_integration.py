@@ -45,14 +45,14 @@ def test_services_propagate_event_dispatcher(
     # Process a request to ensure event system is engaged
     if request_fixture:
         req = request.getfixturevalue(request_fixture)
-        service.handle(operation, request=req)
+        service.dispatch(operation, request=req)
     else:
         cds_request = CDSRequest(
             hook=operation,
             hookInstance="test",
             context={"patientId": "123", "userId": "Practitioner/1"},
         )
-        service.handle(operation, request=cds_request)
+        service.dispatch(operation, request=cds_request)
 
 
 def test_healthchain_api_propagates_dispatcher_to_services():
