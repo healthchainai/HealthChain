@@ -83,7 +83,7 @@ scripts = [
 ]
 docs = [
     "mkdocs>=1.6.1,<2",
-    "mkdocs-material>=9.5.34,<10",
+    "mkdocs-material[imaging]>=9.5.34,<10",
     "mkdocstrings>=0.26.0,<0.27",
     "mkdocstrings-python>=1.11.1,<2",
     "griffe<1.15",
