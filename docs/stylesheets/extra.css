@@ -40,6 +40,10 @@
   --md-default-fg-color--lighter: rgba(55, 53, 47, 0.4);
   --md-default-fg-color--lightest: rgba(55, 53, 47, 0.12);
 
+  /* Material's accent (hover borders, search highlight, active states) tied to
+     the brand accent so it reads warm instead of the old default blue. */
+  --md-accent-fg-color: var(--hc-accent);
+
   /* Warm cream header (faint russet undertone) so the top bar matches the
      page warmth instead of reading as stark white. Dark text on top. */
   --md-primary-fg-color: #f4ede8;
@@ -89,6 +93,9 @@
   --hc-accent-strong: #a35a39;
   /* Muted accent for borders/rules in dark mode */
   --hc-accent-soft: #5e4035;
+  /* Material's accent tied to the brand accent (see light scheme note) */
+  --md-accent-fg-color: var(--hc-accent);
+
   /* Warm near-black header (slightly lifted from the page) with light text */
   --md-primary-fg-color: #221e1b;
   --md-primary-bg-color: #ededeb;
@@ -456,4 +463,12 @@ code {
 [data-md-color-scheme="slate"] .md-typeset .highlight > .filename {
   background-color: #262320;
   border-bottom-color: var(--hc-accent-soft);
+}
+
+/* Brand "Plug" logo: show the dark-prong mark on the light header and the
+   white-prong (-reverse) mark on the dark header so the prongs stay legible.
+   Both <img>s render via docs/overrides/partials/logo.html. */
+[data-md-color-scheme="default"] .md-logo .hc-logo--dark,
+[data-md-color-scheme="slate"] .md-logo .hc-logo--light {
+  display: none;
 }

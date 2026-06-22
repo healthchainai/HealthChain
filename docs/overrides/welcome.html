@@ -8,7 +8,16 @@
 {% block content %}
 <div class="container welcome-page-container" data-md-component="welcome">
     <header>
-        <p class="welcome-eyebrow">Healthcare AI</p>
+        <div class="welcome-mark" aria-hidden="true">
+            <span class="welcome-mark__heart">
+                <img src="{{ 'assets/brand/marks/pulse-heart.svg' | url }}" alt="" class="welcome-mark__img welcome-mark__img--light">
+                <img src="{{ 'assets/brand/marks/pulse-heart-reverse.svg' | url }}" alt="" class="welcome-mark__img welcome-mark__img--dark">
+            </span>
+            <span class="welcome-mark__plug">
+                <img src="{{ 'assets/brand/marks/plug.svg' | url }}" alt="" class="welcome-mark__img welcome-mark__img--light">
+                <img src="{{ 'assets/brand/marks/plug-reverse.svg' | url }}" alt="" class="welcome-mark__img welcome-mark__img--dark">
+            </span>
+        </div>
         <h1 class="welcome-title">From prototype to production</h1>
         <p class="welcome-subtitle">
             HealthChain gives your models and agents tools they can trust on real clinical data — type-safe FHIR, real-time EHR connectivity, and deployment tooling.

@@ -1,8 +1,8 @@
 <div align="center" style="margin-bottom: 1em;">
 
-# HealthChain 💫 🏥
+# HealthChain
 
-<img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/images/healthchain_logo.png" alt="HealthChain Logo" width=300></img>
+<img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/brand/hero/readme-hero-transparent.png" alt="HealthChain — Build, test & deploy AI in real healthcare systems" width="640"></img>
 
 <!-- Project Badges -->
 
@@ -20,8 +20,6 @@
 [![Discord][discord-badge]][discord]
 
 </div>
-
-<h2 align="center" style="border-bottom: none">Open-Source SDK for Healthcare AI</h2>
 
 <div align="center">
 
