@@ -40,6 +40,10 @@
   --md-default-fg-color--lighter: rgba(55, 53, 47, 0.4);
   --md-default-fg-color--lightest: rgba(55, 53, 47, 0.12);
 
+  /* Material's accent (hover borders, search highlight, active states) tied to
+     the brand accent so it reads warm instead of the old default blue. */
+  --md-accent-fg-color: var(--hc-accent);
+
   /* Warm cream header (faint russet undertone) so the top bar matches the
      page warmth instead of reading as stark white. Dark text on top. */
   --md-primary-fg-color: #f4ede8;
@@ -89,6 +93,9 @@
   --hc-accent-strong: #a35a39;
   /* Muted accent for borders/rules in dark mode */
   --hc-accent-soft: #5e4035;
+  /* Material's accent tied to the brand accent (see light scheme note) */
+  --md-accent-fg-color: var(--hc-accent);
+
   /* Warm near-black header (slightly lifted from the page) with light text */
   --md-primary-fg-color: #221e1b;
   --md-primary-bg-color: #ededeb;
@@ -456,4 +463,83 @@ code {
 [data-md-color-scheme="slate"] .md-typeset .highlight > .filename {
   background-color: #262320;
   border-bottom-color: var(--hc-accent-soft);
+}
+
+/* Brand "Plug" logo: show the dark-prong mark on the light header and the
+   white-prong (-reverse) mark on the dark header so the prongs stay legible.
+   Both <img>s render via docs/overrides/partials/logo.html. */
+[data-md-color-scheme="default"] .md-logo .hc-logo--dark,
+[data-md-color-scheme="slate"] .md-logo .hc-logo--light {
+  display: none;
+}
+
+/* Reusable scheme-swap for brand marks: pair a `--light` (dark-detail) and a
+   `--dark` (white-detail / -reverse) variant, and the wrong one is hidden per
+   color scheme. Used by the 404 and footer marks below. */
+[data-md-color-scheme="default"] .hc-mark--dark,
+[data-md-color-scheme="slate"] .hc-mark--light {
+  display: none;
+}
+
+/* ============================================
+   404 — "disconnected" page
+   ============================================ */
+/* Drop the nav columns and let the content span full width so the centered
+   content centers to the viewport, not to the sidebar-offset content column. */
+.md-main__inner:has(.hc-404) .md-sidebar {
+  display: none;
+}
+
+.md-main__inner:has(.hc-404),
+.md-content:has(.hc-404),
+.md-content__inner:has(.hc-404) {
+  max-width: none !important;
+}
+
+.hc-404 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 16px 96px;
+}
+
+.hc-404__mark {
+  display: inline-flex;
+  /* Tip the plug so it reads as unplugged — nothing to connect to here. */
+  transform: rotate(-12deg);
+  margin-bottom: 28px;
+}
+
+.hc-404__mark img {
+  display: block;
+  width: 104px;
+  height: auto;
+}
+
+.hc-404__title {
+  margin: 0 0 12px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.hc-404__text {
+  margin: 0 0 28px;
+  max-width: 32rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.hc-404__home {
+  font-weight: 600;
+  color: var(--hc-accent);
+}
+
+/* ============================================
+   Footer — "made with care" heart mark
+   ============================================ */
+.hc-footer-mark {
+  height: 0.68rem;
+  width: auto;
+  vertical-align: -0.07rem;
+  margin: 0 0.05rem;
 }

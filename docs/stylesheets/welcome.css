@@ -103,14 +103,100 @@
   padding: 0 16px;
 }
 
-.welcome-eyebrow {
-  margin: 80px 0 0 0;
-  font-family: var(--hc-font-mono);
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent-color);
+/* Hero mark — the brand "Plug" reaching up into the "Pulse Heart": the product
+   thesis made visual (connect your model to care). Stacked vertically so the
+   plug keeps its canonical prongs-up orientation (matching the header/favicon) —
+   the prongs already point at the heart above, no rotation needed. A clear gap
+   keeps them two distinct marks; the connection is carried by the plug's motion
+   stopping just short and the heart pulsing in response, not by contact. Both
+   marks are scheme-swapped so the detail stays legible on light and dark. */
+.welcome-mark {
+  margin-top: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.welcome-mark__heart {
+  display: inline-flex;
+}
+
+.welcome-mark__plug {
+  display: inline-flex;
+  /* Small, clean rest gap — the prongs sit just below the heart so the two read
+     as distinct marks, not a collision. Tune to taste. */
+  margin-top: -2px;
+}
+
+.welcome-mark__img {
+  display: block;
+  width: 88px;
+  height: auto;
+}
+
+[data-md-color-scheme="default"] .welcome-mark__img--dark,
+[data-md-color-scheme="slate"] .welcome-mark__img--light {
+  display: none;
+}
+
+/* On load: the plug rises prongs-first toward the heart, pauses mid-travel, then
+   settles just short of it (the cadence of seating a connector); as it lands, the
+   heart gives a double-beat — care responding to the connection. Motion only, no
+   glow (per brand). Reduced-motion users get the static, already-paired marks. */
+@media (prefers-reduced-motion: no-preference) {
+  .welcome-mark__plug {
+    animation: plug-connect 840ms cubic-bezier(0.22, 0.68, 0.3, 1) both;
+  }
+
+  .welcome-mark__heart {
+    animation: care-beat 840ms ease-in-out both;
+  }
+}
+
+@keyframes plug-connect {
+  0% {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  28% {
+    transform: translateY(24px);
+    opacity: 1;
+  }
+  58% {
+    transform: translateY(10px);
+  }
+  76% {
+    transform: translateY(10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes care-beat {
+  0%,
+  76% {
+    transform: scale(1);
+  }
+  84% {
+    transform: scale(1.07);
+  }
+  90% {
+    transform: scale(1);
+  }
+  95% {
+    transform: scale(1.035);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* With the mark leading the hero, set the gap to the title below it. Sized to
+   clear the plug's start-of-animation position so the rising plug never overlaps
+   the title. */
+.welcome-mark + .welcome-title {
+  margin-top: 32px !important;
 }
 
 .welcome-title {
@@ -591,8 +677,16 @@
     height: 28px;
   }
 
-  .welcome-eyebrow {
+  .welcome-mark {
     margin-top: 48px;
+  }
+
+  .welcome-mark__img {
+    width: 72px;
+  }
+
+  .welcome-mark + .welcome-title {
+    margin-top: 28px !important;
   }
 
   .welcome-title {

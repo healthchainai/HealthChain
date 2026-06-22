@@ -1,7 +1,7 @@
 [project]
 name = "healthchain"
 version = "0.0.0"
-description = "Open source framework for productionizing healthcare AI"
+description = "Python SDK for building, testing, and deploying AI in real healthcare systems — type-safe FHIR, real-time EHR connectivity, and production deployment"
 authors = [
     { name = "Jennifer Jiang-Kells", email = "jenniferjiangkells@gmail.com" },
     { name = "Adam Kells", email = "adamjkells93@gmail.com" },
