@@ -472,3 +472,74 @@ code {
 [data-md-color-scheme="slate"] .md-logo .hc-logo--light {
   display: none;
 }
+
+/* Reusable scheme-swap for brand marks: pair a `--light` (dark-detail) and a
+   `--dark` (white-detail / -reverse) variant, and the wrong one is hidden per
+   color scheme. Used by the 404 and footer marks below. */
+[data-md-color-scheme="default"] .hc-mark--dark,
+[data-md-color-scheme="slate"] .hc-mark--light {
+  display: none;
+}
+
+/* ============================================
+   404 — "disconnected" page
+   ============================================ */
+/* Drop the nav columns and let the content span full width so the centered
+   content centers to the viewport, not to the sidebar-offset content column. */
+.md-main__inner:has(.hc-404) .md-sidebar {
+  display: none;
+}
+
+.md-main__inner:has(.hc-404),
+.md-content:has(.hc-404),
+.md-content__inner:has(.hc-404) {
+  max-width: none !important;
+}
+
+.hc-404 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 16px 96px;
+}
+
+.hc-404__mark {
+  display: inline-flex;
+  /* Tip the plug so it reads as unplugged — nothing to connect to here. */
+  transform: rotate(-12deg);
+  margin-bottom: 28px;
+}
+
+.hc-404__mark img {
+  display: block;
+  width: 104px;
+  height: auto;
+}
+
+.hc-404__title {
+  margin: 0 0 12px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.hc-404__text {
+  margin: 0 0 28px;
+  max-width: 32rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.hc-404__home {
+  font-weight: 600;
+  color: var(--hc-accent);
+}
+
+/* ============================================
+   Footer — "made with care" heart mark
+   ============================================ */
+.hc-footer-mark {
+  height: 0.68rem;
+  width: auto;
+  vertical-align: -0.07rem;
+  margin: 0 0.05rem;
+}
