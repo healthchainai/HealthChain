@@ -1,7 +1,5 @@
 <div align="center" style="margin-bottom: 1em;">
 
-# HealthChain
-
 <img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/brand/hero/readme-hero-transparent.png" alt="HealthChain — Build, test & deploy AI in real healthcare systems" width="640"></img>
 
 <!-- Project Badges -->
@@ -23,7 +21,7 @@
 
 <div align="center">
 
-HealthChain is an open-source Python SDK for building healthcare AI on real clinical data. The model is the easy part — HealthChain gives your models and agents tools they can trust: **type-safe FHIR resources**, **real-time EHR connectivity**, and **production-ready deployment**. So what you build holds up outside the demo.
+The model is the easy part — the integration that blocks it from ever reaching production is the hard part. HealthChain is the open-source Python SDK that handles it, giving your models and agents tools they can trust: **type-safe FHIR resources**, **real-time EHR connectivity**, and **production-ready deployment**. So what you build holds up outside the demo.
 
 </div>
 
