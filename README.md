@@ -109,7 +109,7 @@ The quickest way for AI developers and researchers to ship healthcare AI — eve
 
 Every serious healthcare AI project builds the same integration infrastructure from scratch. Whether you're deploying a logistic regression, a 70B-parameter model, or an agentic workflow, the wall between a trained model and a live clinical system is the same: real FHIR APIs, multi-site deployments, auditable governance. No off-the-shelf solution exists, and engineers who understand both AI and healthcare protocols are scarce and hard to retain.
 
-HealthChain handles that complexity so you can focus on what actually matters: the model and the patient. And because the same tools run on sandbox and synthetic data, the wider AI/ML community can experiment with healthcare AI from scratch — no EHR access required.
+HealthChain handles that complexity so you can focus on what actually matters: the model and the patient.
 
 - **Optimized for real-time** - Connect to live FHIR APIs and integration points instead of stale data exports
 - **Automatic validation** - Type-safe FHIR models prevent broken healthcare data
