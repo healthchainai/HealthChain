@@ -192,11 +192,21 @@
   }
 }
 
-/* With the mark leading the hero, set the gap to the title below it. Sized to
-   clear the plug's start-of-animation position so the rising plug never overlaps
-   the title. */
-.welcome-mark + .welcome-title {
-  margin-top: 32px !important;
+.welcome-eyebrow {
+  margin: 0;
+  font-family: var(--hc-font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+}
+
+/* With the mark leading the hero, size the gap to the eyebrow below it so it
+   clears the plug's start-of-animation position — the rising plug never
+   overlaps the eyebrow. */
+.welcome-mark + .welcome-eyebrow {
+  margin-top: 32px;
 }
 
 .welcome-title {
@@ -685,8 +695,8 @@
     width: 72px;
   }
 
-  .welcome-mark + .welcome-title {
-    margin-top: 28px !important;
+  .welcome-mark + .welcome-eyebrow {
+    margin-top: 28px;
   }
 
   .welcome-title {

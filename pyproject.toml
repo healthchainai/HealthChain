@@ -1,7 +1,7 @@
 [project]
 name = "healthchain"
 version = "0.0.0"
-description = "Python SDK for building, testing, and deploying AI in real healthcare systems — type-safe FHIR, real-time EHR connectivity, and production deployment"
+description = "Python SDK for building AI in real healthcare systems — type-safe FHIR, real-time EHR connectivity, and production deployment"
 authors = [
     { name = "Jennifer Jiang-Kells", email = "jenniferjiangkells@gmail.com" },
     { name = "Adam Kells", email = "adamjkells93@gmail.com" },
@@ -83,7 +83,7 @@ scripts = [
 ]
 docs = [
     "mkdocs>=1.6.1,<2",
-    "mkdocs-material>=9.5.34,<10",
+    "mkdocs-material[imaging]>=9.5.34,<10",
     "mkdocstrings>=0.26.0,<0.27",
     "mkdocstrings-python>=1.11.1,<2",
     "griffe<1.15",

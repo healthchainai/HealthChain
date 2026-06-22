@@ -468,9 +468,12 @@ code {
 /* Brand "Plug" logo: show the dark-prong mark on the light header and the
    white-prong (-reverse) mark on the dark header so the prongs stay legible.
    Both <img>s render via docs/overrides/partials/logo.html. */
+/* `!important` so the hidden variant beats Material's logo `display:block` in
+   both render spots — the header (specificity 0,2,1) and the mobile nav drawer
+   (.md-nav__title …, specificity 0,3,1, which a plain selector can't outrank). */
 [data-md-color-scheme="default"] .md-logo .hc-logo--dark,
 [data-md-color-scheme="slate"] .md-logo .hc-logo--light {
-  display: none;
+  display: none !important;
 }
 
 /* Reusable scheme-swap for brand marks: pair a `--light` (dark-detail) and a

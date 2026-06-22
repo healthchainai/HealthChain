@@ -1,6 +1,6 @@
 site_name: HealthChain
 site_url: https://healthchainai.github.io/HealthChain/
-site_description: An open-source Python SDK for building, testing, and deploying AI in real healthcare systems — type-safe FHIR, real-time EHR connectivity, and production deployment.
+site_description: An open-source Python SDK for building AI in real healthcare systems — type-safe FHIR, real-time EHR connectivity, and production deployment.
 site_author: Jennifer Jiang-Kells
 
 # Repository
@@ -179,6 +179,12 @@ plugins:
             show_source: false
   - search
   # - section-index
-  # - social:
-  #     cards_layout_options:
-  #       color: #173a58
+  # Auto-generated Open Graph / Twitter preview cards (one per page) for when
+  # docs links are shared. Needs the imaging libs — see requirements-doc.txt and
+  # the apt step in the doc workflows.
+  - social:
+      cards_layout_options:
+        background_color: "#211c26"
+        color: "#f4f4f6"
+        # White-prong variant so the plug stays legible on the dark card
+        logo: docs/assets/brand/marks/plug-reverse.svg
