@@ -1,6 +1,6 @@
 site_name: HealthChain
 site_url: https://healthchainai.github.io/HealthChain/
-site_description: Simplify prototyping and testing NLP applications in a healthcare context.
+site_description: An open-source Python SDK for building, testing, and deploying AI in real healthcare systems — type-safe FHIR, real-time EHR connectivity, and production deployment.
 site_author: Jennifer Jiang-Kells
 
 # Repository

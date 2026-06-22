@@ -1,7 +1,5 @@
 <div align="center" style="margin-bottom: 1em;">
 
-# HealthChain
-
 <img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/brand/hero/readme-hero-transparent.png" alt="HealthChain — Build, test & deploy AI in real healthcare systems" width="640"></img>
 
 <!-- Project Badges -->
@@ -23,7 +21,7 @@
 
 <div align="center">
 
-HealthChain is an open-source Python SDK for building healthcare AI on real clinical data. The model is the easy part — HealthChain gives your models and agents tools they can trust: **type-safe FHIR resources**, **real-time EHR connectivity**, and **production-ready deployment**. So what you build holds up outside the demo.
+The model is the easy part — the integration that blocks it from ever reaching production is the hard part. HealthChain is the open-source Python SDK that handles it, giving your models and agents tools they can trust: **type-safe FHIR resources**, **real-time EHR connectivity**, and **production-ready deployment**. So what you build holds up outside the demo.
 
 </div>
 
@@ -111,7 +109,7 @@ The quickest way for AI developers and researchers to ship healthcare AI — eve
 
 Every serious healthcare AI project builds the same integration infrastructure from scratch. Whether you're deploying a logistic regression, a 70B-parameter model, or an agentic workflow, the wall between a trained model and a live clinical system is the same: real FHIR APIs, multi-site deployments, auditable governance. No off-the-shelf solution exists, and engineers who understand both AI and healthcare protocols are scarce and hard to retain.
 
-HealthChain handles that complexity so you can focus on what actually matters: the model and the patient.
+HealthChain handles that complexity so you can focus on what actually matters: the model and the patient. And because the same tools run on sandbox and synthetic data, the wider AI/ML community can experiment with healthcare AI from scratch — no EHR access required.
 
 - **Optimized for real-time** - Connect to live FHIR APIs and integration points instead of stale data exports
 - **Automatic validation** - Type-safe FHIR models prevent broken healthcare data
