@@ -41,9 +41,10 @@ jobs:
 
       - name: Check for vulnerabilities
         if: matrix.python-version == '3.12'
-        # Advisory only — does not block PRs. The blocking gate runs on a schedule
-        #   in security-audit.yml, so a newly published advisory in any transitive
-        #   dep can't block unrelated changes. Findings still surface in PR logs.
+        # Advisory only — does not block PRs, so a newly published advisory in any
+        #   transitive dep can't block unrelated changes. Findings still surface in
+        #   PR logs, and Dependabot opens fix PRs for advisories on main. Run
+        #   `uv run pip-audit` locally for a full on-demand audit.
         # PYSEC-2026-196: pip — affects the runner's bundled pip, not a project dep.
         # In-range fixes are taken in uv.lock instead of ignored, so the audit
         #   stays meaningful.

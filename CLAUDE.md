@@ -57,7 +57,12 @@ uv run ruff format .                   # Format code
 uv sync                                # Install/sync dependencies
 uv add <package>                       # Add dependency
 uv add --dev <package>                 # Add dev dependency
+
+# Security
+uv run pip-audit                       # Audit installed deps for known vulnerabilities
 ```
+
+> Vulnerability fixes arrive via Dependabot security PRs; CI runs `pip-audit` advisory-only on PRs. Run `pip-audit` locally for a full on-demand check.
 
 ---
 
