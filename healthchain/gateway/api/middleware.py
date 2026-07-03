@@ -71,6 +71,9 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
 
         response = await call_next(request)
 
+        if response.status_code == 401:
+            return response
+
         duration_ms = round((time.monotonic() - start) * 1000, 1)
         entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
