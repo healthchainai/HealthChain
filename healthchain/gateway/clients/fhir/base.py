@@ -402,7 +402,7 @@ def parse_fhir_auth_connection_string(connection_string: str) -> FHIRAuthConfig:
         return FHIRAuthConfig(
             base_url=base_url,
             timeout=int(params.get("timeout", 30)),
-            verify_ssl=params.get("verify_ssl", "true").lower() == "true",
+            verify_ssl=params.get("verify_ssl", "false").lower() == "true",
         )
 
     # If any auth param is present, validate complete auth config
@@ -416,7 +416,7 @@ def parse_fhir_auth_connection_string(connection_string: str) -> FHIRAuthConfig:
         audience=params.get("audience"),
         base_url=base_url,
         timeout=int(params.get("timeout", 30)),
-        verify_ssl=params.get("verify_ssl", "true").lower() == "true",
+        verify_ssl=params.get("verify_ssl", "false").lower() == "true",
         use_jwt_assertion=params.get("use_jwt_assertion", "false").lower() == "true",
         key_id=params.get("key_id"),
     )
