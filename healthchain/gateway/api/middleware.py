@@ -81,6 +81,9 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
         # Echo the request id back so callers can correlate logs with responses
         response.headers["X-Request-ID"] = request_id
 
+        if response.status_code == 401:
+            return response
+
         duration_ms = round((time.monotonic() - start) * 1000, 1)
         entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
