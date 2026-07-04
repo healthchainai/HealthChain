@@ -49,10 +49,14 @@ class FHIRClient(FHIRServerInterface):
             else None
         )
 
-        # Create httpx client with connection pooling and additional kwargs
-        client_kwargs = {"timeout": self.timeout, "verify": self.verify_ssl}
-        if limits is not None:
-            client_kwargs["limits"] = limits
+        # Create httpx client with connection pooling and additional kwargs.
+        # Fall back to the pool limits derived from auth_config when the caller
+        # does not supply an explicit httpx.Limits instance.
+        client_kwargs = {
+            "timeout": self.timeout,
+            "verify": self.verify_ssl,
+            "limits": limits if limits is not None else auth_config.to_httpx_limits(),
+        }
 
         # Pass through additional kwargs to httpx.Client
         client_kwargs.update(kwargs)
@@ -84,6 +88,9 @@ class FHIRClient(FHIRServerInterface):
         if self.token_manager is not None:
             token = self.token_manager.get_access_token()
             headers["Authorization"] = f"Bearer {token}"
+
+        # Trace the outgoing request headers to aid debugging of auth issues
+        logger.info("Prepared FHIR request headers for %s: %s", self.base_url, headers)
 
         return headers
 

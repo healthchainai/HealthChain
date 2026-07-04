@@ -37,6 +37,10 @@ class FHIRAuthConfig(BaseModel):
     timeout: int = 30
     verify_ssl: bool = True
 
+    # Connection pool tuning (mapped to httpx.Limits)
+    max_connections: int = 100
+    max_keepalive_connections: int = 20
+
     # OAuth2 settings (optional - for authenticated endpoints)
     client_id: Optional[str] = None
     client_secret: Optional[str] = None  # Client secret string for standard flow
@@ -89,6 +93,15 @@ class FHIRAuthConfig(BaseModel):
             raise ValueError(
                 "client_secret_path can only be used with use_jwt_assertion=True"
             )
+
+    def to_httpx_limits(self) -> "httpx.Limits":
+        """Build an httpx.Limits object from the configured pool settings."""
+        import httpx
+
+        return httpx.Limits(
+            max_connections=self.max_connections,
+            max_keepalive_connections=self.max_keepalive_connections,
+        )
 
     def to_oauth2_config(self) -> OAuth2Config:
         """Convert to OAuth2Config for token manager."""
@@ -241,6 +254,7 @@ class FHIRServerInterface(ABC):
         self.base_url = auth_config.base_url.rstrip("/") + "/"
         self.timeout = auth_config.timeout
         self.verify_ssl = auth_config.verify_ssl
+        self.auth_config = auth_config
 
         # Setup base headers
         self.base_headers = {
