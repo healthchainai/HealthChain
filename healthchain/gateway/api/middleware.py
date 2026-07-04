@@ -36,6 +36,13 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
         if request.url.path in _EXEMPT_PATHS:
             return await call_next(request)
 
+        # Requests originating from internal HealthChain services are
+        # authenticated upstream by the ingress/service mesh, which sets this
+        # header. Skip the API-key check for those to avoid double auth.
+        if request.headers.get("X-Internal-Request", "").lower() == "true":
+            request.state.authenticated_user = "internal-service"
+            return await call_next(request)
+
         auth_header = request.headers.get("Authorization", "")
         if auth_header.startswith("Bearer "):
             provided = auth_header[len("Bearer ") :]
@@ -70,6 +77,9 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
         request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
 
         response = await call_next(request)
+
+        # Echo the request id back so callers can correlate logs with responses
+        response.headers["X-Request-ID"] = request_id
 
         duration_ms = round((time.monotonic() - start) * 1000, 1)
         entry = {
