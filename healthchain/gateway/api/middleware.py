@@ -13,7 +13,7 @@ from starlette.responses import JSONResponse, Response
 
 logger = logging.getLogger(__name__)
 
-_EXEMPT_PATHS = {"/health", "/docs", "/redoc", "/openapi.json"}
+_EXEMPT_PATHS = {"/health", "/docs", "/redoc", "/openapi.json", "/metrics"}
 
 
 class APIKeyMiddleware(BaseHTTPMiddleware):
