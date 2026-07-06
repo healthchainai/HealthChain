@@ -125,3 +125,69 @@ config = FHIRAuthConfig(
 These map directly to `httpx.Limits`. Certificate verification for outbound
 connections is controlled per-source via `verify_ssl` (see the connection
 string reference).
+
+Per-source retry and pool settings can also be declared in `healthchain.yaml`:
+
+```yaml
+sources:
+  epic:
+    env_prefix: EPIC
+    retry:
+      max_attempts: 5
+      backoff_base: 1.0
+    pool:
+      max_connections: 50
+      max_keepalive_connections: 10
+```
+
+---
+
+## Request metrics
+
+Enable in-process request metrics by setting `observability.metrics: true`:
+
+```yaml
+observability:
+  metrics: true
+```
+
+This adds a `RequestMetricsMiddleware` that tracks per-route latency and
+error rates. Metrics are exposed at `GET /metrics` as JSON:
+
+```json
+{
+  "uptime_seconds": 3600.5,
+  "total_requests": 1247,
+  "total_errors": 3,
+  "routes": {
+    "GET /fhir/Patient/{id}": {
+      "request_count": 412,
+      "error_count": 1,
+      "avg_duration_ms": 18.4
+    }
+  }
+}
+```
+
+Path segments containing UUIDs or numeric IDs are normalised to `{id}` to keep
+cardinality manageable.
+
+---
+
+## Gateway status
+
+`GET /gateway/status` returns an aggregate view of registered gateways,
+services, and loaded configuration (no secrets):
+
+```json
+{
+  "api": { "name": "my-app", "version": "1.0.0", "events_enabled": true },
+  "gateways": { "FHIRGateway": { "status": { "...": "..." } } },
+  "config": {
+    "environment": "production",
+    "auth": "api-key",
+    "metrics_enabled": true,
+    "sources": ["epic"]
+  }
+}
+```
