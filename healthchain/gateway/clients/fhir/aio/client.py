@@ -9,6 +9,7 @@ from fhir.resources.resource import Resource
 
 from healthchain.gateway.clients.auth import AsyncOAuth2TokenManager
 from healthchain.gateway.clients.fhir.base import FHIRAuthConfig, FHIRServerInterface
+from healthchain.gateway.clients.retry import async_retry_call
 
 
 logger = logging.getLogger(__name__)
@@ -74,6 +75,54 @@ class AsyncFHIRClient(FHIRServerInterface):
 
         return headers
 
+    async def _http_get(self, url: str, headers: Dict[str, str], **kwargs) -> httpx.Response:
+        policy = self.auth_config.to_retry_policy()
+
+        async def _do():
+            return await self.client.get(url, headers=headers, **kwargs)
+
+        return await async_retry_call(_do, policy)
+
+    async def _http_post(
+        self, url: str, headers: Dict[str, str], **kwargs
+    ) -> httpx.Response:
+        policy = self.auth_config.to_retry_policy()
+
+        async def _do():
+            return await self.client.post(url, headers=headers, **kwargs)
+
+        return await async_retry_call(_do, policy)
+
+    async def _http_put(
+        self, url: str, headers: Dict[str, str], **kwargs
+    ) -> httpx.Response:
+        policy = self.auth_config.to_retry_policy()
+
+        async def _do():
+            return await self.client.put(url, headers=headers, **kwargs)
+
+        return await async_retry_call(_do, policy)
+
+    async def _http_patch(
+        self, url: str, headers: Dict[str, str], **kwargs
+    ) -> httpx.Response:
+        policy = self.auth_config.to_retry_policy()
+
+        async def _do():
+            return await self.client.patch(url, headers=headers, **kwargs)
+
+        return await async_retry_call(_do, policy)
+
+    async def _http_delete(
+        self, url: str, headers: Dict[str, str], **kwargs
+    ) -> httpx.Response:
+        policy = self.auth_config.to_retry_policy()
+
+        async def _do():
+            return await self.client.delete(url, headers=headers, **kwargs)
+
+        return await async_retry_call(_do, policy)
+
     async def capabilities(self) -> CapabilityStatement:
         """
         Fetch the server's CapabilityStatement.
@@ -82,7 +131,7 @@ class AsyncFHIRClient(FHIRServerInterface):
             CapabilityStatement resource
         """
         headers = await self._get_headers()
-        response = await self.client.get(self._build_url("metadata"), headers=headers)
+        response = await self._http_get(self._build_url("metadata"), headers=headers)
         data = self._handle_response(response)
         return CapabilityStatement(**data)
 
@@ -104,10 +153,44 @@ class AsyncFHIRClient(FHIRServerInterface):
         logger.debug(f"Sending GET request to {url}")
 
         headers = await self._get_headers()
-        response = await self.client.get(url, headers=headers)
+        response = await self._http_get(url, headers=headers)
         data = self._handle_response(response)
 
         return resource_class(**data)
+
+    async def vread(
+        self,
+        resource_type: Union[str, Type[Resource]],
+        resource_id: str,
+        version_id: str,
+    ) -> Resource:
+        """Read a specific version of a resource."""
+        type_name, resource_class = self._resolve_resource_type(resource_type)
+        url = self._build_url(f"{type_name}/{resource_id}/_history/{version_id}")
+        logger.debug(f"Sending vread GET request to {url}")
+
+        headers = await self._get_headers()
+        response = await self._http_get(url, headers=headers)
+        data = self._handle_response(response)
+
+        return resource_class(**data)
+
+    async def history(
+        self,
+        resource_type: Union[str, Type[Resource]],
+        resource_id: str,
+        params: Dict[str, Any] = None,
+    ) -> Bundle:
+        """Read the version history for a resource."""
+        type_name, _ = self._resolve_resource_type(resource_type)
+        url = self._build_url(f"{type_name}/{resource_id}/_history", params)
+        logger.debug(f"Sending history GET request to {url}")
+
+        headers = await self._get_headers()
+        response = await self._http_get(url, headers=headers)
+        data = self._handle_response(response)
+
+        return Bundle(**data)
 
     async def search(
         self, resource_type: Union[str, Type[Resource]], params: Dict[str, Any] = None
@@ -127,10 +210,32 @@ class AsyncFHIRClient(FHIRServerInterface):
         logger.debug(f"Sending GET request to {url}")
 
         headers = await self._get_headers()
-        response = await self.client.get(url, headers=headers)
+        response = await self._http_get(url, headers=headers)
         data = self._handle_response(response)
 
         return Bundle(**data)
+
+    async def patch(
+        self,
+        resource_type: Union[str, Type[Resource]],
+        resource_id: str,
+        patch_body: list,
+    ) -> Resource:
+        """Apply a JSON Patch to a resource."""
+        import json
+
+        type_name, resource_class = self._resolve_resource_type(resource_type)
+        url = self._build_url(f"{type_name}/{resource_id}")
+        logger.debug(f"Sending PATCH request to {url}")
+
+        headers = await self._get_headers()
+        headers["Content-Type"] = "application/json-patch+json"
+        response = await self._http_patch(
+            url, headers=headers, content=json.dumps(patch_body)
+        )
+        data = self._handle_response(response)
+
+        return resource_class(**data)
 
     async def create(self, resource: Resource) -> Resource:
         """
@@ -149,8 +254,8 @@ class AsyncFHIRClient(FHIRServerInterface):
         logger.debug(f"Sending POST request to {url}")
 
         headers = await self._get_headers()
-        response = await self.client.post(
-            url, content=resource.model_dump_json(), headers=headers
+        response = await self._http_post(
+            url, headers=headers, content=resource.model_dump_json()
         )
         data = self._handle_response(response)
 
@@ -177,8 +282,8 @@ class AsyncFHIRClient(FHIRServerInterface):
         logger.debug(f"Sending PUT request to {url}")
 
         headers = await self._get_headers()
-        response = await self.client.put(
-            url, content=resource.model_dump_json(), headers=headers
+        response = await self._http_put(
+            url, headers=headers, content=resource.model_dump_json()
         )
         data = self._handle_response(response)
 
@@ -203,7 +308,7 @@ class AsyncFHIRClient(FHIRServerInterface):
         logger.debug(f"Sending DELETE request to {url}")
 
         headers = await self._get_headers()
-        response = await self.client.delete(url, headers=headers)
+        response = await self._http_delete(url, headers=headers)
 
         # Delete operations typically return 204 No Content
         if response.status_code in (200, 204):
@@ -226,8 +331,8 @@ class AsyncFHIRClient(FHIRServerInterface):
         logger.debug(f"Sending POST request to {url}")
 
         headers = await self._get_headers()
-        response = await self.client.post(
-            url, content=bundle.model_dump_json(), headers=headers
+        response = await self._http_post(
+            url, headers=headers, content=bundle.model_dump_json()
         )
         data = self._handle_response(response)
 
