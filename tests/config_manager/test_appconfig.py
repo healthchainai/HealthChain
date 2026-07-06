@@ -181,3 +181,43 @@ def test_appconfig_sources_defaults_to_empty(tmp_path):
     config = AppConfig.from_yaml(tmp_path / "healthchain.yaml")
 
     assert config.sources == {}
+
+
+def test_appconfig_observability_metrics_flag(tmp_path):
+    """AppConfig parses observability.metrics from YAML."""
+    (tmp_path / "healthchain.yaml").write_text(
+        "name: app\nobservability:\n  metrics: true\n"
+    )
+    config = AppConfig.from_yaml(tmp_path / "healthchain.yaml")
+    assert config.observability.metrics is True
+
+
+def test_appconfig_source_retry_and_pool_overrides(tmp_path, monkeypatch):
+    """SourceConfig retry/pool settings override FHIRAuthConfig defaults."""
+    (tmp_path / "healthchain.yaml").write_text(
+        """
+name: app
+sources:
+  epic:
+    env_prefix: EPIC
+    retry:
+      max_attempts: 5
+      backoff_base: 1.0
+    pool:
+      max_connections: 50
+      max_keepalive_connections: 10
+"""
+    )
+    monkeypatch.setenv("EPIC_CLIENT_ID", "c")
+    monkeypatch.setenv("EPIC_CLIENT_SECRET", "s")
+    monkeypatch.setenv("EPIC_TOKEN_URL", "https://epic.com/token")
+    monkeypatch.setenv("EPIC_BASE_URL", "https://epic.com/fhir")
+
+    config = AppConfig.from_yaml(tmp_path / "healthchain.yaml")
+    auth = config.sources["epic"].to_fhir_auth_config()
+
+    assert auth.retry_max_attempts == 5
+    assert auth.retry_backoff_base == 1.0
+    assert auth.max_connections == 50
+    assert auth.max_keepalive_connections == 10
+

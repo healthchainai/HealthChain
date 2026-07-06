@@ -18,16 +18,51 @@ logger = logging.getLogger(__name__)
 _CONFIG_FILENAME = "healthchain.yaml"
 
 
+class RetryConfig(BaseModel):
+    """Retry policy for outbound FHIR/OAuth2 calls."""
+
+    max_attempts: int = 3
+    backoff_base: float = 0.5
+    backoff_factor: float = 2.0
+    max_backoff: float = 8.0
+
+
+class PoolConfig(BaseModel):
+    """HTTP connection pool limits for a FHIR source."""
+
+    max_connections: int = 100
+    max_keepalive_connections: int = 20
+
+
+class ObservabilityConfig(BaseModel):
+    """Gateway observability settings."""
+
+    metrics: bool = False
+
+
 class SourceConfig(BaseModel):
     """A FHIR data source. Credentials are loaded from environment variables."""
 
     env_prefix: str  # e.g. "MEDPLUM" reads MEDPLUM_CLIENT_ID, MEDPLUM_BASE_URL etc.
+    retry: RetryConfig = RetryConfig()
+    pool: PoolConfig = PoolConfig()
 
     def to_fhir_auth_config(self):
         """Instantiate FHIRAuthConfig by reading env vars for this source's prefix."""
         from healthchain.gateway.clients.fhir.base import FHIRAuthConfig
 
-        return FHIRAuthConfig.from_env(self.env_prefix)
+        cfg = FHIRAuthConfig.from_env(self.env_prefix)
+        # YAML-level overrides take precedence over env defaults
+        return cfg.model_copy(
+            update={
+                "retry_max_attempts": self.retry.max_attempts,
+                "retry_backoff_base": self.retry.backoff_base,
+                "retry_backoff_factor": self.retry.backoff_factor,
+                "retry_max_backoff": self.retry.max_backoff,
+                "max_connections": self.pool.max_connections,
+                "max_keepalive_connections": self.pool.max_keepalive_connections,
+            }
+        )
 
 
 class LLMConfig(BaseModel):
@@ -120,6 +155,7 @@ class AppConfig(BaseModel):
     service: ServiceConfig = ServiceConfig()
     security: SecurityConfig = SecurityConfig()
     compliance: ComplianceConfig = ComplianceConfig()
+    observability: ObservabilityConfig = ObservabilityConfig()
     site: SiteConfig = SiteConfig()
     sources: Dict[str, SourceConfig] = {}
     llm: Optional[LLMConfig] = None
