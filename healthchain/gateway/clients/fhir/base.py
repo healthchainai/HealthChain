@@ -41,6 +41,12 @@ class FHIRAuthConfig(BaseModel):
     max_connections: int = 100
     max_keepalive_connections: int = 20
 
+    # Retry policy for outbound FHIR HTTP calls
+    retry_max_attempts: int = 3
+    retry_backoff_base: float = 0.5
+    retry_backoff_factor: float = 2.0
+    retry_max_backoff: float = 8.0
+
     # OAuth2 settings (optional - for authenticated endpoints)
     client_id: Optional[str] = None
     client_secret: Optional[str] = None  # Client secret string for standard flow
@@ -101,6 +107,17 @@ class FHIRAuthConfig(BaseModel):
         return httpx.Limits(
             max_connections=self.max_connections,
             max_keepalive_connections=self.max_keepalive_connections,
+        )
+
+    def to_retry_policy(self) -> "RetryPolicy":
+        """Build a RetryPolicy for outbound FHIR HTTP calls."""
+        from healthchain.gateway.clients.retry import RetryPolicy
+
+        return RetryPolicy(
+            max_attempts=self.retry_max_attempts,
+            backoff_base=self.retry_backoff_base,
+            backoff_factor=self.retry_backoff_factor,
+            max_backoff=self.retry_max_backoff,
         )
 
     def to_oauth2_config(self) -> OAuth2Config:
@@ -178,6 +195,10 @@ class FHIRAuthConfig(BaseModel):
             os.getenv(f"{env_prefix}_USE_JWT_ASSERTION", "false").lower() == "true"
         )
         key_id = os.getenv(f"{env_prefix}_KEY_ID")
+        max_connections = int(os.getenv(f"{env_prefix}_MAX_CONNECTIONS", "100"))
+        max_keepalive = int(os.getenv(f"{env_prefix}_MAX_KEEPALIVE_CONNECTIONS", "20"))
+        retry_max_attempts = int(os.getenv(f"{env_prefix}_RETRY_MAX_ATTEMPTS", "3"))
+        retry_backoff_base = float(os.getenv(f"{env_prefix}_RETRY_BACKOFF_BASE", "0.5"))
 
         return cls(
             client_id=client_id,
@@ -191,6 +212,10 @@ class FHIRAuthConfig(BaseModel):
             verify_ssl=verify_ssl,
             use_jwt_assertion=use_jwt_assertion,
             key_id=key_id,
+            max_connections=max_connections,
+            max_keepalive_connections=max_keepalive,
+            retry_max_attempts=retry_max_attempts,
+            retry_backoff_base=retry_backoff_base,
         )
 
     def to_connection_string(self) -> str:
@@ -363,6 +388,36 @@ class FHIRServerInterface(ABC):
     @abstractmethod
     def capabilities(self) -> CapabilityStatement:
         """Get the capabilities of the FHIR server."""
+        pass
+
+    @abstractmethod
+    def patch(
+        self,
+        resource_type: Union[str, Type[Resource]],
+        resource_id: str,
+        patch_body: list,
+    ) -> Resource:
+        """Apply a JSON Patch to a resource (FHIR PATCH interaction)."""
+        pass
+
+    @abstractmethod
+    def vread(
+        self,
+        resource_type: Union[str, Type[Resource]],
+        resource_id: str,
+        version_id: str,
+    ) -> Resource:
+        """Read a specific version of a resource (FHIR vread interaction)."""
+        pass
+
+    @abstractmethod
+    def history(
+        self,
+        resource_type: Union[str, Type[Resource]],
+        resource_id: str,
+        params: Optional[Dict[str, Any]] = None,
+    ) -> Bundle:
+        """Read the version history for a resource (FHIR history interaction)."""
         pass
 
 
