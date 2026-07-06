@@ -89,3 +89,52 @@ class ClientPool(Generic[ClientInterface]):
             stats["clients"][conn_str] = client_stats
 
         return stats
+
+
+class SyncClientPool(Generic[ClientInterface]):
+    """
+    Synchronous client pool that reuses FHIR client instances per connection string.
+
+    Mirrors the async ``ClientPool`` behaviour for sync gateways and scripts that
+    perform many sequential reads against the same EHR endpoint.
+    """
+
+    def __init__(
+        self,
+        max_connections: int = 100,
+        max_keepalive_connections: int = 20,
+        keepalive_expiry: float = 5.0,
+    ):
+        self._clients: Dict[str, ClientInterface] = {}
+        self._client_limits = httpx.Limits(
+            max_connections=max_connections,
+            max_keepalive_connections=max_keepalive_connections,
+            keepalive_expiry=keepalive_expiry,
+        )
+
+    def get_client(
+        self, connection_string: str, client_factory: Callable
+    ) -> ClientInterface:
+        if connection_string not in self._clients:
+            self._clients[connection_string] = client_factory(
+                connection_string, limits=self._client_limits
+            )
+        return self._clients[connection_string]
+
+    def close_all(self) -> None:
+        for client in self._clients.values():
+            if hasattr(client, "close"):
+                client.close()
+        self._clients.clear()
+
+    def get_pool_stats(self) -> Dict[str, Any]:
+        return {
+            "total_clients": len(self._clients),
+            "limits": {
+                "max_connections": self._client_limits.max_connections,
+                "max_keepalive_connections": self._client_limits.max_keepalive_connections,
+                "keepalive_expiry": self._client_limits.keepalive_expiry,
+            },
+            "connection_strings": list(self._clients.keys()),
+        }
+

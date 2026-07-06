@@ -85,7 +85,7 @@ def test_connection_manager_cleanup_all_sources(connection_manager):
     mock_client2.close = Mock()
 
     # Mock the client creation to return our mock clients
-    def mock_create_client(connection_string):
+    def mock_create_client(connection_string, limits=None):
         if "source1.com" in connection_string:
             return mock_client1
         else:

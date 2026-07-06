@@ -139,6 +139,23 @@ def test_endpoints(client):
     assert "MockGateway" in metadata["gateways"]
 
 
+def test_gateway_status_endpoint(client):
+    """GET /gateway/status returns aggregate gateway and service info."""
+    status = client.get("/gateway/status").json()
+    assert status["api"]["name"] == "Test API"
+    assert "MockGateway" in status["gateways"]
+    assert "gateways" in status
+
+
+def test_metrics_endpoint(client):
+    """GET /metrics returns JSON metrics snapshot."""
+    response = client.get("/metrics")
+    assert response.status_code == 200
+    body = response.json()
+    assert "total_requests" in body
+    assert "routes" in body
+
+
 def test_register_gateway(app):
     """Test gateway registration."""
 

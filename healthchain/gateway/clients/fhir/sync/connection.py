@@ -4,6 +4,7 @@ import urllib.parse
 from typing import Dict
 
 from healthchain.gateway.clients.fhir.base import FHIRServerInterface
+from healthchain.gateway.clients.pool import SyncClientPool
 from healthchain.gateway.fhir.errors import FHIRConnectionError
 
 
@@ -15,14 +16,23 @@ class FHIRConnectionManager:
     Base FHIR connection manager for sync clients.
 
     Handles connection strings, source configuration, and provides
-    sync FHIR clients.
+    pooled sync FHIR clients for efficient resource management.
     """
 
-    def __init__(self):
-        """Initialize the sync connection manager."""
-        # Store configuration
+    def __init__(
+        self,
+        max_connections: int = 100,
+        max_keepalive_connections: int = 20,
+        keepalive_expiry: float = 5.0,
+    ):
+        """Initialize the sync connection manager with optional pool limits."""
         self.sources = {}
         self._connection_strings = {}
+        self.client_pool = SyncClientPool(
+            max_connections=max_connections,
+            max_keepalive_connections=max_keepalive_connections,
+            keepalive_expiry=keepalive_expiry,
+        )
 
     def add_source(self, name: str, connection_string: str):
         """
@@ -70,13 +80,13 @@ class FHIRConnectionManager:
 
     def get_client(self, source: str = None) -> FHIRServerInterface:
         """
-        Get a sync FHIR client for the specified source.
+        Get a pooled sync FHIR client for the specified source.
 
         Args:
             source: Source name to get client for (uses first available if None)
 
         Returns:
-            FHIRServerInterface: A sync FHIR client
+            FHIRServerInterface: A sync FHIR client with pooled connections
 
         Raises:
             ValueError: If source is unknown or no connection string found
@@ -90,22 +100,29 @@ class FHIRConnectionManager:
 
         connection_string = self._connection_strings[source_name]
 
-        return self._create_server_from_connection_string(connection_string)
+        return self.client_pool.get_client(
+            connection_string, self._create_server_from_connection_string
+        )
+
+    def close(self) -> None:
+        """Close all pooled client connections."""
+        self.client_pool.close_all()
 
     def get_status(self) -> Dict[str, any]:
         """
         Get the current status of the sync connection manager.
 
         Returns:
-            Dict containing status information for sync clients.
+            Dict containing status information including pool stats.
         """
         return {
             "client_type": "sync",
-            "pooling_enabled": False,
+            "pooling_enabled": True,
             "sources": {
                 "count": len(self.sources),
                 "configured": list(self.sources.keys()),
             },
+            "pool_stats": self.client_pool.get_pool_stats(),
         }
 
     def get_sources(self) -> Dict[str, any]:
@@ -118,13 +135,14 @@ class FHIRConnectionManager:
         return self.sources.copy()
 
     def _create_server_from_connection_string(
-        self, connection_string: str
+        self, connection_string: str, limits=None
     ) -> FHIRServerInterface:
         """
         Create a sync FHIR server instance from a connection string.
 
         Args:
             connection_string: FHIR connection string
+            limits: httpx connection limits for pooling
 
         Returns:
             FHIRServerInterface: A new sync FHIR server instance
@@ -137,4 +155,4 @@ class FHIRConnectionManager:
         # Parse connection string as OAuth2.0 configuration
         auth_config = parse_fhir_auth_connection_string(connection_string)
 
-        return create_fhir_client(auth_config=auth_config)
+        return create_fhir_client(auth_config=auth_config, limits=limits)
