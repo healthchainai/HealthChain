@@ -1,0 +1,3 @@
+# Terminology
+
+::: healthchain.terminology
