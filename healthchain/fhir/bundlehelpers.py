@@ -10,6 +10,7 @@ Patterns:
 
 from typing import List, Type, TypeVar, Optional, Union
 from fhir.resources.R4B.bundle import Bundle, BundleEntry
+from fhir.resources.R4B.reference import Reference
 from fhir.resources.resource import Resource
 
 T = TypeVar("T", bound=Resource)
@@ -107,6 +108,92 @@ def get_resources(
         for entry in (bundle.entry or [])
         if entry.resource is not None and entry.resource.__class__.__name__ == type_name
     ]
+
+
+def resolve_reference(
+    bundle: Bundle,
+    reference: Union[str, Reference],
+    parent: Optional[Resource] = None,
+) -> Optional[Resource]:
+    """Resolve a FHIR Reference to its target resource within a bundle.
+
+    Read-side counterpart to ``add_resource``: given a reference string or an
+    R4B ``Reference`` element, find the resource it points to. Resolution is
+    attempted in this order:
+
+    1. Contained: references starting with ``#`` are resolved against
+       ``parent.contained`` by resource ``id``.
+    2. Exact ``fullUrl`` match against ``entry.fullUrl`` (covers absolute URLs
+       and ``urn:uuid:...`` references).
+    3. ``Type/id`` relative references: match an entry whose resource type name
+       and ``id`` match, or an absolute ``fullUrl`` ending in ``/Type/id``.
+    4. ``urn:uuid:{id}`` fallback: when no ``fullUrl`` matched, match a resource
+       whose ``id`` equals the uuid part.
+
+    Never raises on unresolvable or malformed references; returns None instead.
+    The lookup is built lazily per call (no caching or state).
+
+    Args:
+        bundle: The bundle to search
+        reference: A reference string (e.g. "Patient/123", "urn:uuid:...",
+            "#contained-id") or an R4B ``Reference`` element
+        parent: The resource that owns the reference, required only to resolve
+            contained ("#id") references against its ``contained`` list
+
+    Returns:
+        The first matching resource, or None if the reference cannot be resolved
+
+    Example:
+        >>> bundle = load_bundle("synthea_patient.json")
+        >>> med_request = get_resources(bundle, "MedicationRequest")[0]
+        >>> medication = resolve_reference(bundle, med_request.medicationReference)
+        >>> patient = resolve_reference(bundle, "Patient/patient-1")
+    """
+    ref = reference.reference if isinstance(reference, Reference) else reference
+    if not ref:
+        return None
+
+    # 1. Contained reference (#id) resolves against the parent's contained list
+    if ref.startswith("#"):
+        if parent is None:
+            return None
+        target_id = ref[1:]
+        for contained in getattr(parent, "contained", None) or []:
+            if getattr(contained, "id", None) == target_id:
+                return contained
+        return None
+
+    entries = [entry for entry in (bundle.entry or []) if entry.resource is not None]
+
+    # 2. Exact fullUrl match (absolute URLs and urn:uuid references)
+    for entry in entries:
+        if entry.fullUrl and entry.fullUrl == ref:
+            return entry.resource
+
+    # 3. Type/id relative references, and absolute fullUrls ending in /Type/id
+    if "/" in ref:
+        head, _, res_id = ref.rpartition("/")
+        type_name = head.rsplit("/", 1)[-1]
+        if type_name and res_id:
+            tail = f"/{type_name}/{res_id}"
+            for entry in entries:
+                resource = entry.resource
+                if (
+                    resource.__class__.__name__ == type_name
+                    and getattr(resource, "id", None) == res_id
+                ):
+                    return resource
+                if entry.fullUrl and entry.fullUrl.endswith(tail):
+                    return resource
+
+    # 4. urn:uuid fallback: match a resource whose id equals the uuid part
+    if ref.startswith("urn:uuid:"):
+        uuid_part = ref[len("urn:uuid:") :]
+        for entry in entries:
+            if getattr(entry.resource, "id", None) == uuid_part:
+                return entry.resource
+
+    return None
 
 
 def set_resources(
