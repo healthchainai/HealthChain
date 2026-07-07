@@ -96,7 +96,7 @@ medication_statement["medication"]["concept"]["coding"][0]["display"]
 | Resource Type | Required Fields | Sensible Defaults | Common Use Cases |
 |--------------|-----------------|-------------------|------------------|
 | **Condition** | • `clinicalStatus`<br>• `subject` | • `clinicalStatus`: "active"<br>• `id`: auto-generated with "hc-" prefix | • Recording diagnoses<br>• Problem list items<br>• Active conditions |
-| **MedicationStatement** | • `subject`<br>• `status`<br>• `medication` | • `status`: "recorded"<br>• `id`: auto-generated with "hc-" prefix | • Current medications<br>• Medication history<br>• Prescribed medications |
+| **MedicationStatement** | • `subject`<br>• `status`<br>• `medication` | • `status`: "unknown"<br>• `id`: auto-generated with "hc-" prefix | • Current medications<br>• Medication history<br>• Prescribed medications |
 | **AllergyIntolerance** | • `patient` | • `id`: auto-generated with "hc-" prefix | • Allergies<br>• Intolerances<br>• Adverse reactions |
 | **DocumentReference** | • `type` | • `status`: "current"<br>• `date`: UTC now<br>• `description`: default text<br>• `content.attachment.title`: default text | • Clinical notes<br>• Lab reports<br>• Imaging reports |
 
@@ -165,7 +165,7 @@ Creates a new [**MedicationStatement**](https://www.hl7.org/fhir/medicationstate
     - [medication](https://www.hl7.org/fhir/medicationstatement-definitions.html#MedicationStatement.medication)
 
 !!! tip "Sensible Defaults"
-    `status` is set to "`recorded`"
+    `status` is set to "`unknown`"
 
 ```python
 from healthchain.fhir import create_medication_statement
@@ -187,7 +187,7 @@ print(medication.model_dump())
     {
         "resourceType": "MedicationStatement",
         "id": "hc-86a26eba-63f9-4017-b7b2-5b36f9bad5f1",
-        "status": "recorded",
+        "status": "unknown",
         "medicationCodeableConcept": {
             "coding": [{
                 "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
@@ -783,7 +783,7 @@ allergies = get_resources(bundle, "AllergyIntolerance")
                 "resource": {
                     "resourceType": "MedicationStatement",
                     "id": "hc-86a26eba-63f9-4017-b7b2-5b36f9bad5f1",
-                    "status": "recorded",
+                    "status": "unknown",
                     "medication": {
                         "concept": {
                             "coding": [{
