@@ -33,8 +33,12 @@ from healthchain.fhir.elementhelpers import (
 )
 
 from healthchain.fhir.readers import (
+    CodedEntry,
+    EntryCoding,
     create_resource_from_dict,
     convert_prefetch_to_fhir_objects,
+    get_coded_entries,
+    get_medications,
     prefetch_to_bundle,
     read_content_attachment,
 )
@@ -102,8 +106,12 @@ __all__ = [
     "add_provenance_metadata",
     "add_coding_to_codeable_concept",
     # Conversions and readers
+    "CodedEntry",
+    "EntryCoding",
     "create_resource_from_dict",
     "convert_prefetch_to_fhir_objects",
+    "get_coded_entries",
+    "get_medications",
     "prefetch_to_bundle",
     "read_content_attachment",
     # Validation
