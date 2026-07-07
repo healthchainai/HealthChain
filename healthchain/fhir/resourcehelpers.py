@@ -12,11 +12,12 @@ Parameters marked REQUIRED are required by FHIR specification.
 
 import logging
 
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 
 from fhir.resources.R4B.allergyintolerance import AllergyIntolerance
 from fhir.resources.R4B.condition import Condition
 from fhir.resources.R4B.documentreference import DocumentReference
+from fhir.resources.R4B.dosage import Dosage
 from fhir.resources.R4B.identifier import Identifier
 from fhir.resources.R4B.medicationstatement import MedicationStatement
 from fhir.resources.R4B.observation import Observation
@@ -35,12 +36,31 @@ from healthchain.fhir.utilities import _generate_id, _utc_now
 logger = logging.getLogger(__name__)
 
 
+def _warn_binding_issues(resource: Any) -> None:
+    """Warn (never raise) if a freshly built resource has spec-invalid codes.
+
+    Runs the required-binding check from ``healthchain.fhir.validation`` on the
+    resource instance and logs one warning per issue. This catches cases where a
+    helper produced a code outside the value set (e.g. R5 vocabulary on an R4B
+    model) that Pydantic does not reject.
+    """
+    from healthchain.fhir.validation import _check_bindings
+
+    for issue in _check_bindings(resource, resource.__class__.__name__):
+        logger.warning(
+            "FHIR binding check on %s: %s",
+            issue.expression or resource.__class__.__name__,
+            issue.diagnostics,
+        )
+
+
 def create_condition(
     subject: str,
     clinical_status: str = "active",
     code: Optional[str] = None,
     display: Optional[str] = None,
     system: Optional[str] = "http://snomed.info/sct",
+    onset: Optional[str] = None,
 ) -> Condition:
     """
     Create a minimal active FHIR Condition.
@@ -53,6 +73,8 @@ def create_condition(
         code: The condition code
         display: The display name for the condition
         system: The code system (default: SNOMED CT)
+        onset: When the condition began, as an ISO 8601 date/datetime string,
+            set as onsetDateTime (e.g. "2024-01-15" or "2024-01-15T09:00:00Z")
 
     Returns:
         Condition: A FHIR Condition resource with an auto-generated ID prefixed with 'hc-'
@@ -61,7 +83,7 @@ def create_condition(
         create_single_codeable_concept(code, display, system) if code else None
     )
 
-    return Condition(
+    condition = Condition(
         id=_generate_id(),
         subject=Reference(reference=subject),
         clinicalStatus=create_single_codeable_concept(
@@ -70,27 +92,36 @@ def create_condition(
             system="http://terminology.hl7.org/CodeSystem/condition-clinical",
         ),
         code=condition_code,
+        onsetDateTime=onset,
     )
+    _warn_binding_issues(condition)
+    return condition
 
 
 def create_medication_statement(
     subject: str,
-    status: Optional[str] = "recorded",
+    status: Optional[str] = "unknown",
     code: Optional[str] = None,
     display: Optional[str] = None,
     system: Optional[str] = "http://snomed.info/sct",
+    dosage: Optional[Union[str, Dosage, List[Dosage]]] = None,
 ) -> MedicationStatement:
     """
-    Create a minimal recorded FHIR MedicationStatement.
+    Create a minimal FHIR MedicationStatement.
     If you need to create a more complex medication statement, use the FHIR MedicationStatement resource directly.
     https://build.fhir.org/medicationstatement.html
 
     Args:
         subject: REQUIRED. Reference to the patient (e.g. "Patient/123")
-        status: REQUIRED. Status of the medication (default: recorded)
+        status: REQUIRED. Status of the medication. Default "unknown" (an R4B-valid
+            code that makes no clinical assertion). Allowed R4B values: active,
+            completed, entered-in-error, intended, stopped, on-hold, unknown, not-taken
         code: The medication code
         display: The display name for the medication
         system: The code system (default: SNOMED CT)
+        dosage: Dosage instructions. A plain string is wrapped as a single
+            free-text Dosage; a single Dosage is wrapped in a one-element list;
+            a list of Dosage elements is used as-is. See create_dosage().
 
     Returns:
         MedicationStatement: A FHIR MedicationStatement resource with an auto-generated ID prefixed with 'hc-'
@@ -99,12 +130,22 @@ def create_medication_statement(
         create_single_codeable_concept(code, display, system) if code else None
     )
 
-    return MedicationStatement(
+    if isinstance(dosage, str):
+        dosage_list: Optional[List[Dosage]] = [Dosage(text=dosage)]
+    elif isinstance(dosage, Dosage):
+        dosage_list = [dosage]
+    else:
+        dosage_list = dosage
+
+    medication_statement = MedicationStatement(
         id=_generate_id(),
         subject=Reference(reference=subject),
         status=status,
         medicationCodeableConcept=medication_concept,
+        dosage=dosage_list,
     )
+    _warn_binding_issues(medication_statement)
+    return medication_statement
 
 
 def create_allergy_intolerance(
@@ -131,11 +172,13 @@ def create_allergy_intolerance(
         create_single_codeable_concept(code, display, system) if code else None
     )
 
-    return AllergyIntolerance(
+    allergy = AllergyIntolerance(
         id=_generate_id(),
         patient=Reference(reference=patient),
         code=allergy_code,
     )
+    _warn_binding_issues(allergy)
+    return allergy
 
 
 def create_value_quantity_observation(
@@ -171,7 +214,7 @@ def create_value_quantity_observation(
 
     subject_ref = Reference(reference=subject) if subject is not None else None
 
-    return Observation(
+    observation = Observation(
         id=_generate_id(),
         status=status,
         code=create_single_codeable_concept(code, display, system),
@@ -181,6 +224,8 @@ def create_value_quantity_observation(
             value=value, unit=unit, system="http://unitsofmeasure.org", code=unit
         ),
     )
+    _warn_binding_issues(observation)
+    return observation
 
 
 def create_patient(
@@ -216,7 +261,9 @@ def create_patient(
             Identifier(system=identifier_system, value=identifier)
         ]
 
-    return Patient(**patient_data)
+    patient = Patient(**patient_data)
+    _warn_binding_issues(patient)
+    return patient
 
 
 def create_risk_assessment_from_prediction(
@@ -298,7 +345,9 @@ def create_risk_assessment_from_prediction(
     if comment:
         risk_assessment_data["note"] = [{"text": comment}]
 
-    return RiskAssessment(**risk_assessment_data)
+    risk_assessment = RiskAssessment(**risk_assessment_data)
+    _warn_binding_issues(risk_assessment)
+    return risk_assessment
 
 
 def create_document_reference(
@@ -325,7 +374,7 @@ def create_document_reference(
     Returns:
         DocumentReference: A FHIR DocumentReference resource with an auto-generated ID prefixed with 'hc-'
     """
-    return DocumentReference(
+    document_reference = DocumentReference(
         id=_generate_id(),
         status=status,
         date=_utc_now(),
@@ -341,6 +390,8 @@ def create_document_reference(
             }
         ],
     )
+    _warn_binding_issues(document_reference)
+    return document_reference
 
 
 def create_document_reference_content(
