@@ -29,6 +29,7 @@ from healthchain.fhir.elementhelpers import (
     create_single_codeable_concept,
     create_single_reaction,
     create_single_attachment,
+    create_dosage,
 )
 
 from healthchain.fhir.readers import (
@@ -94,6 +95,7 @@ __all__ = [
     "create_single_codeable_concept",
     "create_single_reaction",
     "create_single_attachment",
+    "create_dosage",
     # Resource modification
     "set_condition_category",
     "add_provenance_metadata",
