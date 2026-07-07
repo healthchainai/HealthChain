@@ -53,21 +53,47 @@ def _fix_timezone_naive_datetimes(data: Any) -> Any:
 
 
 def create_resource_from_dict(
-    resource_dict: Dict, resource_type: str
+    resource_dict: Dict, resource_type: str, raise_on_error: bool = False
 ) -> Optional[Resource]:
     """Create a FHIR resource instance from a dictionary
 
     Args:
         resource_dict: Dictionary representation of the resource
         resource_type: Type of FHIR resource to create
+        raise_on_error: If True, raise FHIRValidationError with a full
+            ValidationReport instead of returning None on failure
 
     Returns:
         Optional[Resource]: FHIR resource instance or None if creation failed
+
+    Raises:
+        FHIRValidationError: If raise_on_error is True and validation fails
     """
     try:
         resource_class = get_fhir_resource(resource_type)
         return resource_class(**resource_dict)
     except Exception as e:
+        if raise_on_error:
+            from healthchain.fhir.validation import (
+                FHIRValidationError,
+                ValidationIssue,
+                ValidationReport,
+                validate_resource,
+            )
+
+            report = validate_resource(resource_dict, resource_type=resource_type)
+            if report.valid:
+                # The constructor failed for a reason validation didn't reproduce
+                report = ValidationReport(
+                    valid=False,
+                    resource_type=resource_type,
+                    issues=[
+                        ValidationIssue(
+                            severity="fatal", code="exception", diagnostics=str(e)
+                        )
+                    ],
+                )
+            raise FHIRValidationError(report) from e
         logger.error(f"Failed to create FHIR resource: {str(e)}")
         return None
 
