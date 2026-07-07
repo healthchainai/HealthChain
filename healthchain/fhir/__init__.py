@@ -38,6 +38,14 @@ from healthchain.fhir.readers import (
     read_content_attachment,
 )
 
+from healthchain.fhir.validation import (
+    FHIRValidationError,
+    ValidationIssue,
+    ValidationReport,
+    load_bundle,
+    validate_resource,
+)
+
 from healthchain.fhir.bundlehelpers import (
     create_bundle,
     add_resource,
@@ -95,6 +103,12 @@ __all__ = [
     "convert_prefetch_to_fhir_objects",
     "prefetch_to_bundle",
     "read_content_attachment",
+    # Validation
+    "FHIRValidationError",
+    "ValidationIssue",
+    "ValidationReport",
+    "load_bundle",
+    "validate_resource",
     # Bundle operations
     "create_bundle",
     "add_resource",
