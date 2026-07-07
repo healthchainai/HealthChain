@@ -5,7 +5,9 @@ from fhir.resources.R4B.codeableconcept import CodeableConcept
 from fhir.resources.R4B.documentreference import DocumentReference
 from fhir.resources.R4B.attachment import Attachment
 from fhir.resources.R4B.coding import Coding
+from fhir.resources.R4B.dosage import Dosage
 from datetime import datetime
+import logging
 
 
 from healthchain.fhir import (
@@ -15,6 +17,7 @@ from healthchain.fhir import (
     create_condition,
     create_medication_statement,
     create_allergy_intolerance,
+    create_dosage,
     set_condition_category,
     create_single_attachment,
     create_document_reference,
@@ -97,10 +100,115 @@ def test_create_medication_statement_minimal():
     assert medication.id.startswith("hc-")
     assert len(medication.id) > 3  # Ensure there's content after "hc-"
     assert medication.subject.reference == "Patient/123"
-    assert medication.status == "recorded"
+    assert medication.status == "unknown"
     assert medication.medicationCodeableConcept.coding[0].code == "123"
     assert medication.medicationCodeableConcept.coding[0].display == "Test Medication"
     assert medication.medicationCodeableConcept.coding[0].system == "http://test.system"
+
+
+def test_create_medication_statement_default_status_no_warning(caplog):
+    """The default 'unknown' status is valid R4B and must not warn."""
+    with caplog.at_level(logging.WARNING):
+        medication = create_medication_statement(subject="Patient/123", code="123")
+
+    assert medication.status == "unknown"
+    assert caplog.records == []
+
+
+def test_create_medication_statement_invalid_status_warns(caplog):
+    """An R5-only status like 'recorded' is invalid R4B and must warn (not raise)."""
+    with caplog.at_level(logging.WARNING):
+        medication = create_medication_statement(
+            subject="Patient/123", status="recorded", code="123"
+        )
+
+    # The resource is still built (warn, don't raise)
+    assert medication.status == "recorded"
+    assert len(caplog.records) == 1
+    record = caplog.records[0]
+    assert record.levelno == logging.WARNING
+    assert "MedicationStatement.status" in record.getMessage()
+    assert "recorded" in record.getMessage()
+
+
+def test_create_medication_statement_with_dosage_string():
+    """A plain string dosage is wrapped as a single free-text Dosage."""
+    medication = create_medication_statement(
+        subject="Patient/123", code="123", dosage="1 tablet twice daily"
+    )
+
+    assert len(medication.dosage) == 1
+    assert medication.dosage[0].text == "1 tablet twice daily"
+
+
+def test_create_medication_statement_with_dosage_object():
+    """A single Dosage is wrapped in a one-element list."""
+    dosage = create_dosage(text="Take with food")
+    medication = create_medication_statement(
+        subject="Patient/123", code="123", dosage=dosage
+    )
+
+    assert len(medication.dosage) == 1
+    assert medication.dosage[0].text == "Take with food"
+
+
+def test_create_medication_statement_with_dosage_list():
+    """A list of Dosage elements is used as-is."""
+    dosages = [create_dosage(text="Morning"), create_dosage(text="Evening")]
+    medication = create_medication_statement(
+        subject="Patient/123", code="123", dosage=dosages
+    )
+
+    assert len(medication.dosage) == 2
+    assert medication.dosage[0].text == "Morning"
+    assert medication.dosage[1].text == "Evening"
+
+
+def test_create_dosage_text_only():
+    """A minimal dosage with only free text."""
+    dosage = create_dosage(text="1 tablet daily")
+
+    assert isinstance(dosage, Dosage)
+    assert dosage.text == "1 tablet daily"
+    assert dosage.route is None
+    assert dosage.doseAndRate is None
+    assert dosage.timing is None
+
+
+def test_create_dosage_full():
+    """A dosage with route, dose quantity, timing, and as-needed."""
+    dosage = create_dosage(
+        text="500 mg by mouth every 6 hours as needed",
+        route_code="26643006",
+        route_display="Oral route",
+        dose_value=500,
+        dose_unit="mg",
+        frequency=1,
+        period=6,
+        period_unit="h",
+        as_needed=True,
+    )
+
+    assert dosage.text == "500 mg by mouth every 6 hours as needed"
+    assert dosage.route.coding[0].code == "26643006"
+    assert dosage.route.coding[0].system == "http://snomed.info/sct"
+    assert dosage.doseAndRate[0].doseQuantity.value == 500
+    assert dosage.doseAndRate[0].doseQuantity.unit == "mg"
+    assert dosage.timing.repeat.frequency == 1
+    assert dosage.timing.repeat.period == 6
+    assert dosage.timing.repeat.periodUnit == "h"
+    assert dosage.asNeededBoolean is True
+
+
+def test_create_condition_with_onset():
+    """An onset string is set as onsetDateTime; omitting it changes nothing."""
+    condition = create_condition(
+        subject="Patient/123", code="38341003", onset="2024-01-15"
+    )
+    assert str(condition.onsetDateTime) == "2024-01-15"
+
+    without_onset = create_condition(subject="Patient/123", code="38341003")
+    assert without_onset.onsetDateTime is None
 
 
 def test_create_allergy_intolerance_minimal():

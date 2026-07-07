@@ -29,11 +29,16 @@ from healthchain.fhir.elementhelpers import (
     create_single_codeable_concept,
     create_single_reaction,
     create_single_attachment,
+    create_dosage,
 )
 
 from healthchain.fhir.readers import (
+    CodedEntry,
+    EntryCoding,
     create_resource_from_dict,
     convert_prefetch_to_fhir_objects,
+    get_coded_entries,
+    get_medications,
     prefetch_to_bundle,
     read_content_attachment,
 )
@@ -51,6 +56,7 @@ from healthchain.fhir.bundlehelpers import (
     add_resource,
     get_resource_type,
     get_resources,
+    resolve_reference,
     set_resources,
     merge_bundles,
     extract_resources,
@@ -94,13 +100,18 @@ __all__ = [
     "create_single_codeable_concept",
     "create_single_reaction",
     "create_single_attachment",
+    "create_dosage",
     # Resource modification
     "set_condition_category",
     "add_provenance_metadata",
     "add_coding_to_codeable_concept",
     # Conversions and readers
+    "CodedEntry",
+    "EntryCoding",
     "create_resource_from_dict",
     "convert_prefetch_to_fhir_objects",
+    "get_coded_entries",
+    "get_medications",
     "prefetch_to_bundle",
     "read_content_attachment",
     # Validation
@@ -114,6 +125,7 @@ __all__ = [
     "add_resource",
     "get_resource_type",
     "get_resources",
+    "resolve_reference",
     "set_resources",
     "merge_bundles",
     "extract_resources",
