@@ -57,6 +57,10 @@ include = [
     "healthchain/configs/**/*.liquid",
 ]
 
+[project.optional-dependencies]
+mcp = ["mcp>=1.2.0,<2"]
+langchain = ["langchain-core>=0.3.0,<2"]
+
 [project.urls]
 Homepage = "https://healthchainai.github.io/HealthChain/"
 Repository = "https://github.com/healthchainai/HealthChain"

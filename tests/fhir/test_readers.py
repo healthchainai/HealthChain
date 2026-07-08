@@ -67,7 +67,7 @@ def test_get_coded_entries_condition():
     assert entry.resource_type == "Condition"
     assert entry.resource_id == "c1"
     assert entry.subject == "Patient/123"
-    assert entry.date == "2024-01-15T09:00:00+00:00"
+    assert entry.authored_on == "2024-01-15T09:00:00+00:00"
 
 
 def test_get_coded_entries_status_filter_clinical_status():
@@ -194,7 +194,7 @@ def test_get_coded_entries_observation_value():
     assert entry.status == "final"
     assert entry.value == 140.0
     assert entry.unit == "mmHg"
-    assert entry.date == "2024-02-01T08:30:00+00:00"
+    assert entry.authored_on == "2024-02-01T08:30:00+00:00"
 
 
 def test_get_coded_entries_resolves_medication_reference(reference_bundle):

@@ -415,6 +415,14 @@ def serve(app_module: str, host: str, port: int | None):
         pass
 
 
+def serve_mcp(bundle: str | None):
+    """Serve the FHIR toolkit as an MCP server over stdio."""
+    from healthchain.tools import FHIRToolkit
+
+    toolkit = FHIRToolkit(bundle=bundle)
+    toolkit.as_mcp().run(transport="stdio")
+
+
 def sandbox_run(
     url: str,
     workflow: str,
@@ -665,6 +673,19 @@ def main():
         help="Port (default: from healthchain.yaml or 8000)",
     )
 
+    # Subparser for the 'mcp' command
+    mcp_parser = subparsers.add_parser(
+        "mcp",
+        help="Serve FHIR agent tools as an MCP server over stdio "
+        "(requires healthchain[mcp])",
+    )
+    mcp_parser.add_argument(
+        "--bundle",
+        type=str,
+        default=None,
+        help="Optional FHIR Bundle (file path) to preload for the read tools",
+    )
+
     # Subparser for the 'sandbox' command
     sandbox_parser = subparsers.add_parser(
         "sandbox", help="Send test requests to a running HealthChain service"
@@ -749,6 +770,8 @@ def main():
         new_project(args.name, args.template)
     elif args.command == "serve":
         serve(args.app_module, args.host, args.port)
+    elif args.command == "mcp":
+        serve_mcp(args.bundle)
     elif args.command == "sandbox":
         if args.sandbox_command == "run":
             sandbox_run(

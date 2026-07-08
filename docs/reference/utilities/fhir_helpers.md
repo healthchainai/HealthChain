@@ -784,7 +784,7 @@ from healthchain.fhir import get_coded_entries, load_bundle
 bundle = load_bundle("synthea_patient.json")
 
 for entry in get_coded_entries(bundle, "Condition", status="active"):
-    print(entry.code, entry.display, entry.system, entry.date)
+    print(entry.code, entry.display, entry.system, entry.authored_on)
 
 # Multiple types in one call
 entries = get_coded_entries(bundle, ["Condition", "Observation"])
@@ -799,7 +799,7 @@ Each `CodedEntry` is a Pydantic model with:
 | `status` | Resource status — for Condition/AllergyIntolerance this is the `clinicalStatus` code, and the `status` filter matches it |
 | `resource_type` / `resource_id` | Where the entry came from |
 | `subject` | The `subject`/`patient` reference string |
-| `date` | First of `authoredOn`/`effectiveDateTime`/`occurrenceDateTime`/`recordedDate`, ISO 8601 |
+| `authored_on` | First of `authoredOn`/`effectiveDateTime`/`occurrenceDateTime`/`recordedDate`, ISO 8601 |
 | `value` / `unit` | `valueQuantity` for value-bearing Observations |
 
 !!! note "What's included"

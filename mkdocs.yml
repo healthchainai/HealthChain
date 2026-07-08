@@ -80,6 +80,7 @@ nav:
       - Utilities:
         - FHIR Helpers: reference/utilities/fhir_helpers.md
         - Terminology: reference/utilities/terminology.md
+        - Agent Tools: reference/utilities/tools.md
         - Sandbox: reference/utilities/sandbox.md
         - Data Generator: reference/utilities/data_generator.md
   - API Reference:
@@ -93,6 +94,7 @@ nav:
       - api/interop.md
       - api/fhir_helpers.md
       - api/terminology.md
+      - api/tools.md
   - Community:
       - community/index.md
 
