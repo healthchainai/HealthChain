@@ -131,6 +131,47 @@ def test_create_medication_statement_invalid_status_warns(caplog):
     assert "recorded" in record.getMessage()
 
 
+def test_create_helpers_warn_false_silences_binding_warning(caplog):
+    """warn=False suppresses the binding warning so validate_resource is the single check."""
+    with caplog.at_level(logging.WARNING):
+        medication = create_medication_statement(
+            subject="Patient/123", status="recorded", code="123", warn=False
+        )
+
+    assert medication.status == "recorded"
+    assert caplog.records == []
+
+
+def test_create_helpers_generate_id_false_is_deterministic():
+    """generate_id=False skips the random hc-<uuid> id for snapshot-stable output."""
+    from healthchain.fhir import create_patient, create_value_quantity_observation
+
+    condition = create_condition(subject="Patient/123", code="E11.9", generate_id=False)
+    medication = create_medication_statement(
+        subject="Patient/123", code="123", generate_id=False
+    )
+    patient = create_patient(gender="female", generate_id=False)
+    observation = create_value_quantity_observation(
+        code="8867-4", value=85.0, unit="bpm", generate_id=False
+    )
+
+    assert condition.id is None
+    assert medication.id is None
+    assert patient.id is None
+    assert observation.id is None
+
+
+def test_create_observation_never_invents_timestamp():
+    """effectiveDateTime stays unset unless the caller asserts a time."""
+    from healthchain.fhir import create_value_quantity_observation
+
+    observation = create_value_quantity_observation(
+        code="8867-4", value=85.0, unit="bpm"
+    )
+
+    assert observation.effectiveDateTime is None
+
+
 def test_create_medication_statement_with_dosage_string():
     """A plain string dosage is wrapped as a single free-text Dosage."""
     medication = create_medication_statement(

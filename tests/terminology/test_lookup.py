@@ -82,6 +82,31 @@ def test_custom_catalog():
     assert lookup.search("aspirin") == []
 
 
+def test_entries_returns_whole_catalog():
+    """entries() exposes the catalog publicly — e.g. to derive a mention lexicon."""
+    lookup = LocalCodeLookup()
+
+    entries = lookup.entries()
+
+    assert len(entries) == len(lookup._catalog)
+    assert all(isinstance(entry, Coding) for entry in entries)
+    # A copy, not the internal list
+    entries.clear()
+    assert len(lookup.entries()) > 0
+
+
+def test_lookup_is_iterable():
+    """Iterating a lookup walks the catalog; len() reports its size."""
+    catalog = [
+        Coding(code="123", display="Testdrug 10 MG Tablet", system=RXNORM),
+        Coding(code="456", display="Other Testdrug", system=RXNORM),
+    ]
+    lookup = LocalCodeLookup(catalog=catalog)
+
+    assert len(lookup) == 2
+    assert [coding.code for coding in lookup] == ["123", "456"]
+
+
 def test_local_lookup_satisfies_protocol():
     """LocalCodeLookup structurally implements TerminologyLookup."""
     assert isinstance(LocalCodeLookup(), TerminologyLookup)

@@ -8,7 +8,7 @@ a few dozen concepts. For real coverage, put a proper terminology service
 behind the same ``TerminologyLookup`` protocol.
 """
 
-from typing import Iterable, List, Optional, Union
+from typing import Iterable, Iterator, List, Optional, Union
 
 from healthchain.terminology.base import Coding
 
@@ -106,6 +106,7 @@ class LocalCodeLookup:
         >>> lookup.search("hypertension", system=ICD10CM)[0].code
         'I10'
         >>> site_lookup = LocalCodeLookup(catalog=my_formulary)
+        >>> all_codings = list(lookup)  # or lookup.entries()
     """
 
     def __init__(self, catalog: Optional[Iterable[Union[Coding, dict]]] = None) -> None:
@@ -114,6 +115,26 @@ class LocalCodeLookup:
             entry if isinstance(entry, Coding) else Coding.model_validate(entry)
             for entry in source
         ]
+
+    def entries(self) -> List[Coding]:
+        """Return every coding in the catalog.
+
+        A local catalog (e.g. a site formulary) is data an application may
+        legitimately want to walk — to build a mention lexicon, render a
+        picker, or export — not just probe via ``search``. Enumeration is a
+        capability of *local* lookups, not part of the ``TerminologyLookup``
+        protocol: a remote terminology service generally cannot list itself.
+
+        Returns:
+            A new list of all catalog codings, in catalog order
+        """
+        return list(self._catalog)
+
+    def __iter__(self) -> Iterator[Coding]:
+        return iter(self._catalog)
+
+    def __len__(self) -> int:
+        return len(self._catalog)
 
     def search(self, text: str, system: Optional[str] = None) -> List[Coding]:
         """Search the catalog for codings matching free text.

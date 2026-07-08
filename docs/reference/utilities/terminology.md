@@ -48,6 +48,16 @@ site_lookup = LocalCodeLookup(catalog=[
 ])
 ```
 
+A local catalog is data your application may want to walk, not just probe — to build a mention lexicon for an extractor, render a picker, or export. `LocalCodeLookup` is iterable and exposes the full catalog via `entries()`:
+
+```python
+lexicon = {coding.display.lower() for coding in site_lookup}
+all_codings = site_lookup.entries()
+len(site_lookup)  # catalog size
+```
+
+(Enumeration is a capability of *local* lookups, not part of the `TerminologyLookup` protocol — a remote terminology service generally can't list itself.)
+
 ## The protocol
 
 Anything with a `search(text, system) -> list[Coding]` method is a `TerminologyLookup` — the protocol is [runtime-checkable](https://docs.python.org/3/library/typing.html#typing.runtime_checkable), and structural, so implementations don't need to inherit anything:
