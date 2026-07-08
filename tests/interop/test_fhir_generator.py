@@ -310,34 +310,16 @@ def test_transform_method(fhir_generator):
     ) as mock_cda_generate:
         mock_cda_generate.return_value = [{"resourceType": "Condition", "id": "test-1"}]
 
-        # Mock the generate_resources_from_hl7v2_entries method
-        with patch.object(
-            fhir_generator, "generate_resources_from_hl7v2_entries"
-        ) as mock_hl7v2_generate:
-            mock_hl7v2_generate.return_value = [
-                {"resourceType": "Observation", "id": "test-2"}
-            ]
+        # Test CDA transformation
+        entries = [{"id": "entry1", "data": "value1"}]
+        result = fhir_generator.transform(
+            entries, src_format=FormatType.CDA, section_key="problems"
+        )
 
-            # Test CDA transformation
-            entries = [{"id": "entry1", "data": "value1"}]
-            result = fhir_generator.transform(
-                entries, src_format=FormatType.CDA, section_key="problems"
-            )
+        # Verify correct method was called
+        mock_cda_generate.assert_called_once_with(entries, "problems")
+        assert result == [{"resourceType": "Condition", "id": "test-1"}]
 
-            # Verify correct method was called
-            mock_cda_generate.assert_called_once_with(entries, "problems")
-            assert result == [{"resourceType": "Condition", "id": "test-1"}]
-
-            # Test HL7v2 transformation
-            entries = [{"id": "entry2", "data": "value2"}]
-            result = fhir_generator.transform(
-                entries, src_format=FormatType.HL7V2, message_key="observations"
-            )
-
-            # Verify correct method was called
-            mock_hl7v2_generate.assert_called_once_with(entries, "observations")
-            assert result == [{"resourceType": "Observation", "id": "test-2"}]
-
-            # Test with invalid format
-            with pytest.raises(ValueError):
-                fhir_generator.transform(entries, src_format="invalid")
+        # Test with invalid format
+        with pytest.raises(ValueError):
+            fhir_generator.transform(entries, src_format="invalid")

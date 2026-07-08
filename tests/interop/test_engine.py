@@ -108,7 +108,6 @@ def test_validate_format():
     # Test with enum values
     assert validate_format(FormatType.FHIR) == FormatType.FHIR
     assert validate_format(FormatType.CDA) == FormatType.CDA
-    assert validate_format(FormatType.HL7V2) == FormatType.HL7V2
 
     # Test with string values (case insensitive)
     assert validate_format("fhir") == FormatType.FHIR
@@ -117,9 +116,6 @@ def test_validate_format():
 
     assert validate_format("cda") == FormatType.CDA
     assert validate_format("CDA") == FormatType.CDA
-
-    assert validate_format("hl7v2") == FormatType.HL7V2
-    assert validate_format("HL7V2") == FormatType.HL7V2
 
     # Test with invalid formats
     with pytest.raises(ValueError, match="Unsupported format: invalid"):
@@ -237,57 +233,3 @@ def test_from_fhir_with_unsupported_format(interop_engine, mock_fhir_resources):
     """Test from_fhir with unsupported format."""
     with pytest.raises(ValueError):
         interop_engine.from_fhir(mock_fhir_resources, dest_format="invalid")
-
-
-# def test_fhir_to_hl7v2(interop_engine, mock_fhir_resources):
-#     """Test converting from FHIR to HL7v2."""
-#     # Mock the HL7v2 generator
-#     mock_hl7v2_generator = Mock()
-#     mock_hl7v2_generator.transform.return_value = "MSH|^~\\&|SENDER|RECEIVER|"
-#     interop_engine._generators[FormatType.HL7V2] = mock_hl7v2_generator
-
-#     # Mock cached property access
-#     interop_engine.hl7v2_generator = mock_hl7v2_generator
-
-#     # Test conversion
-#     result = interop_engine._fhir_to_hl7v2(mock_fhir_resources)
-
-#     # Verify generator was called with transform method
-#     assert mock_hl7v2_generator.transform.call_count == len(mock_fhir_resources)
-
-#     # Verify result is a list of messages
-#     assert isinstance(result, list)
-#     assert all(isinstance(msg, str) for msg in result)
-
-
-# def test_hl7v2_to_fhir(interop_engine, mock_fhir_resources):
-#     """Test converting from HL7v2 to FHIR."""
-#     # Mock the HL7v2 parser
-#     mock_hl7v2_parser = Mock()
-#     mock_hl7v2_parser.from_string.return_value = {"observations": ["test_entry"]}
-#     interop_engine._parsers[FormatType.HL7V2] = mock_hl7v2_parser
-
-#     # Mock the FHIR generator
-#     mock_fhir_generator = Mock()
-#     mock_fhir_generator.transform.return_value = mock_fhir_resources
-#     interop_engine._generators[FormatType.FHIR] = mock_fhir_generator
-
-#     # Mock the cached property access
-#     interop_engine.hl7v2_parser = mock_hl7v2_parser
-#     interop_engine.fhir_generator = mock_fhir_generator
-
-#     # Test conversion
-#     result = interop_engine._hl7v2_to_fhir("MSH|^~\\&|SENDER|RECEIVER|")
-
-#     # Verify parser was called with correct input
-#     mock_hl7v2_parser.from_string.assert_called_once_with("MSH|^~\\&|SENDER|RECEIVER|")
-
-#     # Verify generator was called with transform
-#     mock_fhir_generator.transform.assert_called_with(
-#         ["test_entry"],
-#         src_format=FormatType.HL7V2,
-#         message_key="observations"
-#     )
-
-#     # Verify result matches expected output
-#     assert result == mock_fhir_resources

@@ -48,9 +48,8 @@ class FHIRGenerator(BaseGenerator):
         Args:
             data: List of entries from source format
             **kwargs:
-                src_format: The source format type (FormatType.CDA or FormatType.HL7V2)
+                src_format: The source format type (FormatType.CDA)
                 section_key: For CDA, the section key
-                message_key: For HL7v2, the message key
 
         Returns:
             List[Resource]: FHIR resources
@@ -59,10 +58,6 @@ class FHIRGenerator(BaseGenerator):
         if src_format == FormatType.CDA:
             return self.generate_resources_from_cda_section_entries(
                 data, kwargs.get("section_key")
-            )
-        elif src_format == FormatType.HL7V2:
-            return self.generate_resources_from_hl7v2_entries(
-                data, kwargs.get("message_key")
             )
         else:
             raise ValueError(f"Unsupported source format: {src_format}")
@@ -237,22 +232,3 @@ class FHIRGenerator(BaseGenerator):
                 resource_dict["clinicalStatus"] = default_status
 
         return resource_dict
-
-    def generate_resources_from_hl7v2_entries(
-        self, entries: List[Dict], message_key: str
-    ) -> List[Dict]:
-        """
-        Convert HL7v2 message entries into FHIR resources.
-        This is a placeholder implementation.
-
-        Args:
-            entries: List of HL7v2 message entries to convert
-            message_key: Key identifying the message type
-
-        Returns:
-            List of FHIR resources
-        """
-        log.warning(
-            "FHIR resource generation from HL7v2 is a placeholder implementation"
-        )
-        return []
