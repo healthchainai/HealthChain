@@ -132,32 +132,6 @@ def get_resource_info(resource_type: str) -> Dict[str, Any]:
     return SUPPORTED_RESOURCES.get(resource_type, {})
 
 
-def print_supported_resources() -> None:
-    """Print user-friendly list of supported FHIR resources for conversion.
-
-    Example:
-        >>> from healthchain.fhir.converters import print_supported_resources
-        >>> print_supported_resources()
-        Supported FHIR Resources for ML Dataset Conversion:
-
-          ✓ Patient
-            Patient demographics (age, gender)
-            Columns: age, gender
-        ...
-    """
-    print("Supported FHIR Resources for ML Dataset Conversion:\n")
-    for resource, info in SUPPORTED_RESOURCES.items():
-        print(f"  ✓ {resource}")
-        print(f"    {info['description']}")
-        if isinstance(info["output_columns"], list):
-            print(f"    Columns: {', '.join(info['output_columns'])}")
-        else:
-            print(f"    Columns: {info['output_columns']}")
-        if info.get("options"):
-            print(f"    Options: {', '.join(info['options'])}")
-        print()
-
-
 def _get_field(resource: Dict, field_name: str, default=None):
     """Get field value from a dictionary."""
     return resource.get(field_name, default)

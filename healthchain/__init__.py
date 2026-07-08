@@ -29,14 +29,4 @@ def __getattr__(name):
         from healthchain.sandbox import generators
 
         return generators
-    elif name == "use_cases":
-        warnings.warn(
-            "Importing use_cases from healthchain is deprecated. "
-            "Use 'from healthchain.sandbox import use_cases' instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        from healthchain.sandbox import use_cases
-
-        return use_cases
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

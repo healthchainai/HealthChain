@@ -34,7 +34,7 @@ class LLMConfig(BaseModel):
     """LLM provider settings. API key is read from the standard env var for each provider."""
 
     provider: str = "anthropic"  # anthropic | openai | google | huggingface
-    model: str = "claude-opus-4-6"
+    model: str = "claude-opus-4-8"
     max_tokens: int = 512
 
     @field_validator("provider")

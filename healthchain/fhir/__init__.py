@@ -68,7 +68,6 @@ from healthchain.fhir.dataframe import (
     bundle_to_dataframe,
     get_supported_resources,
     get_resource_info,
-    print_supported_resources,
 )
 
 from healthchain.fhir.utilities import (
@@ -135,7 +134,6 @@ __all__ = [
     "bundle_to_dataframe",
     "get_supported_resources",
     "get_resource_info",
-    "print_supported_resources",
     # Utility functions
     "calculate_age_from_birthdate",
     "calculate_age_from_event_date",

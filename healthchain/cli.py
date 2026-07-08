@@ -286,7 +286,7 @@ site:
 # LLM provider — uncomment and set llm = config.llm.to_langchain() in app.py to enable
 # llm:
 #   provider: anthropic     # anthropic | openai | google | huggingface
-#   model: claude-opus-4-6
+#   model: claude-opus-4-8
 #   max_tokens: 512
 """
 
