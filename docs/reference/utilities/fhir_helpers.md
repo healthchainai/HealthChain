@@ -80,16 +80,20 @@ medication_statement["medicationCodeableConcept"]["coding"][0]["display"]
 
 !!! tip "Sensible Defaults for Resource Creation"
     The `fhir` `create_*` functions create FHIR resources with sensible defaults, automatically setting:
-      - A reference ID prefixed by "`hc-`"
+      - A reference ID prefixed by "`hc-`" — pass `generate_id=False` to skip it when you need deterministic output (snapshot tests, evals)
       - A status of "`active`" (or equivalent)
-      - A creation date where necessary
+
+    The helpers never invent clinical timestamps: fields like `Observation.effectiveDateTime` stay unset unless you pass them, so a resource only asserts times the caller can actually vouch for.
 
     You can modify and manipulate these resources as you would any other Pydantic object after their creation.
 
 !!! important "Validation of FHIR Resources"
     Internally, HealthChain uses [fhir.resources](https://github.com/nazrulworld/fhir.resources) to validate FHIR resources, which is powered by [Pydantic V2](https://docs.pydantic.dev/latest/).
-    These helpers create minimal valid FHIR objects to help you get started easily, and log a warning if a produced resource contains a code outside a required value set.
+    These helpers create minimal valid FHIR objects to help you get started easily, and log a warning if a produced resource contains a code outside a required value set. If you validate explicitly with [validate_resource()](#validate_resource) on the same path, pass `warn=False` to the `create_*` helper so each issue is reported once.
     :octicons-alert-16: **ALWAYS check that the sensible defaults fit your needs, and validate your resource!** Use [validate_resource()](#validate_resource) to get an explicit validation report.
+
+!!! warning "Serializing resources to JSON"
+    `model_dump()` returns Python-mode values — FHIR date fields come back as `datetime` objects, which `json.dumps` cannot serialize. Whenever a resource crosses a JSON boundary (an API response, an agent tool return, a file), use `model_dump(mode="json", exclude_none=True)` or `model_dump_json()`.
 
 ### Overview
 
@@ -780,7 +784,7 @@ from healthchain.fhir import get_coded_entries, load_bundle
 bundle = load_bundle("synthea_patient.json")
 
 for entry in get_coded_entries(bundle, "Condition", status="active"):
-    print(entry.code, entry.display, entry.system, entry.date)
+    print(entry.code, entry.display, entry.system, entry.authored_on)
 
 # Multiple types in one call
 entries = get_coded_entries(bundle, ["Condition", "Observation"])
@@ -795,7 +799,7 @@ Each `CodedEntry` is a Pydantic model with:
 | `status` | Resource status — for Condition/AllergyIntolerance this is the `clinicalStatus` code, and the `status` filter matches it |
 | `resource_type` / `resource_id` | Where the entry came from |
 | `subject` | The `subject`/`patient` reference string |
-| `date` | First of `authoredOn`/`effectiveDateTime`/`occurrenceDateTime`/`recordedDate`, ISO 8601 |
+| `authored_on` | First of `authoredOn`/`effectiveDateTime`/`occurrenceDateTime`/`recordedDate`, ISO 8601 |
 | `value` / `unit` | `valueQuantity` for value-bearing Observations |
 
 !!! note "What's included"

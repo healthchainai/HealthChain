@@ -63,7 +63,7 @@ class CodedEntry(BaseModel):
     subject: Optional[str] = Field(
         default=None, description="Reference string of subject/patient, if any"
     )
-    date: Optional[str] = Field(
+    authored_on: Optional[str] = Field(
         default=None,
         description="First of authoredOn/effectiveDateTime/occurrenceDateTime/"
         "recordedDate, ISO 8601",
@@ -153,7 +153,7 @@ def get_coded_entries(
     Example:
         >>> bundle = load_bundle("synthea_patient.json")
         >>> for entry in get_coded_entries(bundle, "Condition", status="active"):
-        ...     print(entry.code, entry.display, entry.date)
+        ...     print(entry.code, entry.display, entry.authored_on)
         >>> meds = get_coded_entries(bundle, ["MedicationStatement", "MedicationRequest"])
     """
     types = [resource_type] if isinstance(resource_type, str) else list(resource_type)
@@ -180,7 +180,7 @@ def get_coded_entries(
                     resource_type=type_name,
                     resource_id=getattr(resource, "id", None),
                     subject=getattr(subject, "reference", None) if subject else None,
-                    date=_entry_date(resource),
+                    authored_on=_entry_date(resource),
                     value=float(quantity.value)
                     if quantity is not None and quantity.value is not None
                     else None,

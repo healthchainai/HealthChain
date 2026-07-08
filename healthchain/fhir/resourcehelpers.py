@@ -61,6 +61,9 @@ def create_condition(
     display: Optional[str] = None,
     system: Optional[str] = "http://snomed.info/sct",
     onset: Optional[str] = None,
+    *,
+    generate_id: bool = True,
+    warn: bool = True,
 ) -> Condition:
     """
     Create a minimal active FHIR Condition.
@@ -75,6 +78,10 @@ def create_condition(
         system: The code system (default: SNOMED CT)
         onset: When the condition began, as an ISO 8601 date/datetime string,
             set as onsetDateTime (e.g. "2024-01-15" or "2024-01-15T09:00:00Z")
+        generate_id: Stamp an auto-generated 'hc-<uuid>' id. Pass False for
+            deterministic output (snapshot tests, evals)
+        warn: Log a warning for spec-invalid codes. Pass False if you validate
+            explicitly with validate_resource()
 
     Returns:
         Condition: A FHIR Condition resource with an auto-generated ID prefixed with 'hc-'
@@ -84,7 +91,7 @@ def create_condition(
     )
 
     condition = Condition(
-        id=_generate_id(),
+        id=_generate_id() if generate_id else None,
         subject=Reference(reference=subject),
         clinicalStatus=create_single_codeable_concept(
             code=clinical_status,
@@ -94,7 +101,8 @@ def create_condition(
         code=condition_code,
         onsetDateTime=onset,
     )
-    _warn_binding_issues(condition)
+    if warn:
+        _warn_binding_issues(condition)
     return condition
 
 
@@ -105,6 +113,9 @@ def create_medication_statement(
     display: Optional[str] = None,
     system: Optional[str] = "http://snomed.info/sct",
     dosage: Optional[Union[str, Dosage, List[Dosage]]] = None,
+    *,
+    generate_id: bool = True,
+    warn: bool = True,
 ) -> MedicationStatement:
     """
     Create a minimal FHIR MedicationStatement.
@@ -122,6 +133,10 @@ def create_medication_statement(
         dosage: Dosage instructions. A plain string is wrapped as a single
             free-text Dosage; a single Dosage is wrapped in a one-element list;
             a list of Dosage elements is used as-is. See create_dosage().
+        generate_id: Stamp an auto-generated 'hc-<uuid>' id. Pass False for
+            deterministic output (snapshot tests, evals)
+        warn: Log a warning for spec-invalid codes. Pass False if you validate
+            explicitly with validate_resource()
 
     Returns:
         MedicationStatement: A FHIR MedicationStatement resource with an auto-generated ID prefixed with 'hc-'
@@ -138,13 +153,14 @@ def create_medication_statement(
         dosage_list = dosage
 
     medication_statement = MedicationStatement(
-        id=_generate_id(),
+        id=_generate_id() if generate_id else None,
         subject=Reference(reference=subject),
         status=status,
         medicationCodeableConcept=medication_concept,
         dosage=dosage_list,
     )
-    _warn_binding_issues(medication_statement)
+    if warn:
+        _warn_binding_issues(medication_statement)
     return medication_statement
 
 
@@ -153,6 +169,9 @@ def create_allergy_intolerance(
     code: Optional[str] = None,
     display: Optional[str] = None,
     system: Optional[str] = "http://snomed.info/sct",
+    *,
+    generate_id: bool = True,
+    warn: bool = True,
 ) -> AllergyIntolerance:
     """
     Create a minimal active FHIR AllergyIntolerance.
@@ -164,6 +183,10 @@ def create_allergy_intolerance(
         code: The allergen code
         display: The display name for the allergen
         system: The code system (default: SNOMED CT)
+        generate_id: Stamp an auto-generated 'hc-<uuid>' id. Pass False for
+            deterministic output (snapshot tests, evals)
+        warn: Log a warning for spec-invalid codes. Pass False if you validate
+            explicitly with validate_resource()
 
     Returns:
         AllergyIntolerance: A FHIR AllergyIntolerance resource with an auto-generated ID prefixed with 'hc-'
@@ -173,11 +196,12 @@ def create_allergy_intolerance(
     )
 
     allergy = AllergyIntolerance(
-        id=_generate_id(),
+        id=_generate_id() if generate_id else None,
         patient=Reference(reference=patient),
         code=allergy_code,
     )
-    _warn_binding_issues(allergy)
+    if warn:
+        _warn_binding_issues(allergy)
     return allergy
 
 
@@ -190,6 +214,9 @@ def create_value_quantity_observation(
     system: str = "http://loinc.org",
     display: Optional[str] = None,
     effective_datetime: Optional[str] = None,
+    *,
+    generate_id: bool = True,
+    warn: bool = True,
 ) -> Observation:
     """
     Create a minimal FHIR Observation for vital signs or laboratory values.
@@ -203,19 +230,22 @@ def create_value_quantity_observation(
         unit: The unit of measure (e.g., "beats/min", "mg/dL")
         system: The code system for the observation code (default: LOINC)
         display: The display name for the observation code
-        effective_datetime: When the observation was made (ISO format). Uses current time if not provided.
+        effective_datetime: When the observation was made (ISO format). Omitted
+            when not provided — the helper never invents a timestamp, so only
+            record a time the caller can actually assert
         subject: Reference to the patient (e.g. "Patient/123")
+        generate_id: Stamp an auto-generated 'hc-<uuid>' id. Pass False for
+            deterministic output (snapshot tests, evals)
+        warn: Log a warning for spec-invalid codes. Pass False if you validate
+            explicitly with validate_resource()
 
     Returns:
         Observation: A FHIR Observation resource with an auto-generated ID prefixed with 'hc-'
     """
-    if not effective_datetime:
-        effective_datetime = _utc_now()
-
     subject_ref = Reference(reference=subject) if subject is not None else None
 
     observation = Observation(
-        id=_generate_id(),
+        id=_generate_id() if generate_id else None,
         status=status,
         code=create_single_codeable_concept(code, display, system),
         subject=subject_ref,
@@ -224,7 +254,8 @@ def create_value_quantity_observation(
             value=value, unit=unit, system="http://unitsofmeasure.org", code=unit
         ),
     )
-    _warn_binding_issues(observation)
+    if warn:
+        _warn_binding_issues(observation)
     return observation
 
 
@@ -233,6 +264,9 @@ def create_patient(
     birth_date: Optional[str] = None,
     identifier: Optional[str] = None,
     identifier_system: Optional[str] = "http://hospital.example.org",
+    *,
+    generate_id: bool = True,
+    warn: bool = True,
 ) -> Patient:
     """
     Create a minimal FHIR Patient resource with basic gender and birthdate
@@ -244,11 +278,15 @@ def create_patient(
         birth_date: Birth date in YYYY-MM-DD format
         identifier: Optional identifier value for the patient (e.g., MRN)
         identifier_system: The system for the identifier (default: "http://hospital.example.org")
+        generate_id: Stamp an auto-generated 'hc-<uuid>' id. Pass False for
+            deterministic output (snapshot tests, evals)
+        warn: Log a warning for spec-invalid codes. Pass False if you validate
+            explicitly with validate_resource()
 
     Returns:
         Patient: A FHIR Patient resource with an auto-generated ID prefixed with 'hc-'
     """
-    patient_data: Dict[str, Any] = {"id": _generate_id()}
+    patient_data: Dict[str, Any] = {"id": _generate_id()} if generate_id else {}
 
     if birth_date:
         patient_data["birthDate"] = birth_date
@@ -262,7 +300,8 @@ def create_patient(
         ]
 
     patient = Patient(**patient_data)
-    _warn_binding_issues(patient)
+    if warn:
+        _warn_binding_issues(patient)
     return patient
 
 
@@ -274,6 +313,9 @@ def create_risk_assessment_from_prediction(
     basis: Optional[List[Reference]] = None,
     comment: Optional[str] = None,
     occurrence_datetime: Optional[str] = None,
+    *,
+    generate_id: bool = True,
+    warn: bool = True,
 ) -> RiskAssessment:
     """
     Create a FHIR RiskAssessment from ML model prediction output.
@@ -290,7 +332,12 @@ def create_risk_assessment_from_prediction(
         method: Optional CodeableConcept describing the assessment method/model used
         basis: Optional list of References to observations or other resources used as input
         comment: Optional text comment about the assessment
-        occurrence_datetime: When the assessment was made (ISO format). Uses current time if not provided.
+        occurrence_datetime: When the assessment was made (ISO format). Omitted
+            when not provided — the helper never invents a timestamp
+        generate_id: Stamp an auto-generated 'hc-<uuid>' id. Pass False for
+            deterministic output (snapshot tests, evals)
+        warn: Log a warning for spec-invalid codes. Pass False if you validate
+            explicitly with validate_resource()
 
     Returns:
         RiskAssessment: A FHIR RiskAssessment resource with an auto-generated ID prefixed with 'hc-'
@@ -303,9 +350,6 @@ def create_risk_assessment_from_prediction(
         ... }
         >>> risk = create_risk_assessment("Patient/123", prediction)
     """
-    if not occurrence_datetime:
-        occurrence_datetime = _utc_now()
-
     outcome = prediction.get("outcome")
     if isinstance(outcome, dict):
         outcome_concept = create_single_codeable_concept(
@@ -329,7 +373,7 @@ def create_risk_assessment_from_prediction(
         )
 
     risk_assessment_data: Dict[str, Any] = {
-        "id": _generate_id(),
+        "id": _generate_id() if generate_id else None,
         "status": status,
         "subject": Reference(reference=subject),
         "occurrenceDateTime": occurrence_datetime,
@@ -346,7 +390,8 @@ def create_risk_assessment_from_prediction(
         risk_assessment_data["note"] = [{"text": comment}]
 
     risk_assessment = RiskAssessment(**risk_assessment_data)
-    _warn_binding_issues(risk_assessment)
+    if warn:
+        _warn_binding_issues(risk_assessment)
     return risk_assessment
 
 
@@ -357,6 +402,9 @@ def create_document_reference(
     status: str = "current",
     description: Optional[str] = "DocumentReference created by HealthChain",
     attachment_title: Optional[str] = "Attachment created by HealthChain",
+    *,
+    generate_id: bool = True,
+    warn: bool = True,
 ) -> DocumentReference:
     """
     Create a minimal FHIR DocumentReference.
@@ -370,12 +418,16 @@ def create_document_reference(
         status: REQUIRED. Status of the document reference (default: current)
         description: Description of the document reference
         attachment_title: Title for the document attachment
+        generate_id: Stamp an auto-generated 'hc-<uuid>' id. Pass False for
+            deterministic output (snapshot tests, evals)
+        warn: Log a warning for spec-invalid codes. Pass False if you validate
+            explicitly with validate_resource()
 
     Returns:
         DocumentReference: A FHIR DocumentReference resource with an auto-generated ID prefixed with 'hc-'
     """
     document_reference = DocumentReference(
-        id=_generate_id(),
+        id=_generate_id() if generate_id else None,
         status=status,
         date=_utc_now(),
         description=description,
@@ -390,7 +442,8 @@ def create_document_reference(
             }
         ],
     )
-    _warn_binding_issues(document_reference)
+    if warn:
+        _warn_binding_issues(document_reference)
     return document_reference
 
 

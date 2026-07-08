@@ -16,6 +16,7 @@ from healthchain.fhir.resourcehelpers import (
     create_risk_assessment_from_prediction,
     create_single_codeable_concept,
 )
+from healthchain.fhir.utilities import _utc_now
 
 
 @dataclass
@@ -308,11 +309,14 @@ class Dataset(DataContainer[pd.DataFrame]):
             )
 
             # Create RiskAssessment
+            # The assessment is being made right now, so the prediction time is
+            # asserted here rather than invented by the create_* helper
             risk_assessment = create_risk_assessment_from_prediction(
                 subject=patient_ref,
                 prediction=prediction_dict,
                 method=method,
                 comment=comment,
+                occurrence_datetime=_utc_now(),
             )
 
             risk_assessments.append(risk_assessment)
