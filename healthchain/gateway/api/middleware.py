@@ -3,7 +3,7 @@ import logging
 import os
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -94,7 +94,9 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
 
         duration_ms = round((time.monotonic() - start) * 1000, 1)
         entry = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            # Local wall-clock time is friendlier for operators reading the log
+            # on the host than UTC offsets.
+            "timestamp": datetime.now().isoformat(),
             "method": request.method,
             "path": request.url.path,
             "status_code": response.status_code,
