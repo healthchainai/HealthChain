@@ -194,3 +194,14 @@ def test_audit_log_user_populated_when_auth_state_set(tmp_path):
     client.get("/data")
     entry = json.loads(log_path.read_text().strip())
     assert entry["user"] == "api-key"
+
+
+def test_audit_log_includes_auditevent_aligned_fields(tmp_path):
+    """Audit entries carry FHIR AuditEvent-style action/outcome metadata."""
+    log_path = tmp_path / "audit.jsonl"
+    client = TestClient(_audit_app(str(log_path)), raise_server_exceptions=False)
+    client.get("/data", headers={"X-Forwarded-For": "203.0.113.10, 10.0.0.1"})
+    entry = json.loads(log_path.read_text().strip())
+    assert entry["action"] == "R"
+    assert entry["outcome"] == "0"
+    assert entry["client_ip"] == "203.0.113.10"

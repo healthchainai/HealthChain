@@ -34,6 +34,17 @@ _HTTP_AUDIT_ACTION = {
 }
 
 
+def _client_address(request: Request) -> Optional[str]:
+    """Best-effort client address for audit records behind reverse proxies."""
+    forwarded = request.headers.get("X-Forwarded-For", "").strip()
+    if forwarded:
+        # First hop is the original client when proxies append addresses
+        return forwarded.split(",")[0].strip()
+    if request.client:
+        return request.client.host
+    return None
+
+
 def _audit_outcome(status_code: int) -> str:
     """Map an HTTP status to a FHIR AuditEvent outcome code."""
     if status_code >= 500:
@@ -121,6 +132,7 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
             "duration_ms": duration_ms,
             "request_id": request_id,
             "user": _get_user(request),
+            "client_ip": _client_address(request),
             "action": _HTTP_AUDIT_ACTION.get(request.method.upper(), "E"),
             "outcome": _audit_outcome(response.status_code),
         }
