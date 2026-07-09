@@ -227,8 +227,8 @@ class OAuth2TokenManager:
             "jti": jti,  # Unique token identifier
             "iat": int(now.timestamp()),  # Issued at
             "exp": int(
-                (now + timedelta(minutes=5)).timestamp()
-            ),  # Expires in 5 minutes
+                (now + timedelta(minutes=30)).timestamp()
+            ),  # generous window for busy token endpoints
         }
 
         # Create and sign JWT with optional kid header
@@ -367,8 +367,8 @@ class AsyncOAuth2TokenManager:
             "jti": jti,  # Unique token identifier
             "iat": int(now.timestamp()),  # Issued at
             "exp": int(
-                (now + timedelta(minutes=5)).timestamp()
-            ),  # Expires in 5 minutes
+                (now + timedelta(minutes=30)).timestamp()
+            ),  # generous window for busy token endpoints
         }
 
         # Create and sign JWT with optional kid header
