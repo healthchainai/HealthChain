@@ -118,6 +118,7 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
         # Echo request id so clients can correlate gateway logs with responses
         response.headers["X-Request-ID"] = request_id
 
+        # Unauthenticated scanner traffic should not flood the audit log
         if response.status_code == 401:
             return response
 
