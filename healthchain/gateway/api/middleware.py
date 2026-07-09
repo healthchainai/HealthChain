@@ -13,7 +13,15 @@ from starlette.responses import JSONResponse, Response
 
 logger = logging.getLogger(__name__)
 
-_EXEMPT_PATHS = {"/health", "/docs", "/redoc", "/openapi.json", "/metrics"}
+_EXEMPT_PATHS = {
+    "/health",
+    "/docs",
+    "/redoc",
+    "/openapi.json",
+    "/metrics",
+    # Uptime/monitoring probes read the aggregate gateway status without a key
+    "/gateway/status",
+}
 
 
 class APIKeyMiddleware(BaseHTTPMiddleware):
