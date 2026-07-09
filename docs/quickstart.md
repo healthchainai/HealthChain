@@ -1,11 +1,12 @@
 # Quickstart
 
 After [installing HealthChain](installation.md), get up to speed quickly with the core components before diving further into the [full documentation](reference/index.md)!
-HealthChain has three main components:
+HealthChain's main building blocks:
 
 - **Gateway:** Connect to multiple FHIR sources and healthcare systems with a single API.
-- **Pipelines:** Build data processing pipelines for healthcare NLP and ML tasks with automatic FHIR output.
-- **InteropEngine:** Convert between healthcare data formats like [FHIR](https://www.hl7.org/fhir/) and [HL7 CDA](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=7).
+- **FHIR helpers:** Create, validate, and code [FHIR](https://www.hl7.org/fhir/) resources with type safety and minimal boilerplate.
+- **Agent tools:** Serve typed, validated FHIR tools to Claude over MCP, or to LangChain agents.
+- **Pipelines:** Compose processing steps around your own models, with automatic FHIR output.
 
 
 ## Core Components 🧩
@@ -42,6 +43,29 @@ def enhance_patient(id: str, source: str = None) -> Patient:
 app.register_gateway(fhir)
 
 # Available at: GET /fhir/transform/Patient/123?source=epic
+```
+
+### Agent Tools 🤖
+
+The [**FHIRToolkit**](./reference/utilities/tools.md) hands your agent typed, validated FHIR tools — build, validate, read, and code clinical data — from one toolkit.
+
+[(Full Documentation on Agent Tools)](./reference/utilities/tools.md)
+
+<!--pytest.mark.skip-->
+```python
+from healthchain.tools import FHIRToolkit
+
+kit = FHIRToolkit(bundle="patient_bundle.json")
+
+kit.as_mcp().run()          # serve to Claude or any MCP client (healthchain[mcp])
+tools = kit.as_langchain()  # or drop into a LangChain agent (healthchain[langchain])
+```
+
+Or serve the tools straight from the terminal, no code:
+
+<!--pytest.mark.skip-->
+```bash
+healthchain mcp --bundle patient_bundle.json
 ```
 
 ### Pipeline 🛠️
@@ -114,67 +138,11 @@ doc = Document("Patient presents with hypertension.")
 output = pipe(doc)
 ```
 
-You can process legacy healthcare data formats too. [**Adapters**](./reference/io/adapters/adapters.md) convert between healthcare formats like [CDA](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=7) and your pipeline — just parse, process, and format without worrying about low-level data conversion.
-
-[(Full Documentation on Adapters)](./reference/io/adapters/adapters.md)
-
-<!--pytest.mark.skip-->
-```python
-from healthchain.io import CdaAdapter
-from healthchain.models import CdaRequest
-
-# Use adapter for format conversion
-adapter = CdaAdapter()
-cda_request = CdaRequest(document="<CDA XML content>")
-
-# Parse, process, format
-doc = adapter.parse(cda_request)
-processed_doc = pipe(doc)
-output = adapter.format(processed_doc)
-```
+Working with external or legacy data formats? [**Adapters**](./reference/io/adapters/adapters.md) interface them with your pipeline so you can parse, process, and format without worrying about low-level data conversion.
 
 #### 3. Use Prebuilt Pipelines
 
-Prebuilt pipelines are the fastest way to jump into healthcare AI with minimal setup: just load and run. Each pipeline bundles best-practice components and models for common clinical tasks (like coding or summarization) and handles all FHIR/CDA conversion for you. Easily customize or extend pipelines by adding/removing components, or swap models as needed.
-
-[(Full Documentation on Pipelines)](./reference/pipeline/pipeline.md#prebuilt)
-
-<!--pytest.mark.skip-->
-```python
-from healthchain.pipeline import MedicalCodingPipeline
-from healthchain.models import CdaRequest
-
-# Or load from local model
-pipeline = MedicalCodingPipeline.from_local_model("./path/to/model", source="spacy")
-
-cda_request = CdaRequest(document="<CDA XML content>")
-output = pipeline.process_request(cda_request)
-```
-
-### Interoperability 🔄
-
-The HealthChain Interoperability module provides tools for converting between healthcare data formats, including FHIR and CDA.
-
-[(Full Documentation on Interoperability Engine)](./reference/interop/interop.md)
-
-<!--pytest.mark.skip-->
-```python
-from healthchain.interop import create_interop, FormatType
-
-# Uses bundled configs - basic CDA ↔ FHIR conversion
-engine = create_interop()
-
-# Load a CDA document
-with open("tests/data/test_cda.xml", "r") as f:
-    cda_xml = f.read()
-
-# Convert CDA XML to FHIR resources
-fhir_resources = engine.to_fhir(cda_xml, src_format=FormatType.CDA)
-
-# Convert FHIR resources back to CDA
-cda_document = engine.from_fhir(fhir_resources, dest_format=FormatType.CDA)
-```
-
+[**Prebuilt pipelines**](./reference/pipeline/pipeline.md#prebuilt) bundle best-practice components for common clinical tasks (like coding or summarization) and handle data conversion for you — load, run, and customize by swapping components or models as needed.
 
 ## Utilities ⚙️
 
@@ -242,21 +210,6 @@ client.get_status()        # Check client state
 responses = client.send_requests()
 ```
 
-For clinical documentation workflows using SOAP/CDA:
-
-<!--pytest.mark.skip-->
-```python
-# Use context manager for automatic result saving
-with SandboxClient(
-    url="http://localhost:8000/notereader/ProcessDocument",
-    workflow="sign-note-inpatient",
-    protocol="soap"
-) as client:
-    client.load_from_path("./cookbook/data/notereader_cda.xml")
-    responses = client.send_requests()
-    # Results automatically saved to ./output/ on success
-```
-
 ### FHIR Helpers 🔥
 
 Use `healthchain.fhir` helpers to quickly create and manipulate FHIR resources (like `Condition`, `Observation`, etc.) in your code, ensuring they’re standards-compliant with minimal boilerplate.
@@ -274,6 +227,8 @@ condition = create_condition(
     clinical_status="active"
 )
 ```
+
+Pair them with [validation](./reference/utilities/fhir_helpers.md#validation-loading) to catch broken data before it ships — `validate_resource` returns a structured report of everything wrong with a resource instead of throwing.
 
 ## Going further ✨
 Check out our [Cookbook](cookbook/index.md) section for more worked examples! HealthChain is still in its early stages, so if you have any questions please feel free to reach us on [Github](https://github.com/healthchainai/HealthChain/discussions) or [Discord](https://discord.gg/UQC6uAepUz).

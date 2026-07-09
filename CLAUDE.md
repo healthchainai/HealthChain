@@ -8,10 +8,9 @@ HealthChain is an open-source Python framework for productionizing healthcare AI
 
 **Key Problem**: EHR data is specific, complex, and fragmented. HealthChain eliminates months of custom integration work by understanding healthcare protocols and data formats out of the box.
 
-**Target Users**:
-- HealthTech engineers building clinical workflow integrations
-- LLM/GenAI developers aggregating multi-EHR data
-- ML researchers deploying models as healthcare APIs
+**Target Users** (two audiences, one platform):
+- Clinical AI builders and healthtech teams shipping AI into real healthcare systems — EHR integration, FHIR, reliability
+- AI and agent engineers building on healthcare data — agents, LLMs, and models that read and write validated FHIR
 
 For more background, see @README.md and @docs/index.md.
 
