@@ -40,10 +40,14 @@ class AsyncFHIRClient(FHIRServerInterface):
         super().__init__(auth_config)
         self.token_manager = AsyncOAuth2TokenManager(auth_config.to_oauth2_config())
 
-        # Create httpx client with connection pooling and additional kwargs
-        client_kwargs = {"timeout": self.timeout, "verify": self.verify_ssl}
-        if limits is not None:
-            client_kwargs["limits"] = limits
+        # Create httpx client with connection pooling and additional kwargs.
+        # Fall back to the pool limits derived from auth_config when the caller
+        # does not supply an explicit httpx.Limits instance.
+        client_kwargs = {
+            "timeout": self.timeout,
+            "verify": self.verify_ssl,
+            "limits": limits if limits is not None else auth_config.to_httpx_limits(),
+        }
 
         # Pass through additional kwargs to httpx.AsyncClient
         client_kwargs.update(kwargs)
@@ -67,6 +71,7 @@ class AsyncFHIRClient(FHIRServerInterface):
         headers = self.base_headers.copy()
         token = await self.token_manager.get_access_token()
         headers["Authorization"] = f"Bearer {token}"
+
         return headers
 
     async def capabilities(self) -> CapabilityStatement:
