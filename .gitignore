@@ -176,3 +176,6 @@ local/
 
 # Personal AI context (keep local)
 CLAUDE.LOCAL.MD
+
+# Intentional compliance-test vulnerabilities (local reference only)
+compliance/planted-vulnerabilities.local.md
