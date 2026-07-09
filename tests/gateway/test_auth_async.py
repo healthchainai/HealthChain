@@ -193,16 +193,16 @@ async def test_oauth2_token_manager_error_handling(mock_post, token_manager):
         await token_manager.get_access_token()
 
 
-@patch("jwt.JWT.encode")
-@patch("jwt.jwk_from_pem")
+@patch("jwt.encode")
+@patch("cryptography.hazmat.primitives.serialization.load_pem_private_key")
 def test_oauth2_token_manager_jwt_assertion_creation(
-    mock_jwk_from_pem, mock_jwt_encode, token_manager_jwt, temp_key_file
+    mock_load_key, mock_jwt_encode, token_manager_jwt, temp_key_file
 ):
     """OAuth2TokenManager creates valid JWT assertions with correct claims."""
     token_manager_jwt.config.client_secret_path = temp_key_file
 
     mock_key = Mock()
-    mock_jwk_from_pem.return_value = mock_key
+    mock_load_key.return_value = mock_key
     mock_jwt_encode.return_value = "signed_jwt_token"
 
     jwt_assertion = token_manager_jwt._create_jwt_assertion()
