@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 460" role="img" aria-label="FHIRToolkit serves typed FHIR tools to Claude over MCP and to LangChain agents">
+  <rect x="0" y="0" width="880" height="460" rx="16" fill="#faf8f7"/>
+  <rect x="36" y="110" width="324" height="240" rx="16" fill="#eeeefb" stroke="#5b5bd6" stroke-width="2.5"/>
+  <text x="68" y="188" font-size="34" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5b5bd6">FHIRToolkit</text>
+  <text x="68" y="236" font-size="24" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">typed FHIR tools</text>
+  <text x="68" y="272" font-size="24" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">validated output</text>
+  <rect x="330" y="122" width="12" height="12" fill="#8585e0"/>
+  <rect x="316" y="136" width="12" height="12" fill="#8585e0" opacity="0.6"/>
+  <rect x="330" y="150" width="12" height="12" fill="#8585e0" opacity="0.35"/>
+
+  <path d="M360 170 C440 170 460 132 538 130" stroke="#5b5bd6" stroke-width="3" fill="none" marker-end="url(#t1)"/>
+  <text x="398" y="118" font-size="24" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5b5bd6">.as_mcp()</text>
+  <rect x="544" y="86" width="304" height="88" rx="44" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="584" y="142" font-size="30" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">Claude · MCP</text>
+
+  <path d="M360 290 C440 290 460 330 538 332" stroke="#5b5bd6" stroke-width="3" fill="none" marker-end="url(#t1)"/>
+  <text x="388" y="404" font-size="24" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5b5bd6">.as_langchain()</text>
+  <rect x="544" y="288" width="304" height="88" rx="44" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="612" y="344" font-size="30" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">LangChain</text>
+
+  <defs>
+    <marker id="t1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5b5bd6"/>
+    </marker>
+  </defs>
+</svg>

@@ -3,7 +3,7 @@
 ## Core Components
 
 - [Gateway](gateway/gateway.md): Connect to multiple healthcare systems and services.
-- [Pipeline](pipeline/pipeline.md): Build and manage processing pipelines for healthcare NLP and ML tasks.
+- [FHIR Helpers](utilities/fhir_helpers.md): Create, validate, and code FHIR resources with type safety and minimal boilerplate.
+- [Agent Tools](utilities/tools.md): Typed, validated FHIR tools for agents — served over MCP or LangChain.
+- [Pipeline](pipeline/pipeline.md): Build and manage processing pipelines around your own models.
 - [Sandbox](utilities/sandbox.md): Test your pipelines in a simulated healthcare environment.
-- [Interoperability](interop/interop.md): Convert between healthcare data formats like FHIR and CDA.
-- [Utilities](utilities/fhir_helpers.md): Additional tools for development and testing.

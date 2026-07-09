@@ -10,13 +10,15 @@ requires-python = ">=3.10,<3.14"
 readme = "README.md"
 license = { text = "Apache-2.0" }
 keywords = [
-    "nlp",
     "ai",
     "llm",
+    "agents",
+    "mcp",
     "healthcare",
     "ehr",
     "mlops",
     "fhir",
+    "fhir-tools",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
