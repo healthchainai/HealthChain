@@ -71,6 +71,9 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
 
         response = await call_next(request)
 
+        # Echo request id so clients can correlate gateway logs with responses
+        response.headers["X-Request-ID"] = request_id
+
         if response.status_code == 401:
             return response
 
