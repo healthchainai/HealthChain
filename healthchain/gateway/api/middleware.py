@@ -23,6 +23,24 @@ _EXEMPT_PATHS = {
     "/gateway/status",
 }
 
+# FHIR AuditEvent action codes (ITI-20 / IHE ATNA)
+_HTTP_AUDIT_ACTION = {
+    "GET": "R",
+    "HEAD": "R",
+    "POST": "C",
+    "PUT": "U",
+    "PATCH": "U",
+    "DELETE": "D",
+}
+
+
+def _audit_outcome(status_code: int) -> str:
+    """Map an HTTP status to a FHIR AuditEvent outcome code."""
+    if status_code >= 500:
+        return "8"  # serious failure
+    # Non-server errors mean the gateway handled the request successfully
+    return "0"
+
 
 class APIKeyMiddleware(BaseHTTPMiddleware):
     """Enforce API-key authentication on all non-exempt routes.
@@ -103,6 +121,8 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
             "duration_ms": duration_ms,
             "request_id": request_id,
             "user": _get_user(request),
+            "action": _HTTP_AUDIT_ACTION.get(request.method.upper(), "E"),
+            "outcome": _audit_outcome(response.status_code),
         }
 
         try:
