@@ -38,6 +38,8 @@ class ObservabilityConfig(BaseModel):
     """Gateway observability settings."""
 
     metrics: bool = False
+    slow_threshold_ms: float = 1000.0
+    slow_sample_size: int = 20
 
 
 class SourceConfig(BaseModel):

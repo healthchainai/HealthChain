@@ -10,9 +10,14 @@ from __future__ import annotations
 import re
 import threading
 import time
-from collections import defaultdict
+from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Deque, Dict, List, Optional, Tuple
+
+# Requests slower than this (ms) are captured as samples for diagnostics.
+DEFAULT_SLOW_THRESHOLD_MS = 1000.0
+# Number of most-recent slow-request samples to retain in memory.
+DEFAULT_SLOW_SAMPLE_SIZE = 20
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
@@ -74,10 +79,16 @@ class RouteStats:
 class MetricsCollector:
     """Thread-safe in-memory metrics store shared by middleware and /metrics."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        slow_threshold_ms: float = DEFAULT_SLOW_THRESHOLD_MS,
+        slow_sample_size: int = DEFAULT_SLOW_SAMPLE_SIZE,
+    ) -> None:
         self._lock = threading.Lock()
         self._routes: Dict[Tuple[str, str], RouteStats] = {}
         self._started_at = time.time()
+        self._slow_threshold_ms = slow_threshold_ms
+        self._slow_samples: Deque[Dict[str, Any]] = deque(maxlen=slow_sample_size)
 
     def record(self, method: str, path: str, status_code: int, duration_ms: float) -> None:
         key = (method.upper(), normalize_path(path))
@@ -85,6 +96,26 @@ class MetricsCollector:
             if key not in self._routes:
                 self._routes[key] = RouteStats()
             self._routes[key].record(status_code, duration_ms)
+
+    def record_slow(
+        self, method: str, full_path: str, status_code: int, duration_ms: float
+    ) -> None:
+        """Capture a diagnostic sample for a slow request.
+
+        Unlike :meth:`record`, the exact request path (including query string)
+        is retained so operators can reproduce and profile the slow call.
+        """
+        if duration_ms < self._slow_threshold_ms:
+            return
+        with self._lock:
+            self._slow_samples.append(
+                {
+                    "method": method.upper(),
+                    "path": full_path,
+                    "status_code": status_code,
+                    "duration_ms": duration_ms,
+                }
+            )
 
     def snapshot(self) -> Dict[str, Any]:
         with self._lock:
@@ -94,17 +125,23 @@ class MetricsCollector:
             }
             total_requests = sum(s.request_count for s in self._routes.values())
             total_errors = sum(s.error_count for s in self._routes.values())
+            slow_requests = list(self._slow_samples)
+
+        error_rate = round(total_errors / total_requests, 4) if total_requests else 0.0
 
         return {
             "uptime_seconds": round(time.time() - self._started_at, 1),
             "total_requests": total_requests,
             "total_errors": total_errors,
+            "error_rate": error_rate,
             "routes": routes,
+            "slow_requests": slow_requests,
         }
 
     def reset(self) -> None:
         with self._lock:
             self._routes.clear()
+            self._slow_samples.clear()
             self._started_at = time.time()
 
 
@@ -117,6 +154,12 @@ def get_metrics_collector() -> MetricsCollector:
     if _collector is None:
         _collector = MetricsCollector()
     return _collector
+
+
+def set_metrics_collector(collector: MetricsCollector) -> None:
+    """Install a pre-configured collector as the process-wide singleton."""
+    global _collector
+    _collector = collector
 
 
 class RequestMetricsMiddleware(BaseHTTPMiddleware):
@@ -139,6 +182,18 @@ class RequestMetricsMiddleware(BaseHTTPMiddleware):
         self._collector.record(
             request.method,
             request.url.path,
+            response.status_code,
+            duration_ms,
+        )
+
+        # Retain the exact URL (path + query) for slow calls so operators can
+        # replay the request when profiling latency regressions.
+        full_path = request.url.path
+        if request.url.query:
+            full_path = f"{full_path}?{request.url.query}"
+        self._collector.record_slow(
+            request.method,
+            full_path,
             response.status_code,
             duration_ms,
         )

@@ -317,9 +317,18 @@ class HealthChainAPI(FastAPI):
             self.add_middleware(APIKeyMiddleware)
 
         if _config and _config.observability.metrics:
-            from healthchain.gateway.api.metrics import RequestMetricsMiddleware
+            from healthchain.gateway.api.metrics import (
+                MetricsCollector,
+                RequestMetricsMiddleware,
+                set_metrics_collector,
+            )
 
-            self.add_middleware(RequestMetricsMiddleware)
+            collector = MetricsCollector(
+                slow_threshold_ms=_config.observability.slow_threshold_ms,
+                slow_sample_size=_config.observability.slow_sample_size,
+            )
+            set_metrics_collector(collector)
+            self.add_middleware(RequestMetricsMiddleware, collector=collector)
 
         # Add global exception handler
         self.add_exception_handler(Exception, self._exception_handler)

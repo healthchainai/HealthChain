@@ -149,6 +149,8 @@ Enable in-process request metrics by setting `observability.metrics: true`:
 ```yaml
 observability:
   metrics: true
+  slow_threshold_ms: 1000     # capture samples for requests slower than this
+  slow_sample_size: 20        # number of recent slow samples to retain
 ```
 
 This adds a `RequestMetricsMiddleware` that tracks per-route latency and
@@ -159,18 +161,23 @@ error rates. Metrics are exposed at `GET /metrics` as JSON:
   "uptime_seconds": 3600.5,
   "total_requests": 1247,
   "total_errors": 3,
+  "error_rate": 0.0024,
   "routes": {
     "GET /fhir/Patient/{id}": {
       "request_count": 412,
       "error_count": 1,
       "avg_duration_ms": 18.4
     }
-  }
+  },
+  "slow_requests": [
+    { "method": "GET", "path": "/fhir/Patient?name=Smith", "status_code": 200, "duration_ms": 1450.0 }
+  ]
 }
 ```
 
-Path segments containing UUIDs or numeric IDs are normalised to `{id}` to keep
-cardinality manageable.
+Aggregate route keys normalise UUID and numeric path segments to `{id}` to keep
+cardinality manageable. The `slow_requests` samples retain the exact URL
+(including query string) so operators can replay and profile slow calls.
 
 ---
 

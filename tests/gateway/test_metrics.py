@@ -95,3 +95,27 @@ def test_get_metrics_collector_returns_singleton():
     a = get_metrics_collector()
     b = get_metrics_collector()
     assert a is b
+
+
+def test_snapshot_includes_error_rate():
+    collector = MetricsCollector()
+    collector.record("GET", "/a", 200, 5.0)
+    collector.record("GET", "/b", 500, 5.0)
+    snap = collector.snapshot()
+    assert snap["error_rate"] == 0.5
+
+
+def test_slow_requests_captured_above_threshold():
+    collector = MetricsCollector(slow_threshold_ms=100.0, slow_sample_size=5)
+    collector.record_slow("GET", "/fhir/Patient?name=x", 200, 250.0)
+    collector.record_slow("GET", "/fhir/Observation", 200, 10.0)  # below threshold
+    snap = collector.snapshot()
+    assert len(snap["slow_requests"]) == 1
+    assert snap["slow_requests"][0]["duration_ms"] == 250.0
+
+
+def test_slow_requests_ring_buffer_bounded():
+    collector = MetricsCollector(slow_threshold_ms=0.0, slow_sample_size=3)
+    for i in range(10):
+        collector.record_slow("GET", f"/x/{i}", 200, 5.0)
+    assert len(collector.snapshot()["slow_requests"]) == 3
