@@ -66,11 +66,14 @@ The log directory is created automatically if it does not exist. Each request ap
   "status_code": 200,
   "duration_ms": 14.2,
   "request_id": "a1b2c3d4-...",
-  "user": "api-key"
+  "user": "api-key",
+  "client_ip": "203.0.113.10",
+  "action": "R",
+  "outcome": "0"
 }
 ```
 
-`request_id` uses the `X-Request-ID` header if present, otherwise a UUID is generated. `user` is populated when `api-key` auth is enabled, and `null` otherwise.
+`request_id` uses the `X-Request-ID` header if present, otherwise a UUID is generated. `user` is populated when `api-key` auth is enabled, and `null` otherwise. `client_ip` prefers the first address in `X-Forwarded-For` when the gateway runs behind a reverse proxy. `action` and `outcome` follow FHIR AuditEvent / IHE ATNA conventions (`R` = read, `0` = success).
 
 Log writes are non-blocking — IO errors are swallowed so a full disk or permission issue does not take down the service.
 
@@ -184,7 +187,8 @@ cardinality manageable. The `slow_requests` samples retain the exact URL
 ## Gateway status
 
 `GET /gateway/status` returns an aggregate view of registered gateways,
-services, and loaded configuration (no secrets):
+services, and loaded configuration (no secrets). It is exempt from API-key
+authentication so external uptime and monitoring probes can read it directly:
 
 ```json
 {
