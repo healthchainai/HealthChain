@@ -16,8 +16,17 @@ from typing import Dict, Optional, Any
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
 
+from healthchain.gateway.clients.retry import (
+    RetryPolicy,
+    async_retry_call,
+    retry_call,
+)
+
 
 logger = logging.getLogger(__name__)
+
+# Token endpoints are prone to transient throttling/5xx under load; retry them.
+_TOKEN_RETRY_POLICY = RetryPolicy(max_attempts=3, backoff_base=0.5)
 
 
 class OAuth2Config(BaseModel):
@@ -159,9 +168,9 @@ class OAuth2TokenManager:
         if self.config.audience:
             token_data["audience"] = self.config.audience
 
-        # Make token request
-        with httpx.Client() as client:
-            try:
+        # Make token request with exponential-backoff retries for transient errors
+        def _request() -> Dict[str, Any]:
+            with httpx.Client() as client:
                 response = client.post(
                     self.config.token_url,
                     data=token_data,
@@ -169,22 +178,24 @@ class OAuth2TokenManager:
                     timeout=30,
                 )
                 response.raise_for_status()
+                return response.json()
 
-                response_data = response.json()
-                self._token = TokenInfo.from_response(response_data)
+        try:
+            response_data = retry_call(_request, _TOKEN_RETRY_POLICY)
+            self._token = TokenInfo.from_response(response_data)
 
-                logger.debug(
-                    f"Token refreshed successfully, expires at {self._token.expires_at}"
-                )
+            logger.debug(
+                f"Token refreshed successfully, expires at {self._token.expires_at}"
+            )
 
-            except httpx.HTTPStatusError as e:
-                logger.error(
-                    f"Token refresh failed: {e.response.status_code} {e.response.text}"
-                )
-                raise Exception(f"Failed to refresh token: {e.response.status_code}")
-            except Exception as e:
-                logger.error(f"Token refresh error: {str(e)}")
-                raise
+        except httpx.HTTPStatusError as e:
+            logger.error(
+                f"Token refresh failed: {e.response.status_code} {e.response.text}"
+            )
+            raise Exception(f"Failed to refresh token: {e.response.status_code}")
+        except Exception as e:
+            logger.error(f"Token refresh error: {str(e)}")
+            raise
 
     def invalidate_token(self):
         """Invalidate the current token to force refresh on next request."""
@@ -297,9 +308,9 @@ class AsyncOAuth2TokenManager:
         if self.config.audience:
             token_data["audience"] = self.config.audience
 
-        # Make token request
-        async with httpx.AsyncClient() as client:
-            try:
+        # Make token request with exponential-backoff retries for transient errors
+        async def _request() -> Dict[str, Any]:
+            async with httpx.AsyncClient() as client:
                 response = await client.post(
                     self.config.token_url,
                     data=token_data,
@@ -307,22 +318,24 @@ class AsyncOAuth2TokenManager:
                     timeout=30,
                 )
                 response.raise_for_status()
+                return response.json()
 
-                response_data = response.json()
-                self._token = TokenInfo.from_response(response_data)
+        try:
+            response_data = await async_retry_call(_request, _TOKEN_RETRY_POLICY)
+            self._token = TokenInfo.from_response(response_data)
 
-                logger.debug(
-                    f"Token refreshed successfully, expires at {self._token.expires_at}"
-                )
+            logger.debug(
+                f"Token refreshed successfully, expires at {self._token.expires_at}"
+            )
 
-            except httpx.HTTPStatusError as e:
-                logger.error(
-                    f"Token refresh failed: {e.response.status_code} {e.response.text}"
-                )
-                raise Exception(f"Failed to refresh token: {e.response.status_code}")
-            except Exception as e:
-                logger.error(f"Token refresh error: {str(e)}")
-                raise
+        except httpx.HTTPStatusError as e:
+            logger.error(
+                f"Token refresh failed: {e.response.status_code} {e.response.text}"
+            )
+            raise Exception(f"Failed to refresh token: {e.response.status_code}")
+        except Exception as e:
+            logger.error(f"Token refresh error: {str(e)}")
+            raise
 
     def invalidate_token(self):
         """Invalidate the current token to force refresh on next request."""
