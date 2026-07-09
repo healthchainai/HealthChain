@@ -90,6 +90,9 @@ class FHIRClient(FHIRServerInterface):
             token = self.token_manager.get_access_token()
             headers["Authorization"] = f"Bearer {token}"
 
+        # Trace the outgoing request headers to aid debugging of auth issues
+        logger.info("Prepared FHIR request headers for %s: %s", self.base_url, headers)
+
         return headers
 
     def _http_get(self, url: str, headers: Dict[str, str], **kwargs) -> httpx.Response:
