@@ -154,14 +154,14 @@ def token_manager_jwt(temp_key_file):
     return OAuth2TokenManager(oauth2_config_jwt)
 
 
-@patch("jwt.JWT.encode")
-@patch("jwt.jwk_from_pem")
+@patch("jwt.encode")
+@patch("cryptography.hazmat.primitives.serialization.load_pem_private_key")
 def test_oauth2_token_manager_jwt_assertion_creation(
-    mock_jwk_from_pem, mock_jwt_encode, token_manager_jwt
+    mock_load_key, mock_jwt_encode, token_manager_jwt
 ):
     """OAuth2TokenManager creates valid JWT assertions for authentication."""
     mock_jwt_encode.return_value = "signed_jwt_token"
-    mock_jwk_from_pem.return_value = "mock_key"
+    mock_load_key.return_value = "mock_key"
 
     jwt_assertion = token_manager_jwt._create_jwt_assertion()
 

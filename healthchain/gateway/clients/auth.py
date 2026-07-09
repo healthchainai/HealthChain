@@ -192,7 +192,10 @@ class OAuth2TokenManager:
 
     def _create_jwt_assertion(self) -> str:
         """Create JWT client assertion for SMART on FHIR authentication."""
-        from jwt import JWT, jwk_from_pem
+        import jwt
+        from cryptography.hazmat.primitives.serialization import (
+            load_pem_private_key,
+        )
 
         # Generate unique JTI
         jti = str(uuid.uuid4())
@@ -201,7 +204,7 @@ class OAuth2TokenManager:
         try:
             with open(self.config.client_secret_path, "rb") as f:
                 private_key_data = f.read()
-            key = jwk_from_pem(private_key_data)
+            key = load_pem_private_key(private_key_data, password=None)
         except Exception as e:
             raise Exception(
                 f"Failed to load private key from {os.path.basename(self.config.client_secret_path)}: {e}"
@@ -222,7 +225,7 @@ class OAuth2TokenManager:
 
         # Create and sign JWT with optional kid header
         headers = {"kid": self.config.key_id} if self.config.key_id else None
-        signed_jwt = JWT().encode(claims, key, alg="RS384", optional_headers=headers)
+        signed_jwt = jwt.encode(claims, key, algorithm="RS384", headers=headers)
 
         return signed_jwt
 
@@ -330,7 +333,10 @@ class AsyncOAuth2TokenManager:
 
     def _create_jwt_assertion(self) -> str:
         """Create JWT client assertion for SMART on FHIR authentication."""
-        from jwt import JWT, jwk_from_pem
+        import jwt
+        from cryptography.hazmat.primitives.serialization import (
+            load_pem_private_key,
+        )
 
         # Generate unique JTI
         jti = str(uuid.uuid4())
@@ -339,7 +345,7 @@ class AsyncOAuth2TokenManager:
         try:
             with open(self.config.client_secret_path, "rb") as f:
                 private_key_data = f.read()
-            key = jwk_from_pem(private_key_data)
+            key = load_pem_private_key(private_key_data, password=None)
         except Exception as e:
             raise Exception(
                 f"Failed to load private key from {os.path.basename(self.config.client_secret_path)}: {e}"
@@ -360,6 +366,6 @@ class AsyncOAuth2TokenManager:
 
         # Create and sign JWT with optional kid header
         headers = {"kid": self.config.key_id} if self.config.key_id else None
-        signed_jwt = JWT().encode(claims, key, alg="RS384", optional_headers=headers)
+        signed_jwt = jwt.encode(claims, key, algorithm="RS384", headers=headers)
 
         return signed_jwt
