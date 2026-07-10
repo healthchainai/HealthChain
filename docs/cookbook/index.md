@@ -11,7 +11,7 @@ Hands-on, production-ready examples for building healthcare AI applications with
     uv sync   # or: pip install healthchain
     ```
 
-    Run any cookbook from the repo root — e.g. `python cookbook/sepsis_cds_hooks.py`. Filter by **Zero Setup** below to find examples that run immediately with no external accounts.
+    Run any cookbook from the repo root — e.g. `python cookbook/ml_risk_to_fhir.py`. Filter by **Zero Setup** below to find examples that run immediately with no external accounts.
 
 <div class="tag-legend">
   <span class="tag-legend-title">Filter:</span>
@@ -123,11 +123,11 @@ Cookbooks are standalone scripts — run them directly to explore and experiment
 
 ```bash
 # 1. Run a cookbook locally
-python cookbook/sepsis_cds_hooks.py
+python cookbook/cds_discharge_summarizer_hf_chat.py
 
 # 2. Scaffold a project
-healthchain new my-sepsis-service -t cds-hooks
-cd my-sepsis-service
+healthchain new my-cds-service -t cds-hooks
+cd my-cds-service
 
 # 3. Move your hook logic into app.py, then run with config
 healthchain serve

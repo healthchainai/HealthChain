@@ -295,8 +295,8 @@ def create_resource_from_dict(
 def prefetch_to_bundle(prefetch: Dict[str, Any]) -> Dict[str, Any]:
     """Flatten CDS Hooks prefetch into a collection Bundle dict.
 
-    Converts the keyed prefetch format (used in CDS Hooks) into a flat bundle
-    suitable for Dataset.from_fhir_bundle().
+    Converts the keyed prefetch format (used in CDS Hooks) into a flat
+    collection bundle for downstream processing.
 
     Args:
         prefetch: CDS Hooks prefetch dict with format:
@@ -308,7 +308,6 @@ def prefetch_to_bundle(prefetch: Dict[str, Any]) -> Dict[str, Any]:
     Example:
         >>> prefetch = request.prefetch
         >>> bundle = prefetch_to_bundle(prefetch)
-        >>> dataset = Dataset.from_fhir_bundle(bundle, schema=schema)
     """
     entries = []
     for key, value in prefetch.items():
