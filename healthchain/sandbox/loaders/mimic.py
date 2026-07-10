@@ -89,14 +89,13 @@ class MimicOnFHIRLoader(DatasetLoader):
             ... )
             >>> prefetch["medicationstatement"]  # Pydantic Bundle object
 
-            ML workflow (single bundle dict, fast, no validation):
+            Fast workflow (single bundle dict, no validation):
             >>> bundle = loader.load(
             ...     data_dir="./data/mimic-iv-fhir",
             ...     resource_types=["MimicObservationChartevents", "MimicPatient"],
             ...     as_dict=True
             ... )
-            >>> from healthchain.io import Dataset
-            >>> dataset = Dataset.from_fhir_bundle(bundle, schema="sepsis_vitals.yaml")
+            >>> bundle["entry"]  # raw dict entries
         """
 
         data_dir = Path(data_dir)

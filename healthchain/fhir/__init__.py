@@ -63,14 +63,6 @@ from healthchain.fhir.bundlehelpers import (
     count_resources,
 )
 
-from healthchain.fhir.dataframe import (
-    BundleConverterConfig,
-    bundle_to_dataframe,
-    get_supported_resources,
-    get_resource_info,
-    print_supported_resources,
-)
-
 from healthchain.fhir.utilities import (
     calculate_age_from_birthdate,
     calculate_age_from_event_date,
@@ -130,12 +122,6 @@ __all__ = [
     "merge_bundles",
     "extract_resources",
     "count_resources",
-    # Bundle to DataFrame conversion
-    "BundleConverterConfig",
-    "bundle_to_dataframe",
-    "get_supported_resources",
-    "get_resource_info",
-    "print_supported_resources",
     # Utility functions
     "calculate_age_from_birthdate",
     "calculate_age_from_event_date",
