@@ -159,28 +159,21 @@ data_dir/
     )
     ```
 
-=== "Direct Loader for ML Workflows"
+=== "Direct Loader for Fast Access"
     ```python
-    # Use loader directly for ML pipelines (faster, no validation)
+    # Use loader directly for a raw bundle (faster, no validation)
     from healthchain.sandbox.loaders import MimicOnFHIRLoader
-    from healthchain.io import Dataset
 
     loader = MimicOnFHIRLoader()
 
     # as_dict=True: Returns single bundle dict (fast, no FHIR validation)
-    # Suitable for ML feature extraction workflows
+    # Suitable for feeding your own downstream processing
     bundle = loader.load(
         data_dir="./data/mimic-iv-fhir",
         resource_types=["MimicObservationChartevents", "MimicPatient"],
         as_dict=True
     )
-
-    # Convert to DataFrame for ML
-    dataset = Dataset.from_fhir_bundle(
-        bundle,
-        schema="healthchain/configs/features/sepsis_vitals.yaml"
-    )
-    df = dataset.data
+    entries = bundle["entry"]  # raw dict entries
 
     # as_dict=False (default): Returns Dict[str, Bundle]
     # Validated Bundle objects grouped by resource type (for CDS Hooks)

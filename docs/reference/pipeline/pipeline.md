@@ -63,7 +63,7 @@ pipeline = MedicalCodingPipeline.from_local_model(
 
 [**Containers**](../io/containers/containers.md) are at the core of HealthChain pipelines: they define your data type and flow through each pipeline step, just like spaCy's `Doc`.
 
-Specify the container (e.g. [Document](../io/containers/document.md) or [Dataset](../io/containers/dataset.md)) when creating your pipeline (`Pipeline[Document]()`). Each node processes and returns the container, enabling smooth, type-safe, modular workflows and direct FHIR conversion.
+Specify the container (e.g. [Document](../io/containers/document.md)) when creating your pipeline (`Pipeline[Document]()`). Each node processes and returns the container, enabling smooth, type-safe, modular workflows and direct FHIR conversion.
 
 ```python
 from healthchain.pipeline import Pipeline

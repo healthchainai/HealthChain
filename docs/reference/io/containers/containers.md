@@ -1,13 +1,12 @@
 # Containers
 
-The `healthchain.io.containers` module provides FHIR-native containers for healthcare data processing. These containers handle the complexities of clinical data formats while providing a clean Python interface for NLP/ML pipelines.
+The `healthchain.io.containers` module provides FHIR-native containers for healthcare data processing. These containers handle the complexities of clinical data formats while providing a clean Python interface for pipelines.
 
 ## Available Containers
 
 | Container | Purpose | Use Cases |
 |-----------|---------|-----------|
 | [**Document**](document.md) | Clinical text + FHIR resources | Clinical notes, discharge summaries, CDS workflows |
-| [**Dataset**](dataset.md) | ML-ready features from FHIR | Model training/inference, feature engineering |
 
 ## DataContainer 📦
 
