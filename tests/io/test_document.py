@@ -222,7 +222,7 @@ def test_document_patient_convenience_properties_param(num_patients):
     assert len(bundle_patients) == num_patients
 
 
-@patch("healthchain.io.containers.document.Span")
+@patch("spacy.tokens.Span")
 def test_update_problem_list_from_nlp(mock_span_class, test_empty_document):
     """Test updating problem list from NLP entities"""
 

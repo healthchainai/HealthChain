@@ -5,14 +5,13 @@ This module provides:
 - Adapters: Convert external formats (CDA, CDS Hooks) to/from HealthChain
 """
 
-from .containers import DataContainer, Document
+from .containers import Document
 from .adapters.base import BaseAdapter
 from .adapters.cdaadapter import CdaAdapter
 from .adapters.cdsfhiradapter import CdsFhirAdapter
 
 __all__ = [
     # Containers
-    "DataContainer",
     "Document",
     # Adapters
     "BaseAdapter",

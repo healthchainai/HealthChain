@@ -8,7 +8,7 @@ from healthchain.io.containers import Document
 logger = logging.getLogger(__name__)
 
 
-class FHIRProblemListExtractor(BaseComponent[Document]):
+class FHIRProblemListExtractor(BaseComponent):
     """
     Component that automatically extracts FHIR Condition resources from NLP entities.
 
@@ -18,7 +18,7 @@ class FHIRProblemListExtractor(BaseComponent[Document]):
     the document's problem list.
 
     Attributes:
-        patient_ref: Reference to the patient (e.g., "Patient/123")
+        patient_ref: Reference to the patient (e.g., "Patient/456")
         coding_system: The coding system for the conditions (default: SNOMED CT)
         code_attribute: Name of the attribute containing medical codes
 
@@ -28,19 +28,20 @@ class FHIRProblemListExtractor(BaseComponent[Document]):
 
         >>> # Custom code attribute - uses ent._.snomed_id
         >>> extractor = ProblemListExtractor(
+        ...     patient_ref="Patient/456",
         ...     code_attribute="snomed_id",
         ...     coding_system="http://snomed.info/sct"
         ... )
 
         >>> # Works with any framework - extracts from generic entities
-        >>> extractor = ProblemListExtractor(code_attribute="cui")
+        >>> extractor = ProblemListExtractor(patient_ref="Patient/456", code_attribute="cui")
 
         >>> pipeline.add_node(extractor, position="after", reference="entity_linking")
     """
 
     def __init__(
         self,
-        patient_ref: str = "Patient/123",
+        patient_ref: str,
         coding_system: str = "http://snomed.info/sct",
         code_attribute: str = "cui",
     ):
@@ -48,7 +49,7 @@ class FHIRProblemListExtractor(BaseComponent[Document]):
         Initialize the ProblemListExtractor.
 
         Args:
-            patient_ref: FHIR reference to the patient
+            patient_ref: FHIR reference to the patient (required)
             coding_system: Coding system URI for the conditions
             code_attribute: Name of the spaCy extension attribute containing medical codes
         """

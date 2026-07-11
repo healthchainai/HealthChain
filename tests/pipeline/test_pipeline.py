@@ -1,7 +1,7 @@
 import pytest
 from pydantic import BaseModel, Field, ValidationError
 from healthchain.pipeline.base import BaseComponent
-from healthchain.io.containers import DataContainer
+from healthchain.io.containers import Document
 from healthchain.pipeline.base import Pipeline
 
 
@@ -19,7 +19,7 @@ class MockOutputModel(BaseModel):
     data: int = Field(lt=15)
 
 
-def mock_component(data: DataContainer) -> DataContainer:
+def mock_component(data: Document) -> Document:
     data.data += 1
     return data
 
@@ -91,7 +91,7 @@ def test_add_component(mock_basic_pipeline):
 
     # Test adding component as a decorator
     @mock_basic_pipeline.add_node(name="decorator_component", stage="processing")
-    def decorator_component(data: DataContainer) -> DataContainer:
+    def decorator_component(data: Document) -> Document:
         data.data += 1
         return data
 
@@ -112,7 +112,7 @@ def test_remove_and_replace_component(mock_basic_pipeline, caplog):
     mock_basic_pipeline.add_node(mock_component, name="original")
 
     # Test replacing with a valid callable
-    def new_component(data: DataContainer) -> DataContainer:
+    def new_component(data: Document) -> Document:
         return data
 
     mock_basic_pipeline.replace("original", new_component)
@@ -127,7 +127,7 @@ def test_remove_and_replace_component(mock_basic_pipeline, caplog):
 
     # Test replacing with a BaseComponent
     class NewComponent(BaseComponent):
-        def __call__(self, data: DataContainer) -> DataContainer:
+        def __call__(self, data: Document) -> Document:
             return data
 
     new_base_component = NewComponent()
@@ -149,7 +149,7 @@ def test_build_and_execute_pipeline(mock_basic_pipeline):
     mock_basic_pipeline.add_node(mock_component, name="comp2")
 
     # Test that the pipeline automatically builds on first use
-    input_data = DataContainer(1)
+    input_data = Document(data=1)
     result = mock_basic_pipeline(input_data)  # This should trigger the automatic build
 
     assert result.data == 3
@@ -158,7 +158,7 @@ def test_build_and_execute_pipeline(mock_basic_pipeline):
     )  # Check that the pipeline was built
 
     # Test that subsequent calls use the already built pipeline
-    result2 = mock_basic_pipeline(DataContainer(2))
+    result2 = mock_basic_pipeline(Document(data=2))
     assert result2.data == 4
 
     # Test explicit build method
@@ -166,7 +166,7 @@ def test_build_and_execute_pipeline(mock_basic_pipeline):
     explicit_pipeline = mock_basic_pipeline.build()
     assert callable(explicit_pipeline)
 
-    result3 = explicit_pipeline(DataContainer(3))
+    result3 = explicit_pipeline(Document(data=3))
     assert result3.data == 5
     assert mock_basic_pipeline._built_pipeline is explicit_pipeline
 
@@ -179,7 +179,7 @@ def test_build_and_execute_pipeline(mock_basic_pipeline):
 
     with pytest.raises(ValueError, match="Circular dependency detected"):
         mock_basic_pipeline(
-            DataContainer(1)
+            Document(data=1)
         )  # This should trigger the build and raise the error
 
     # Also test that explicit build raises the same error
@@ -187,9 +187,20 @@ def test_build_and_execute_pipeline(mock_basic_pipeline):
         mock_basic_pipeline.build()
 
 
+# Test raw input is wrapped into a Document
+def test_raw_input_wrapped_into_document(mock_basic_pipeline):
+    @mock_basic_pipeline.add_node
+    def annotate(doc: Document) -> Document:
+        return doc
+
+    result = mock_basic_pipeline("some clinical text")
+    assert isinstance(result, Document)
+    assert result.text == "some clinical text"
+
+
 # Test input and output model validation
 def test_input_output_validation(mock_basic_pipeline):
-    def validated_component(data: DataContainer) -> DataContainer:
+    def validated_component(data: Document) -> Document:
         data.data = data.data * 2
         return data
 
@@ -202,11 +213,11 @@ def test_input_output_validation(mock_basic_pipeline):
 
     pipeline_func = mock_basic_pipeline.build()
 
-    valid_input = DataContainer(5)
+    valid_input = Document(data=5)
     result = pipeline_func(valid_input)
     assert result.data == 10
 
-    invalid_input = DataContainer(-1)
+    invalid_input = Document(data=-1)
     with pytest.raises(ValidationError):
         pipeline_func(invalid_input)
 
@@ -214,7 +225,7 @@ def test_input_output_validation(mock_basic_pipeline):
     @mock_basic_pipeline.add_node(
         name="invalid_output", input_model=MockInputModel, output_model=MockOutputModel
     )
-    def invalid_output_component(data: DataContainer) -> DataContainer:
+    def invalid_output_component(data: Document) -> Document:
         data.data = data.data * 10  # This will produce an invalid output
         return data
 
@@ -222,14 +233,13 @@ def test_input_output_validation(mock_basic_pipeline):
     pipeline_func = mock_basic_pipeline.build()
 
     with pytest.raises(ValidationError):
-        pipeline_func(DataContainer(5))  # 5 * 10 = 50, which is > 15 (invalid output)
+        pipeline_func(Document(data=5))  # 5 * 10 = 50, which is > 15 (invalid output)
 
 
 # Test Pipeline class and representation
 def test_pipeline_class_and_representation(mock_basic_pipeline):
     pipeline = Pipeline()
-    assert hasattr(pipeline, "configure_pipeline")
-    pipeline.configure_pipeline("dummy_path")  # Should not raise any exception
+    assert isinstance(pipeline, Pipeline)
 
     mock_basic_pipeline.add_node(mock_component, name="comp1")
     mock_basic_pipeline.add_node(mock_component, name="comp2")
@@ -237,9 +247,6 @@ def test_pipeline_class_and_representation(mock_basic_pipeline):
     repr_string = repr(mock_basic_pipeline)
     assert "comp1" in repr_string
     assert "comp2" in repr_string
-
-    loaded_pipeline = Pipeline.from_local_model("dummy_path", source="spacy")
-    assert isinstance(loaded_pipeline, Pipeline)
 
 
 # Add a new test for the stages property

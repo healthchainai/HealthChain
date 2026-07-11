@@ -4,8 +4,6 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Iterator, List, Optional, Union
 from uuid import uuid4
 
-from spacy.tokens import Doc as SpacyDoc
-from spacy.tokens import Span
 from fhir.resources.R4B.condition import Condition
 from fhir.resources.R4B.medicationstatement import MedicationStatement
 from fhir.resources.R4B.allergyintolerance import AllergyIntolerance
@@ -64,9 +62,9 @@ class NlpAnnotations:
     _tokens: List[str] = field(default_factory=list)
     _entities: List[Dict[str, Any]] = field(default_factory=list)
     _embeddings: Optional[List[float]] = None
-    _spacy_doc: Optional[SpacyDoc] = None
+    _spacy_doc: Optional[Any] = None
 
-    def add_spacy_doc(self, doc: SpacyDoc):
+    def add_spacy_doc(self, doc: Any):
         self._spacy_doc = doc
         self._tokens = [token.text for token in doc]
         self._entities = [
@@ -79,7 +77,7 @@ class NlpAnnotations:
             for ent in doc.ents
         ]
 
-    def get_spacy_doc(self) -> Optional[SpacyDoc]:
+    def get_spacy_doc(self) -> Optional[Any]:
         return self._spacy_doc
 
     def get_tokens(self) -> List[str]:
@@ -99,114 +97,6 @@ class NlpAnnotations:
 
     def set_embeddings(self, embeddings: List[float]):
         self._embeddings = embeddings
-
-
-@dataclass
-class ModelOutputs:
-    """
-    Container for storing and managing third-party integration model outputs.
-
-    This class stores outputs from different NLP/ML frameworks like Hugging Face
-    and LangChain, organizing them by task type. It also maintains a list of
-    generated text outputs across frameworks.
-
-    Attributes:
-        _huggingface_results (Dict[str, Any]): Dictionary storing Hugging Face model
-            outputs, keyed by task name.
-        _langchain_results (Dict[str, Any]): Dictionary storing LangChain outputs,
-            keyed by task name.
-
-    Methods:
-        add_output(source: str, task: str, output: Any): Adds a model output for a
-            specific source and task. For text generation tasks, also extracts and
-            stores the generated text.
-        get_output(source: str, task: str, default: Any = None) -> Any: Gets the model
-            output for a specific source and task. Returns default if not found.
-        get_generated_text() -> List[str]: Returns the list of generated text outputs
-    """
-
-    _huggingface_results: Dict[str, Any] = field(default_factory=dict)
-    _langchain_results: Dict[str, Any] = field(default_factory=dict)
-
-    def add_output(self, source: str, task: str, output: Any):
-        if source == "huggingface":
-            self._huggingface_results[task] = output
-        elif source == "langchain":
-            self._langchain_results[task] = output
-        else:
-            raise ValueError(f"Unknown source: {source}")
-
-    def get_output(self, source: str, task: str) -> Any:
-        if source == "huggingface":
-            return self._huggingface_results.get(task, {})
-        elif source == "langchain":
-            return self._langchain_results.get(task, {})
-        raise ValueError(f"Unknown source: {source}")
-
-    def get_generated_text(self, source: str, task: str) -> List[str]:
-        """
-        Returns generated text outputs for a given source and task.
-
-        Handles different output formats for Hugging Face and LangChain. For
-        Hugging Face, it extracts the last message content from chat-style
-        outputs and common keys like "generated_text", "summary_text", and
-        "translation". For LangChain, it converts JSON outputs to strings, and returns
-        the output as is if it is already a string.
-
-        Args:
-            source (str): Framework name (e.g., "huggingface", "langchain").
-            task (str): Task name for retrieving generated text.
-
-        Returns:
-            List[str]: List of generated text outputs, or an empty list if none.
-        """
-        generated_text = []
-
-        if source == "huggingface":
-            # Handle chat-style output format
-            output = self._huggingface_results.get(task)
-            if isinstance(output, list):
-                for entry in output:
-                    text = entry.get("generated_text")
-                    if isinstance(text, list):
-                        last_msg = text[-1]
-                        if isinstance(last_msg, dict) and "content" in last_msg:
-                            generated_text.append(last_msg["content"])
-                    # Otherwise get common huggingface output keys
-                    elif any(
-                        key in entry
-                        for key in ["generated_text", "summary_text", "translation"]
-                    ):
-                        generated_text.append(
-                            text
-                            or entry.get("summary_text")
-                            or entry.get("translation")
-                        )
-            else:
-                logger.warning("HuggingFace output is not a list of dictionaries. ")
-        elif source == "langchain":
-            output = self._langchain_results.get(task)
-            # Check if output is a string
-            if isinstance(output, str):
-                generated_text.append(output)
-            # Try to convert JSON to string
-            elif isinstance(output, dict):
-                try:
-                    import json
-
-                    output_str = json.dumps(output)
-                    generated_text.append(output_str)
-                except Exception:
-                    logger.warning(
-                        "LangChain output is not a string and could not be converted to JSON string. "
-                        "Chains should output either a string or a JSON object."
-                    )
-            else:
-                logger.warning(
-                    "LangChain output is not a string. Chains should output either a string or a JSON object."
-                )
-
-        return generated_text
 
 
 @dataclass
@@ -698,13 +588,11 @@ class Document(BaseDocument):
         - Provides basic tokenization and supports integration with NLP models (spaCy, transformers).
         - Stores and manipulates clinical FHIR data via the .fhir property (access to bundles, problem lists, meds, allergies, etc.).
         - Encapsulates CDS Hooks-style decision support cards and suggested actions via the .cds property.
-        - Stores outputs from external ML/LLM models: HuggingFace, LangChain, etc.
 
     Attributes:
         nlp (NlpAnnotations): NLP output (tokens, entities, embeddings, spaCy doc)
         fhir (FhirData): FHIR resources and context (problem list, medication, allergy, etc.)
         cds (CdsAnnotations): Clinical decision support (cards and actions)
-        models (ModelOutputs): Results from ML/LLM models (HuggingFace, LangChain, etc.)
         text (str): The text content of the document (if available).
         data: The original input supplied (raw text, Bundle, resource, or list of resources)
 
@@ -714,7 +602,6 @@ class Document(BaseDocument):
         ['Patient', 'has', 'hypertension']
         >>> doc.fhir.problem_list = [Condition(...)]
         >>> doc.cds.cards = [Card(...)]
-        >>> doc.models.huggingface_results = ...
         >>> for token in doc:
         ...     print(token)
 
@@ -725,7 +612,6 @@ class Document(BaseDocument):
     _nlp: NlpAnnotations = field(default_factory=NlpAnnotations)
     _fhir: FhirData = field(default_factory=FhirData)
     _cds: CdsAnnotations = field(default_factory=CdsAnnotations)
-    _models: ModelOutputs = field(default_factory=ModelOutputs)
 
     @property
     def nlp(self) -> NlpAnnotations:
@@ -738,10 +624,6 @@ class Document(BaseDocument):
     @property
     def cds(self) -> CdsAnnotations:
         return self._cds
-
-    @property
-    def models(self) -> ModelOutputs:
-        return self._models
 
     def __post_init__(self):
         """
@@ -836,6 +718,9 @@ class Document(BaseDocument):
 
         # 1. Extract from spaCy entities (if available)
         if self.nlp._spacy_doc and self.nlp._spacy_doc.ents:
+            # spaCy is an optional dependency; only imported when a spaCy doc is present.
+            from spacy.tokens import Span
+
             for ent in self.nlp._spacy_doc.ents:
                 if not Span.has_extension(code_attribute):
                     logger.debug(

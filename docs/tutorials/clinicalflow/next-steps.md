@@ -25,7 +25,7 @@ Convert extracted entities to FHIR resources:
 ```python
 from healthchain.pipeline.components import FHIRProblemListExtractor
 
-pipeline.add_node(FHIRProblemListExtractor())
+pipeline.add_node(FHIRProblemListExtractor(patient_ref="Patient/patient-001"))
 
 # Now doc.fhir.problem_list contains FHIR Condition resources
 ```

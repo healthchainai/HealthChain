@@ -33,11 +33,19 @@ def test_supports_different_code_attributes(code_attribute, code_value):
     entities = [{"text": "fever", code_attribute: code_value}]
     doc.nlp.set_entities(entities)
 
-    extractor = FHIRProblemListExtractor(code_attribute=code_attribute)
+    extractor = FHIRProblemListExtractor(
+        patient_ref="Patient/test", code_attribute=code_attribute
+    )
     result = extractor(doc)
 
     assert len(result.fhir.problem_list) == 1
     assert result.fhir.problem_list[0].code.coding[0].code == code_value
+
+
+def test_requires_patient_ref():
+    """ProblemListExtractor raises TypeError if patient_ref is omitted."""
+    with pytest.raises(TypeError):
+        FHIRProblemListExtractor()
 
 
 def test_skips_entities_without_codes():
@@ -50,7 +58,7 @@ def test_skips_entities_without_codes():
     ]
     doc.nlp.set_entities(entities)
 
-    extractor = FHIRProblemListExtractor()
+    extractor = FHIRProblemListExtractor(patient_ref="Patient/test")
     result = extractor(doc)
 
     assert len(result.fhir.problem_list) == 1
@@ -63,7 +71,7 @@ def test_preserves_existing_conditions(test_condition):
     doc.fhir.problem_list = [test_condition]
     doc.nlp.set_entities([{"text": "fever", "cui": "C0015967"}])
 
-    extractor = FHIRProblemListExtractor()
+    extractor = FHIRProblemListExtractor(patient_ref="Patient/test")
     result = extractor(doc)
 
     assert len(result.fhir.problem_list) == 2

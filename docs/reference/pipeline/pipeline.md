@@ -1,75 +1,20 @@
 # Pipeline
 
-HealthChain pipelines help you quickly build data processing workflows that integrate seamlessly with EHR systems. They support healthcare formats like [FHIR](https://build.fhir.org/) out of the box and include built-in NLP to process free-text and structured clinical data—so you can focus on AI, not integration hassles.
+HealthChain pipelines help you quickly build data processing workflows that integrate seamlessly with EHR systems. They support healthcare formats like [FHIR](https://build.fhir.org/) out of the box, so you can focus on your AI logic, not integration hassles.
 
-Choose from prebuilt pipelines tailored to standard clinical workflows, or build custom pipelines for your own applications. Both approaches ensure production-ready interoperability and make it easy to adapt pipelines for any healthcare use case.
+Pipelines are lightweight composition primitives: create a `Pipeline`, add steps with `add_node`, and run your data through end-to-end. HealthChain doesn't ship prebuilt pipeline classes or NLP wrappers — load models with the library you already use (spaCy, HuggingFace Transformers, LangChain) and wrap them in nodes. For complete worked examples of common clinical tasks (medical coding, discharge summarization, ML risk scoring), start from a [cookbook recipe](../../cookbook/clinical_coding.md).
 
-## Prebuilt 📦
+## Building a Pipeline 🕺
 
-HealthChain comes with a set of end-to-end pipeline implementations of common healthcare data processing tasks.
+[**Containers**](../io/containers/containers.md) are at the core of HealthChain pipelines: a [Document](../io/containers/document.md) carries your data and accumulates results as it flows through each step, just like spaCy's `Doc`.
 
-These prebuilt pipelines handle FHIR conversion, validation, and EHR integration for you. They work out-of-the-box with [**Adapters**](../io/adapters/adapters.md) and [**Gateways**](../gateway/gateway.md), supporting CDS Hooks, NoteReader CDI, and FHIR APIs. They're great for a quick setup to build more complex integrations on top of.
-
-
-| Pipeline | Container | Use Case | Description | Example Application |
-|----------|-----------|----------|-------------|---------------------|
-| [**MedicalCodingPipeline**](./prebuilt_pipelines/medicalcoding.md) | `Document` | Clinical Documentation | Processes clinical notes into FHIR Condition resources with standard medical codes | Automated ICD-10/SNOMED CT coding for billing and CDI workflows |
-| [**SummarizationPipeline**](./prebuilt_pipelines/summarization.md) | `Document` | Clinical Decision Support | Generates clinical summaries as CDS Hooks cards for EHR integration | Real-time discharge summaries in Epic or Cerner workflows |
-<!-- | **QAPipeline** [TODO] | `Document` | Conversational AI | A Question Answering pipeline suitable for conversational AI applications | Developing a chatbot to answer patient queries about their medical records |
-| **ClassificationPipeline** [TODO] | `Tabular` | Predictive Analytics | A pipeline for machine learning classification tasks | Predicting patient readmission risk based on historical health data | -->
-
-When you load your data into a prebuilt pipeline, it receives and returns request and response data ready to send to EHR integration points:
-
-```python
-from healthchain.pipeline import MedicalCodingPipeline
-from healthchain.models import CdaRequest
-
-# Load from a pipeline object
-pipeline = MedicalCodingPipeline.load(pipeline_object)
-
-# Simple end-to-end processing
-cda_request = CdaRequest(document="<Clinical Document>")
-cda_response = pipeline.process_request(cda_request)
-```
-
-### Customizing Prebuilt Pipelines
-
-To customize a prebuilt pipeline, you can use the [pipeline management](#pipeline-management) methods to add, remove, and replace components.
-
-If you need more control and don't mind writing more code, you can subclass `BasePipeline` and implement your own pipeline logic.
-
-[(BasePipeline API Reference)](../../api/pipeline.md#healthchain.pipeline.base.BasePipeline)
-
-## NLP Integrations
-
-HealthChain integrates directly with popular NLP libraries like spaCy, HuggingFace Transformers, and LangChain. Easily add advanced NLP models and components into your pipelines to power state-of-the-art healthcare AI workflows.
-
-[(Full Documentation on NLP Integrations)](./integrations/integrations.md)
-
-```python
-from healthchain.pipeline import MedicalCodingPipeline
-
-# Load from Hugging Face
-pipeline = MedicalCodingPipeline.from_model_id(
-    'blaze999/Medical-NER', task="token-classification", source="huggingface"
-)
-# Load from local model files
-pipeline = MedicalCodingPipeline.from_local_model(
-    '/path/to/model', source="spacy"
-)
-```
-
-## Freestyle 🕺
-
-[**Containers**](../io/containers/containers.md) are at the core of HealthChain pipelines: they define your data type and flow through each pipeline step, just like spaCy's `Doc`.
-
-Specify the container (e.g. [Document](../io/containers/document.md)) when creating your pipeline (`Pipeline[Document]()`). Each node processes and returns the container, enabling smooth, type-safe, modular workflows and direct FHIR conversion.
+Create a `Pipeline`; each node processes and returns a `Document`, enabling smooth, modular workflows and direct FHIR conversion. Raw input (text, a FHIR Bundle, or a list of resources) is wrapped into a `Document` automatically.
 
 ```python
 from healthchain.pipeline import Pipeline
 from healthchain.io.containers import Document
 
-pipeline = Pipeline[Document]()
+pipeline = Pipeline()
 ```
 
 To use a built pipeline, compile it by running `.build()`. This will return a compiled pipeline that you can run on your data.
@@ -127,19 +72,24 @@ pipeline.add_node(link_snomed_codes)
 
 #### Components
 
-Components are pre-configured building blocks for common clinical NLP tasks. They handle FHIR conversion, entity extraction, and CDS formatting automatically.
+Components are reusable building blocks for common clinical processing tasks. HealthChain ships a pure-Python `FHIRProblemListExtractor`; for NLP, bring your own model and wrap it in a node.
 
 See the full list at the [Components](./components/components.md) page.
 
 ```python
-from healthchain.pipeline.components import SpacyNLP, FHIRProblemListExtractor
+import spacy
+from healthchain.pipeline.components import FHIRProblemListExtractor
 
-# Add medical NLP processing
-nlp = SpacyNLP.from_model_id("en_core_sci_sm")
-pipeline.add_node(nlp)
+# Bring your own NLP: load a spaCy model and wrap it in a node
+nlp = spacy.load("en_core_sci_sm")
+
+@pipeline.add_node
+def run_nlp(doc: Document) -> Document:
+    doc.nlp.add_spacy_doc(nlp(doc.text))
+    return doc
 
 # Extract FHIR Condition resources from entities
-extractor = FHIRProblemListExtractor()
+extractor = FHIRProblemListExtractor(patient_ref="Patient/456")
 pipeline.add_node(extractor)
 ```
 
@@ -200,7 +150,7 @@ When using `"after"` or `"before"`, you must also specify the `reference` parame
 You can also specify the `stage` parameter to add the component to a specific stage group of the pipeline.
 
 ```python
-@pipeline.add_node(position="after", reference="SpacyNLP", stage="entity_linking")
+@pipeline.add_node(position="after", reference="run_nlp", stage="entity_linking")
 def link_snomed_codes(doc: Document) -> Document:
     """Add SNOMED CT codes to extracted medical entities."""
     spacy_doc = doc.nlp.get_spacy_doc()
@@ -217,7 +167,7 @@ def link_snomed_codes(doc: Document) -> Document:
 You can specify dependencies between components using the `dependencies` parameter. This is useful if you want to ensure that a component is run after another component.
 
 ```python
-@pipeline.add_node(dependencies=["SpacyNLP"])
+@pipeline.add_node(dependencies=["run_nlp"])
 def extract_medications(doc: Document) -> Document:
     """Extract medication entities and convert to FHIR MedicationStatements."""
     spacy_doc = doc.nlp.get_spacy_doc()
@@ -270,9 +220,9 @@ pipeline.replace("link_snomed_codes", enhanced_entity_linking)
 print(pipeline)
 print(pipeline.stages)
 
-# ["SpacyNLP", "ClinicalEntityLinker", "FHIRProblemListExtractor"]
+# ["run_nlp", "ClinicalEntityLinker", "FHIRProblemListExtractor"]
 # preprocessing:
-#   - SpacyNLP
+#   - run_nlp
 # entity_linking:
 #   - ClinicalEntityLinker
 # fhir_conversion:

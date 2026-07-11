@@ -10,7 +10,7 @@ The `FHIRProblemListExtractor` is a pipeline component that automatically extrac
 from healthchain.pipeline.components import FHIRProblemListExtractor
 
 # Extract conditions with default settings
-extractor = FHIRProblemListExtractor()
+extractor = FHIRProblemListExtractor(patient_ref="Patient/456")  # patient_ref is required
 doc = extractor(doc)  # Extracts from NLP entities stored in document's .nlp.entities or spaCy doc
 ```
 
@@ -19,7 +19,7 @@ doc = extractor(doc)  # Extracts from NLP entities stored in document's .nlp.ent
 ```python
 # Use SNOMED CT codes
 extractor = FHIRProblemListExtractor(
-    patient_ref="Patient/456",  # optional, defaults to "Patient/123"
+    patient_ref="Patient/456",  # required
     code_attribute="snomed_id", # optional, defaults to "cui"
     coding_system="http://snomed.info/sct" # optional, defaults to "http://snomed.info/sct"
 )
@@ -87,21 +87,26 @@ Example of a FHIR Condition resource created by the component:
 ```
 
 
-## MedicalCodingPipeline Integration
+## Using in a Pipeline
+
+Add the extractor after your NLP node to convert coded entities into FHIR Condition resources:
 
 ```python
-from healthchain.pipeline import MedicalCodingPipeline
+from healthchain.pipeline import Pipeline
+from healthchain.pipeline.components import FHIRProblemListExtractor
 
-# Automatic problem extraction
-pipeline = MedicalCodingPipeline(
-    extract_problems=True,
+pipeline = Pipeline()
+
+# ... add your NLP node here ...
+
+pipeline.add_node(FHIRProblemListExtractor(
     patient_ref="Patient/456",
-    code_attribute="cui"
-)
+    code_attribute="cui",
+))
 ```
 
 ## Related Documentation
 
 - [FHIR Condition Resources](https://www.hl7.org/fhir/condition.html)
-- [Medical Coding Pipeline](../prebuilt_pipelines/medicalcoding.md)
+- [Medical Coding Recipe](../../../cookbook/clinical_coding.md)
 - [Document Container](../../io/containers/document.md)

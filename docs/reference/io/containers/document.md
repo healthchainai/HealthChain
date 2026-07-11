@@ -1,6 +1,6 @@
 # Document 📄
 
-The `Document` class is a container for working with both clinical text and structured healthcare data. It natively manages FHIR resources, runs NLP over raw notes, tracks clinical document relationships, stores decision support outputs, and holds LLM model predictions.
+The `Document` class is a container for working with both clinical text and structured healthcare data. It natively manages FHIR resources, runs NLP over raw notes, tracks clinical document relationships, and stores decision support outputs.
 
 Use Document containers for clinical notes, discharge summaries, patient records, and any healthcare data that combines text with structured FHIR resources.
 
@@ -12,19 +12,17 @@ The main things you'll do with `Document`:
 - Extract and manipulate diagnoses, meds, allergies, and documents
 - Run NLP to extract entities or embeddings from text
 - Generate & store CDS Hooks cards (recommendations, alerts)
-- Attach model predictions for downstream use
 
 
 ## API Overview
 
-**Document** has four key components (all accessible as attributes):
+**Document** has three key components (all accessible as attributes):
 
 | Attribute | For |
 |---|---|
 | `doc.fhir` | FHIR management—Clinical lists, Bundles, DocReference, patient info |
 | `doc.nlp`  | NLP features—entities, tokens, embeddings |
 | `doc.cds`  | Decision support—recommendation cards, actions |
-| `doc.models` | ML/LLM outputs—store/retrieve predictions, generations |
 
 
 ### FHIR Data (`doc.fhir`)
@@ -179,32 +177,6 @@ doc.cds.actions = [
 ```
 
 
-### LLM Model Outputs (`doc.models`)
-
-- `get_output(model_name, task)`: Retrieve model predictions by name and task
-- `get_generated_text(model_name, task)`: Extract generated text from LLMs
-- Supports Hugging Face, LangChain, spaCy, and custom models
-
-```python
-# Store classification results
-doc.models.add_output(
-    model_name="clinical_classifier",
-    task="diagnosis_prediction",
-    output={"prediction": "diabetes", "confidence": 0.95}
-)
-
-# Store LLM summary
-doc.models.add_output(
-    model_name="gpt4",
-    task="summarization",
-    output="Patient presents with classic diabetic symptoms..."
-)
-
-# Retrieve outputs
-diagnosis = doc.models.get_output("clinical_classifier", "diagnosis_prediction")
-summary = doc.models.get_generated_text("gpt4", "summarization")
-```
-
 ### Properties and Methods
 
 ```python
@@ -218,10 +190,6 @@ ents = doc.nlp.get_entities()
 
 # Clinical decision support
 cards = doc.cds.cards
-
-# Model outputs
-doc.models.add_output("my_model", "task", output={"foo": "bar"})
-print(doc.models.get_output("my_model", "task"))
 ```
 
 ## Resource Docs

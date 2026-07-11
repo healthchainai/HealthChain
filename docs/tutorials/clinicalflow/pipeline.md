@@ -22,8 +22,8 @@ from healthchain.io import Document
 def create_clinical_pipeline():
     """Create a pipeline for processing clinical notes."""
 
-    # Initialize pipeline with Document as the data container
-    pipeline = Pipeline[Document]()
+    # Initialize the pipeline
+    pipeline = Pipeline()
 
     # Add a simple text preprocessing component
     @pipeline.add_node

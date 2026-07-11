@@ -138,7 +138,7 @@ def link_entities(doc: Document) -> Document:
     pipeline = Pipeline[Document]()
 
     pipeline.add_node(SpacyNLP.from_model_id("en_core_sci_sm"))
-    pipeline.add_node(FHIRProblemListExtractor())
+    pipeline.add_node(FHIRProblemListExtractor(patient_ref="Patient/123"))
     ```
 
 
