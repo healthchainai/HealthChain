@@ -57,9 +57,9 @@ class PatientAnswer(BaseModel):
     answer: str
 
 
-def create_pipeline() -> Pipeline[Document]:
+def create_pipeline() -> Pipeline:
     """Format a FHIR patient bundle into a structured LLM context string."""
-    pipeline = Pipeline[Document]()
+    pipeline = Pipeline()
 
     @pipeline.add_node
     def format_context(doc: Document) -> Document:

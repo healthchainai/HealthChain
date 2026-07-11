@@ -18,12 +18,17 @@ A clinical note arrives from NoteReader as CDA XML → gets parsed and processed
 
 ### Install Dependencies
 
-We'll use [scispacy](https://allenai.github.io/scispacy/) for medical entity extraction. Install the required dependencies:
+We'll use [scispacy](https://allenai.github.io/scispacy/)'s `en_core_sci_sm` model for medical entity extraction. Install everything in one command so pip resolves a compatible set:
 
 ```bash
-pip install healthchain scispacy python-dotenv
-pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_sm-0.5.4.tar.gz
+pip install "healthchain[cda,examples]" "spacy>=3.7,<3.8" python-dotenv \
+    https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_sm-0.5.4.tar.gz
 ```
+
+The `[cda]` extra provides CDA parsing, and `[examples]` provides spaCy for the NLP step.
+
+!!! warning "spaCy version"
+    The `en_core_sci_sm` 0.5.4 model doesn't load on spaCy 3.8+, so the install line pins `spacy>=3.7,<3.8`. If you use a different model, drop the pin.
 
 ### Download Sample Data
 
@@ -79,70 +84,54 @@ response = cda_adapter.format(doc)
     - Stores extracted [Condition](https://www.hl7.org/fhir/condition.html) resources in `doc.fhir.problem_list`
 
 
-## Initialize the Pipeline
+## Build the Medical Coding Pipeline
 
-Next we'll build our NLP processing pipeline. We'll use a [MedicalCodingPipeline](../reference/pipeline/pipeline.md), which will run your specified NLP model on extracted text data out-of-the-box. To link extracted entities (e.g., "chronic kidney disease", "asthma") to standard clinical codes (e.g. SNOMED CT, ICD-10), we'll add a custom node to handle this.
+Next we'll build the medical coding pipeline: run your NLP model of choice directly in a [Pipeline](../reference/pipeline/pipeline.md) node, link the extracted entities (e.g., "chronic kidney disease", "asthma") to standard clinical codes (e.g. SNOMED CT, ICD-10), and write them to the FHIR problem list with [`update_problem_list`](../reference/io/containers/document.md).
 
 For this demo, we'll use a simple dictionary for the SNOMED CT mapping.
 
 ```python
-from healthchain.pipeline.medicalcodingpipeline import MedicalCodingPipeline
+import spacy
+
+from healthchain.pipeline import Pipeline
 from healthchain.io import Document
 
-# Build FHIR-native ML pipeline with automatic problem extraction.
-pipeline = MedicalCodingPipeline.from_model_id("en_core_sci_sm", source="spacy")
+nlp = spacy.load("en_core_sci_sm")
+pipeline = Pipeline()
 
-# Add custom entity linking
-@pipeline.add_node(position="after", reference="SpacyNLP")
-def link_entities(doc: Document) -> Document:
-    """
-    Link medical entities to SNOMED CT codes and update the problem list.
-    """
-    spacy_doc = nlp(doc.text)  # your own spaCy pipeline
+# Dummy medical concept mapping to SNOMED CT codes —
+# swap for a real entity linker in production
+medical_concepts = {
+    "pneumonia": "233604007",
+    "type 2 diabetes mellitus": "44054006",
+    "congestive heart failure": "42343007",
+    "chronic kidney disease": "431855005",
+    "hypertension": "38341003",
+    # Add more mappings as needed
+}
 
-    # Dummy medical concept mapping to SNOMED CT codes
-    medical_concepts = {
-        "pneumonia": "233604007",
-        "type 2 diabetes mellitus": "44054006",
-        "congestive heart failure": "42343007",
-        "chronic kidney disease": "431855005",
-        "hypertension": "38341003",
-        # Add more mappings as needed
-    }
+# The patient the extracted Conditions are written against. In production,
+# resolve this from the incoming document's patient context.
+PATIENT_REF = "Patient/123"
+
+
+@pipeline.add_node
+def extract_problems(doc: Document) -> Document:
+    """Run NER, link entities to SNOMED CT codes, and update the problem list."""
+    spacy_doc = nlp(doc.text)
 
     entities = [
         {"text": ent.text, "cui": medical_concepts[ent.text.lower()]}
         for ent in spacy_doc.ents
         if ent.text.lower() in medical_concepts
     ]
-    doc.update_problem_list(entities, patient_ref="Patient/123")
+    doc.update_problem_list(entities, patient_ref=PATIENT_REF)
 
     return doc
 ```
 
 !!! note
-    [MedicalCodingPipeline](../reference/pipeline/pipeline.md) automatically:
-
-    - Extracts medical entities using the `scispacy` model
-    - Converts NLP entities to FHIR `problem-list-item` [Condition](https://www.hl7.org/fhir/condition.html) resources
-
-    This is equivalent to constructing a pipeline manually — run your own spaCy model in a node, then hand off entities explicitly:
-
-    ```python
-    from healthchain.pipeline import Pipeline
-    from healthchain.io import Document
-
-    pipeline = Pipeline[Document]()
-
-    @pipeline.add_node
-    def extract_problems(doc: Document) -> Document:
-        spacy_doc = nlp(doc.text)  # your own spaCy pipeline
-        doc.update_problem_list(
-            [{"text": ent.text, "cui": ent._.cui} for ent in spacy_doc.ents],
-            patient_ref="Patient/123",
-        )
-        return doc
-    ```
+    The pipeline owns nothing model-specific — spaCy runs inside your node, and HealthChain's job starts where the model output needs to become FHIR. `update_problem_list` converts your linked entities to `problem-list-item` [Condition](https://www.hl7.org/fhir/condition.html) resources, skipping any entity without a code. `patient_ref` is required: these Conditions are written against a real patient record, so the pipeline never guesses it.
 
 
 ## Set up FHIR Gateway

@@ -169,7 +169,7 @@ Add processing nodes using decorators:
 from healthchain.pipeline import Pipeline
 from healthchain.io.containers import Document
 
-pipeline = Pipeline[Document]()
+pipeline = Pipeline()
 
 @pipeline.add_node
 def deduplicate(doc: Document) -> Document:

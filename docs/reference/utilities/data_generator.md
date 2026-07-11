@@ -1,5 +1,8 @@
 # Data Generator
 
+!!! note "Installation"
+    The data generators require the `sandbox` extra: `pip install "healthchain[sandbox]"`
+
 Healthcare systems use standardized data formats, but each hospital or clinic configures their data differently. This creates challenges when building applications that need to work across multiple healthcare systems.
 
 The data generator creates test data that matches the structure and format expected by Electronic Health Record (EHR) systems. It's designed for testing your applications, not for research studies that need realistic patient populations.

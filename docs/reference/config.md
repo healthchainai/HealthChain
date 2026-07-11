@@ -126,14 +126,19 @@ llm:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `provider` | string | `anthropic` | LLM provider — `anthropic`, `openai`, or `google` |
-| `model` | string | `claude-opus-4-6` | Model ID passed to the LangChain chat model |
+| `model` | string | `claude-opus-4-6` | Model ID passed to your LLM framework |
 | `max_tokens` | int | `512` | Maximum tokens for model response |
 
-Use `llm.to_langchain()` to instantiate the configured model:
+`llm` is validated config, not a model factory — instantiate the model with your framework of choice, e.g. LangChain's [`init_chat_model`](https://python.langchain.com/docs/how_to/chat_models_universal_init/):
 
 ```python
+from langchain.chat_models import init_chat_model
+
 from healthchain.config.appconfig import AppConfig
 
 config = AppConfig.load()
-llm = config.llm.to_langchain()  # returns ChatAnthropic / ChatOpenAI / ChatGoogleGenerativeAI
+llm = init_chat_model(
+    f"{config.llm.provider}:{config.llm.model}",
+    max_tokens=config.llm.max_tokens,
+)
 ```

@@ -2,6 +2,9 @@
 
 The sandbox client provides a simplified interface for testing and validating your applications in realistic healthcare contexts. Use `app.sandbox()` to test a `HealthChainAPI` app you've built, or `SandboxClient` directly to connect to any already-running service.
 
+!!! note "Installation"
+    The sandbox client ships with the core install. Methods that generate synthetic data (`load_free_text()`, `load_synthetic()`) require the `sandbox` extra: `pip install "healthchain[sandbox]"`
+
 ## Testing Your App with `app.sandbox()`
 
 The primary way to test a HealthChain app locally. Pass the hook ID you registered — the service URL and workflow are resolved automatically from your registered services:

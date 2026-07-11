@@ -29,6 +29,7 @@ nav:
       - Setup FHIR Sandbox: cookbook/setup_fhir_sandboxes.md
       - FHIR-Grounded Patient Q&A: cookbook/fhir_qa.md
       - Multi-Source Data Integration: cookbook/multi_ehr_aggregation.md
+      - Research Extract to FHIR API: cookbook/research_extract_fhir_api.md
       - Automated Clinical Coding: cookbook/clinical_coding.md
       - Discharge Summarizer: cookbook/discharge_summarizer.md
       - ML Model Deployment: cookbook/ml_model_deployment.md

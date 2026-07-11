@@ -8,8 +8,10 @@ Hands-on, production-ready examples for building healthcare AI applications with
     ```bash
     git clone https://github.com/healthchainai/HealthChain.git
     cd HealthChain
-    uv sync   # or: pip install healthchain
+    uv sync --all-extras   # or: pip install healthchain
     ```
+
+    Each cookbook page states the exact `pip install` line it needs — optional capabilities live in extras (`[cda]`, `[examples]`, `[sandbox]`, ...), so you only install what the example uses.
 
     Run any cookbook from the repo root — e.g. `python cookbook/ml_risk_to_fhir.py`. Filter by **Zero Setup** below to find examples that run immediately with no external accounts.
 
@@ -83,6 +85,20 @@ Hands-on, production-ready examples for building healthcare AI applications with
   </div>
 </a>
 
+<a href="research_extract_fhir_api/" class="cookbook-card" data-tags="ml fhir-gateway beginner zero-setup">
+  <div class="cookbook-card-icon">🗄️</div>
+  <div class="cookbook-card-title">Research Extract to Validated FHIR API</div>
+  <div class="cookbook-card-description">
+    Turn a research database extract into typed, validated FHIR resources and load them into a FHIR server you can query like any EHR — validation catches the dirty rows before they ship.
+  </div>
+  <div class="cookbook-tags">
+    <span class="tag tag-beginner">Beginner</span>
+    <span class="tag tag-ml">ML Research</span>
+    <span class="tag tag-fhirgateway">FHIR Gateway</span>
+    <span class="tag tag-zerosetup">Zero Setup</span>
+  </div>
+</a>
+
 <a href="clinical_coding/" class="cookbook-card" data-tags="interop advanced">
   <div class="cookbook-card-icon">🧾</div>
   <div class="cookbook-card-title">Automate Clinical Coding & FHIR Integration</div>
@@ -123,7 +139,7 @@ Cookbooks are standalone scripts — run them directly to explore and experiment
 
 ```bash
 # 1. Run a cookbook locally
-python cookbook/cds_discharge_summarizer_hf_chat.py
+python cookbook/cds_discharge_summarizer_hf_trf.py
 
 # 2. Scaffold a project
 healthchain new my-cds-service -t cds-hooks
@@ -166,12 +182,14 @@ llm:
 
 ```python
 # app.py — load from config instead
+from langchain.chat_models import init_chat_model
+
 from healthchain.config.appconfig import AppConfig
 from healthchain.gateway import FHIRGateway, HealthChainAPI
 
 config = AppConfig.load()
 gateway = FHIRGateway.from_config(config)
-llm = config.llm.to_langchain()
+llm = init_chat_model(f"{config.llm.provider}:{config.llm.model}")
 
 app = HealthChainAPI(title="My App")
 ```

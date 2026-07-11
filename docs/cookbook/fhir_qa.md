@@ -52,8 +52,8 @@ The first piece is a HealthChain [Pipeline](../reference/pipeline/pipeline.md) t
 from healthchain.pipeline import Pipeline
 from healthchain.io.containers import Document
 
-def create_pipeline() -> Pipeline[Document]:
-    pipeline = Pipeline[Document]()
+def create_pipeline() -> Pipeline:
+    pipeline = Pipeline()
 
     @pipeline.add_node
     def format_context(doc: Document) -> Document:
