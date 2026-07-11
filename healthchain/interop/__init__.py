@@ -5,13 +5,19 @@ This package provides modules for handling interoperability between
 healthcare data formats.
 """
 
-from .config_manager import InteropConfigManager
-from .engine import InteropEngine
-from .types import FormatType, validate_format
-from .template_registry import TemplateRegistry
-from .parsers.cda import CDAParser
-from .generators.cda import CDAGenerator
-from .generators.fhir import FHIRGenerator
+try:
+    from .config_manager import InteropConfigManager
+    from .engine import InteropEngine
+    from .types import FormatType, validate_format
+    from .template_registry import TemplateRegistry
+    from .parsers.cda import CDAParser
+    from .generators.cda import CDAGenerator
+    from .generators.fhir import FHIRGenerator
+except (ImportError, ModuleNotFoundError) as e:
+    raise ImportError(
+        "CDA support requires the cda extra. Install it with: "
+        "pip install healthchain[cda]"
+    ) from e
 
 import logging
 from pathlib import Path

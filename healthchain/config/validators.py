@@ -128,25 +128,6 @@ class MedicationSectionTemplateConfig(SectionTemplateConfigBase):
         return v
 
 
-class AllergySectionTemplateConfig(SectionTemplateConfigBase):
-    """Template configuration for Allergy Section"""
-
-    act: ComponentTemplateConfig
-    allergy_obs: ComponentTemplateConfig
-    reaction_obs: Optional[ComponentTemplateConfig] = None
-    severity_obs: Optional[ComponentTemplateConfig] = None
-    clinical_status_obs: ComponentTemplateConfig
-
-    @field_validator("allergy_obs")
-    @classmethod
-    def validate_allergy_obs(cls, v):
-        required_fields = {"code", "code_system", "status_code"}
-        missing = required_fields - set(v.model_dump(exclude_unset=True).keys())
-        if missing:
-            raise ValueError(f"allergy_obs missing required fields: {missing}")
-        return v
-
-
 class DocumentConfigBase(BaseModel):
     """Generic document configuration model"""
 

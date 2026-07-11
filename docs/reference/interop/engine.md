@@ -2,6 +2,8 @@
 
 The `InteropEngine` is the core component of the HealthChain interoperability module. It provides a unified interface for converting between different healthcare data formats.
 
+The interop/CDA layer requires the `cda` extra: `pip install healthchain[cda]`.
+
 ## Basic Usage
 
 ```python

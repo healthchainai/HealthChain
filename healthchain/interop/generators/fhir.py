@@ -29,7 +29,7 @@ class FHIRGenerator(BaseGenerator):
     Key features:
     - Template-based conversion of CDA entries (xmltodict format) to FHIR resources
     - Automatic population of required FHIR fields based on configuration for
-        common resource types like Condition, MedicationStatement, AllergyIntolerance
+        common resource types like Condition and MedicationStatement
     - Validation of generated FHIR resources
 
     Example:
@@ -192,7 +192,7 @@ class FHIRGenerator(BaseGenerator):
 
     def _add_required_fields(self, resource_dict: Dict, resource_type: str) -> Dict:
         """Add required fields to FHIR resource dictionary based on resource type.
-        Currently only supports Condition, MedicationStatement, and AllergyIntolerance.
+        Currently only supports Condition and MedicationStatement.
 
         Args:
             resource_dict: Dictionary representation of the resource
@@ -227,14 +227,6 @@ class FHIRGenerator(BaseGenerator):
                     "defaults.resources.MedicationStatement.status"
                 )
                 resource_dict["status"] = default_status
-        elif resource_type == "AllergyIntolerance":
-            if "patient" not in resource_dict:
-                resource_dict["patient"] = default_subject
-            if "clinicalStatus" not in resource_dict:
-                default_status = self.config.get_config_value(
-                    "defaults.resources.AllergyIntolerance.clinicalStatus"
-                )
-                resource_dict["clinicalStatus"] = default_status
 
         return resource_dict
 

@@ -1,5 +1,4 @@
 import base64
-import xmltodict
 import logging
 
 from pydantic import BaseModel
@@ -8,6 +7,18 @@ from typing import Dict, Optional
 from healthchain.utils.utils import search_key
 
 log = logging.getLogger(__name__)
+
+
+def _import_xmltodict():
+    try:
+        import xmltodict
+
+        return xmltodict
+    except (ImportError, ModuleNotFoundError) as e:
+        raise ImportError(
+            "CDA support requires the cda extra. Install it with: "
+            "pip install healthchain[cda]"
+        ) from e
 
 
 class CdaRequest(BaseModel):
@@ -21,18 +32,21 @@ class CdaRequest(BaseModel):
         """
         Loads data from dict (xmltodict format)
         """
+        xmltodict = _import_xmltodict()
         return cls(document=xmltodict.unparse(data))
 
     def model_dump(self, *args, **kwargs) -> Dict:
         """
         Dumps document as dict with xmltodict
         """
+        xmltodict = _import_xmltodict()
         return xmltodict.parse(self.document)
 
     def model_dump_xml(self, *args, **kwargs) -> str:
         """
         Decodes and dumps document as an xml string
         """
+        xmltodict = _import_xmltodict()
         xml_dict = xmltodict.parse(self.document)
         document = search_key(xml_dict, "urn:Document")
         if document is None:

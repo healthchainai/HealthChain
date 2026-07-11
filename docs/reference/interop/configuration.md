@@ -2,6 +2,8 @@
 
 The interoperability module uses a configuration system to control its behavior. This includes mappings between different healthcare data formats, validation rules, and environment-specific settings.
 
+The interop/CDA layer requires the `cda` extra: `pip install healthchain[cda]`.
+
 ## Configuration Overview
 
 HealthChain works out-of-the-box with default configurations, but you can customize them for your specific needs.
@@ -148,9 +150,9 @@ structure:
     structured_body: true
     non_xml_body: false
     include_sections:
-      - "allergies"
-      - "medications"
       - "problems"
+      - "medications"
+      - "notes"
 ```
 
 ### Example Section Configuration

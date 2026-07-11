@@ -17,7 +17,7 @@ This directory contains **work-in-progress templates** for HealthChain developer
 
 ## Current Templates
 
-- `allergies/` - Allergy templates with known bugs (see README)
+None right now — this directory is the staging ground for the next template contribution.
 
 ## Guidelines
 

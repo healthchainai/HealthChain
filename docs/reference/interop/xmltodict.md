@@ -2,6 +2,8 @@
 
 The HealthChain interoperability engine uses [xmltodict](https://github.com/martinblech/xmltodict) to convert between XML and Python dictionaries. This guide explains key conventions to be aware of when working with the parsed data.
 
+The interop/CDA layer requires the `cda` extra: `pip install healthchain[cda]`.
+
 *Why use `xmltodict`?* You say, *Why not use the `lxml` or `xml.etree.ElementTree` or some other decent library so you can work on the XML tree directly?*
 
 There are two main reasons:

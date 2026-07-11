@@ -6,6 +6,8 @@ The HealthChain Interop Engine provides a robust and customizable framework for 
 - CDA
 - HL7v2 (Coming soon)
 
+The interop/CDA layer requires the `cda` extra: `pip install healthchain[cda]`.
+
 ## Architecture
 
 The interoperability module is built around a central `InteropEngine` that coordinates format conversion through specialized parsers and generators:
@@ -79,7 +81,7 @@ Then use the `config_dir` parameter to specify the path to your custom configs:
 engine = create_interop(config_dir="./my_configs")
 
 # Now you can customize:
-# • Add experimental features (allergies, procedures)
+# • Add sections beyond the bundled ones (e.g. allergies, procedures)
 # • Modify terminology mappings (SNOMED, LOINC codes)
 # • Customize templates for your organization's CDA format
 # • Configure validation rules and environments
