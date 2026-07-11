@@ -88,7 +88,6 @@ For this demo, we'll use a simple dictionary for the SNOMED CT mapping.
 ```python
 from healthchain.pipeline.medicalcodingpipeline import MedicalCodingPipeline
 from healthchain.io import Document
-from spacy.tokens import Span
 
 # Build FHIR-native ML pipeline with automatic problem extraction.
 pipeline = MedicalCodingPipeline.from_model_id("en_core_sci_sm", source="spacy")
@@ -97,12 +96,9 @@ pipeline = MedicalCodingPipeline.from_model_id("en_core_sci_sm", source="spacy")
 @pipeline.add_node(position="after", reference="SpacyNLP")
 def link_entities(doc: Document) -> Document:
     """
-    Add CUI codes to medical entities for problem extraction.
+    Link medical entities to SNOMED CT codes and update the problem list.
     """
-    if not Span.has_extension("cui"):
-        Span.set_extension("cui", default=None)
-
-    spacy_doc = doc.nlp.get_spacy_doc()
+    spacy_doc = nlp(doc.text)  # your own spaCy pipeline
 
     # Dummy medical concept mapping to SNOMED CT codes
     medical_concepts = {
@@ -114,10 +110,12 @@ def link_entities(doc: Document) -> Document:
         # Add more mappings as needed
     }
 
-    for ent in spacy_doc.ents:
-        if ent.text.lower() in medical_concepts:
-            # Store as custom spacy attribute 'cui'
-            ent._.cui = medical_concepts[ent.text.lower()]
+    entities = [
+        {"text": ent.text, "cui": medical_concepts[ent.text.lower()]}
+        for ent in spacy_doc.ents
+        if ent.text.lower() in medical_concepts
+    ]
+    doc.update_problem_list(entities, patient_ref="Patient/123")
 
     return doc
 ```
@@ -128,17 +126,22 @@ def link_entities(doc: Document) -> Document:
     - Extracts medical entities using the `scispacy` model
     - Converts NLP entities to FHIR `problem-list-item` [Condition](https://www.hl7.org/fhir/condition.html) resources
 
-    This is equivalent to constructing a pipeline with the following components manually:
+    This is equivalent to constructing a pipeline manually — run your own spaCy model in a node, then hand off entities explicitly:
 
     ```python
     from healthchain.pipeline import Pipeline
-    from healthchain.pipeline.components import SpacyNLP, FHIRProblemListExtractor
     from healthchain.io import Document
 
     pipeline = Pipeline[Document]()
 
-    pipeline.add_node(SpacyNLP.from_model_id("en_core_sci_sm"))
-    pipeline.add_node(FHIRProblemListExtractor(patient_ref="Patient/123"))
+    @pipeline.add_node
+    def extract_problems(doc: Document) -> Document:
+        spacy_doc = nlp(doc.text)  # your own spaCy pipeline
+        doc.update_problem_list(
+            [{"text": ent.text, "cui": ent._.cui} for ent in spacy_doc.ents],
+            patient_ref="Patient/123",
+        )
+        return doc
     ```
 
 

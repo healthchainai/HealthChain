@@ -43,15 +43,14 @@ There are three types of nodes you can add to your pipeline with the method `.ad
 Inline functions are simple functions that process Document containers. Use them for custom clinical logic without creating full components.
 
 ```python
-from spacy.tokens import Span
+import spacy
+
+nlp = spacy.load("en_core_sci_sm")
 
 @pipeline.add_node
-def link_snomed_codes(doc: Document) -> Document:
-    """Map medical entities to SNOMED CT codes."""
-    if not Span.has_extension("cui"):
-        Span.set_extension("cui", default=None)
-
-    spacy_doc = doc.nlp.get_spacy_doc()
+def extract_conditions(doc: Document) -> Document:
+    """Extract medical entities, link them to SNOMED CT, and update the problem list."""
+    spacy_doc = nlp(doc.text)  # your own spaCy pipeline
 
     # Map clinical terms to SNOMED CT
     snomed_mapping = {
@@ -60,38 +59,24 @@ def link_snomed_codes(doc: Document) -> Document:
         "pneumonia": "233604007",
     }
 
-    for ent in spacy_doc.ents:
-        if ent.text.lower() in snomed_mapping:
-            ent._.cui = snomed_mapping[ent.text.lower()]
+    entities = [
+        {"text": ent.text, "cui": snomed_mapping[ent.text.lower()]}
+        for ent in spacy_doc.ents
+        if ent.text.lower() in snomed_mapping
+    ]
+    doc.update_problem_list(entities, patient_ref="Patient/456")
 
     return doc
 
 # Equivalent to:
-pipeline.add_node(link_snomed_codes)
+pipeline.add_node(extract_conditions)
 ```
 
 #### Components
 
-Components are reusable building blocks for common clinical processing tasks. HealthChain ships a pure-Python `FHIRProblemListExtractor`; for NLP, bring your own model and wrap it in a node.
+Components are reusable, stateful classes that encapsulate specific processing logic for your pipeline. HealthChain doesn't ship prebuilt components — bring your own NLP or ML model and wrap it in a node, exactly like the inline function above. Reach for a component instead of a plain function when a step needs to hold onto state across calls (a loaded model, a client connection).
 
-See the full list at the [Components](./components/components.md) page.
-
-```python
-import spacy
-from healthchain.pipeline.components import FHIRProblemListExtractor
-
-# Bring your own NLP: load a spaCy model and wrap it in a node
-nlp = spacy.load("en_core_sci_sm")
-
-@pipeline.add_node
-def run_nlp(doc: Document) -> Document:
-    doc.nlp.add_spacy_doc(nlp(doc.text))
-    return doc
-
-# Extract FHIR Condition resources from entities
-extractor = FHIRProblemListExtractor(patient_ref="Patient/456")
-pipeline.add_node(extractor)
-```
+See the [Components](./components/components.md) page for the base component protocol, and [Custom Components](#custom-components) below for a worked example.
 
 #### Custom Components
 
@@ -99,32 +84,31 @@ Custom components implement the `BaseComponent` interface for reusable clinical 
 
 ```python
 from healthchain.pipeline import BaseComponent
-from healthchain.fhir import create_condition
 
 class ClinicalEntityLinker(BaseComponent):
-    """Links extracted entities to standard medical terminologies."""
+    """Links extracted entities to a SNOMED CT terminology service."""
 
-    def __init__(self, terminology_service_url: str):
+    def __init__(self, nlp, terminology_client):
         super().__init__()
-        self.terminology_url = terminology_service_url
+        self.nlp = nlp
+        self.terminology_client = terminology_client
 
     def __call__(self, doc: Document) -> Document:
-        """Convert medical entities to FHIR Conditions."""
-        spacy_doc = doc.nlp.get_spacy_doc()
+        """Extract entities and convert them to FHIR Conditions."""
+        spacy_doc = self.nlp(doc.text)
 
+        entities = []
         for ent in spacy_doc.ents:
-            if ent._.cui:  # Has SNOMED CT code
-                condition = create_condition(
-                    subject=f"Patient/{doc.patient_id}",
-                    code=ent._.cui,
-                    display=ent.text
-                )
-                doc.fhir.problem_list.append(condition)
+            code = self.terminology_client.lookup(ent.text)
+            if code:
+                entities.append({"text": ent.text, "cui": code})
+
+        doc.update_problem_list(entities, patient_ref="Patient/456")
 
         return doc
 
 # Add to pipeline
-linker = ClinicalEntityLinker(terminology_service_url="https://terminology.hl7.org/")
+linker = ClinicalEntityLinker(nlp=nlp, terminology_client=my_terminology_client)
 pipeline.add_node(linker)
 ```
 
@@ -150,33 +134,28 @@ When using `"after"` or `"before"`, you must also specify the `reference` parame
 You can also specify the `stage` parameter to add the component to a specific stage group of the pipeline.
 
 ```python
-@pipeline.add_node(position="after", reference="run_nlp", stage="entity_linking")
-def link_snomed_codes(doc: Document) -> Document:
-    """Add SNOMED CT codes to extracted medical entities."""
-    spacy_doc = doc.nlp.get_spacy_doc()
-    snomed_mapping = {
-        "hypertension": "38341003",
-        "diabetes": "73211009",
-    }
-    for ent in spacy_doc.ents:
-        if ent.text.lower() in snomed_mapping:
-            ent._.cui = snomed_mapping[ent.text.lower()]
+@pipeline.add_node(position="after", reference="extract_conditions", stage="post_processing")
+def log_problem_list(doc: Document) -> Document:
+    """Log the number of conditions found, for observability."""
+    print(f"Extracted {len(doc.fhir.problem_list)} conditions")
     return doc
 ```
 
 You can specify dependencies between components using the `dependencies` parameter. This is useful if you want to ensure that a component is run after another component.
 
 ```python
-@pipeline.add_node(dependencies=["run_nlp"])
+from healthchain.fhir import create_medication_statement
+
+@pipeline.add_node(dependencies=["extract_conditions"])
 def extract_medications(doc: Document) -> Document:
-    """Extract medication entities and convert to FHIR MedicationStatements."""
-    spacy_doc = doc.nlp.get_spacy_doc()
+    """Extract medication entities and convert them to FHIR MedicationStatements."""
+    spacy_doc = nlp(doc.text)
 
     for ent in spacy_doc.ents:
         if ent.label_ == "MEDICATION":
             # Create FHIR MedicationStatement
             med_statement = create_medication_statement(
-                subject=f"Patient/{doc.patient_id}",
+                subject="Patient/456",
                 code=ent._.cui if hasattr(ent._, "cui") else None,
                 display=ent.text
             )
@@ -190,7 +169,7 @@ def extract_medications(doc: Document) -> Document:
 Use `.remove()` to remove a component from the pipeline.
 
 ```python
-pipeline.remove("link_snomed_codes")
+pipeline.remove("extract_conditions")
 ```
 
 #### Replacing
@@ -199,19 +178,22 @@ Use `.replace()` to replace a component in the pipeline.
 
 ```python
 def enhanced_entity_linking(doc: Document) -> Document:
-    """Enhanced entity linking with external terminology service."""
-    spacy_doc = doc.nlp.get_spacy_doc()
+    """Enhanced entity linking with an external terminology service."""
+    spacy_doc = nlp(doc.text)
 
+    entities = []
     for ent in spacy_doc.ents:
         # Call external terminology service for validation
         validated_code = terminology_service.validate(ent.text)
         if validated_code:
-            ent._.cui = validated_code
+            entities.append({"text": ent.text, "cui": validated_code})
+
+    doc.update_problem_list(entities, patient_ref="Patient/456")
 
     return doc
 
-# Replace basic linking with enhanced version
-pipeline.replace("link_snomed_codes", enhanced_entity_linking)
+# Replace basic extraction with the enhanced version
+pipeline.replace("extract_conditions", enhanced_entity_linking)
 ```
 
 #### Inspecting the Pipeline
@@ -220,13 +202,10 @@ pipeline.replace("link_snomed_codes", enhanced_entity_linking)
 print(pipeline)
 print(pipeline.stages)
 
-# ["run_nlp", "ClinicalEntityLinker", "FHIRProblemListExtractor"]
-# preprocessing:
-#   - run_nlp
-# entity_linking:
-#   - ClinicalEntityLinker
-# fhir_conversion:
-#   - FHIRProblemListExtractor
+# ["extract_conditions", "ClinicalEntityLinker", "log_problem_list", "extract_medications"]
+# Pipeline Stages:
+#   post_processing:
+#     - log_problem_list
 ```
 ## Working with Healthcare Data Formats 🔄
 

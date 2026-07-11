@@ -17,6 +17,7 @@ Run:
 import logging
 from pathlib import Path
 
+import spacy
 from spacy.tokens import Span
 from dotenv import load_dotenv
 
@@ -45,15 +46,16 @@ MEDPLUM_URL = config.to_connection_string()
 def create_pipeline():
     """Build FHIR-native ML pipeline with automatic problem extraction."""
     pipeline = MedicalCodingPipeline.from_model_id("en_core_sci_sm", source="spacy")
+    nlp = spacy.load("en_core_sci_sm")
 
-    # Add custom entity linking
+    # Add custom entity linking + problem list extraction
     @pipeline.add_node(position="after", reference="SpacyNLP")
     def link_entities(doc: Document) -> Document:
-        """Add CUI codes to medical entities for problem extraction"""
+        """Run NER, add CUI codes to medical entities, and update the problem list."""
         if not Span.has_extension("cui"):
             Span.set_extension("cui", default=None)
 
-        spacy_doc = doc.nlp.get_spacy_doc()
+        spacy_doc = nlp(doc.text)
 
         # Simple dummy linker for demo purposes
         dummy_linker = {
@@ -74,6 +76,11 @@ def create_pipeline():
         for ent in spacy_doc.ents:
             if ent.text.lower() in dummy_linker:
                 ent._.cui = dummy_linker[ent.text.lower()]
+
+        doc.update_problem_list(
+            [{"text": ent.text, "cui": ent._.cui} for ent in spacy_doc.ents],
+            patient_ref="Patient/123",
+        )
 
         return doc
 

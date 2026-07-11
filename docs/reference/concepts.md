@@ -92,7 +92,6 @@ Bring your own NLP: load a model with the library you already use — spaCy, Hug
 ```python
 import spacy
 from healthchain.pipeline import Pipeline
-from healthchain.pipeline.components import FHIRProblemListExtractor
 from healthchain.io import Document
 
 pipeline = Pipeline()
@@ -100,12 +99,13 @@ pipeline = Pipeline()
 nlp = spacy.load("en_core_sci_sm")
 
 @pipeline.add_node
-def run_nlp(doc: Document) -> Document:
-    doc.nlp.add_spacy_doc(nlp(doc.text))
+def extract_problems(doc: Document) -> Document:
+    spacy_doc = nlp(doc.text)
+    doc.update_problem_list(
+        [{"text": ent.text, "cui": ent._.cui} for ent in spacy_doc.ents],
+        patient_ref="Patient/example",
+    )
     return doc
-
-# Extract FHIR Condition resources from coded entities
-pipeline.add_node(FHIRProblemListExtractor(patient_ref="Patient/example"))
 
 pipe = pipeline.build()
 

@@ -1,6 +1,6 @@
 # Document 📄
 
-The `Document` class is a container for working with both clinical text and structured healthcare data. It natively manages FHIR resources, runs NLP over raw notes, tracks clinical document relationships, and stores decision support outputs.
+The `Document` class is a container for working with both clinical text and structured healthcare data. It natively manages FHIR resources, tracks clinical document relationships, and stores decision support outputs.
 
 Use Document containers for clinical notes, discharge summaries, patient records, and any healthcare data that combines text with structured FHIR resources.
 
@@ -10,19 +10,20 @@ The main things you'll do with `Document`:
 
 - Store and update clinical notes and FHIR Bundles
 - Extract and manipulate diagnoses, meds, allergies, and documents
-- Run NLP to extract entities or embeddings from text
 - Generate & store CDS Hooks cards (recommendations, alerts)
 
 
 ## API Overview
 
-**Document** has three key components (all accessible as attributes):
+**Document** is built around three attributes:
 
 | Attribute | For |
 |---|---|
+| `doc.text` | The input clinical text |
 | `doc.fhir` | FHIR management—Clinical lists, Bundles, DocReference, patient info |
-| `doc.nlp`  | NLP features—entities, tokens, embeddings |
 | `doc.cds`  | Decision support—recommendation cards, actions |
+
+Bring your own NLP or ML library — spaCy, HuggingFace Transformers, LangChain — run it inside a pipeline node, and hand off the results explicitly with `doc.update_problem_list(...)` or by writing straight to `doc.fhir`.
 
 
 ### FHIR Data (`doc.fhir`)
@@ -124,25 +125,20 @@ conditions = doc.fhir.get_prefetch_resources("Condition")
 print(f"Active conditions: {len(conditions)}")
 ```
 
-### NLP (`doc.nlp`)
+### Problem List from NLP (`doc.update_problem_list`)
 
-- Medical text features: tokens, entities (`get_entities()`), embeddings (`get_embeddings()`)
-- Direct spaCy doc access, fast word counting
+Run your own NLP library directly inside a plain pipeline node, then hand the linked entities off explicitly with `update_problem_list(entities, patient_ref, coding_system="http://snomed.info/sct", code_attribute="cui")`. Each entity is a dict with at least `"text"` and a medical code under `code_attribute`; entities missing the code are skipped, and existing problem list Conditions are preserved.
 
 ```python
-# Extract medical concepts from clinical note
-doc = Document("Patient diagnosed with pneumonia, started on azithromycin")
+def extract_problems(doc: Document) -> Document:
+    spacy_doc = nlp(doc.text)  # your own spaCy pipeline
+    doc.update_problem_list(
+        [{"text": ent.text, "cui": ent._.cui} for ent in spacy_doc.ents],
+        patient_ref="Patient/123",
+    )
+    return doc
 
-# Get medical entities
-entities = doc.nlp.get_entities()
-for entity in entities:
-    print(f"{entity.text}: {entity.label_}")  # "pneumonia: CONDITION"
-
-# Access full spaCy document for custom processing
-spacy_doc = doc.nlp.get_spacy_doc()
-for ent in spacy_doc.ents:
-    if hasattr(ent._, "cui"):
-        print(f"{ent.text} -> SNOMED: {ent._.cui}")
+pipeline.add_node(extract_problems)
 ```
 
 ### Clinical Decision Support (`doc.cds`)
@@ -183,10 +179,6 @@ doc.cds.actions = [
 # FHIR access
 print(doc.fhir.problem_list)
 print(doc.fhir.patient)
-
-# NLP
-tokens = doc.nlp.get_tokens()
-ents = doc.nlp.get_entities()
 
 # Clinical decision support
 cards = doc.cds.cards

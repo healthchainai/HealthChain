@@ -2,7 +2,6 @@ from .base import BasePipeline, Pipeline
 from .components import (
     BaseComponent,
     Component,
-    FHIRProblemListExtractor,
 )
 
 __all__ = [
@@ -10,7 +9,6 @@ __all__ = [
     "Pipeline",
     "BaseComponent",
     "Component",
-    "FHIRProblemListExtractor",
 ]
 
 
@@ -50,6 +48,11 @@ _REMOVED_IN_0_16 = {
     "TextPostProcessor": (
         "TextPostProcessor was removed in 0.16.0. Write a plain function that takes and "
         "returns a Document and add it with `pipeline.add_node(...)`."
+    ),
+    "FHIRProblemListExtractor": (
+        "FHIRProblemListExtractor was removed in 0.16.0. Run your NLP model in a plain "
+        "pipeline node and call doc.update_problem_list([{'text': ent.text, 'cui': ent._.cui} "
+        "for ent in spacy_doc.ents], patient_ref=...) directly."
     ),
 }
 

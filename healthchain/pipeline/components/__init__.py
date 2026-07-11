@@ -1,10 +1,8 @@
 from .base import BaseComponent, Component
-from .fhirproblemextractor import FHIRProblemListExtractor
 
 __all__ = [
     "BaseComponent",
     "Component",
-    "FHIRProblemListExtractor",
 ]
 
 
@@ -28,6 +26,11 @@ _REMOVED_IN_0_16 = {
     "CdsCardCreator": (
         "CdsCardCreator was removed in 0.16.0. Build CDS Hooks cards directly with the `Card` "
         "model — see cookbook/cds_discharge_summarizer_hf_trf.py"
+    ),
+    "FHIRProblemListExtractor": (
+        "FHIRProblemListExtractor was removed in 0.16.0. Run your NLP model in a plain "
+        "pipeline node and call doc.update_problem_list([{'text': ent.text, 'cui': ent._.cui} "
+        "for ent in spacy_doc.ents], patient_ref=...) directly."
     ),
     "TextPreProcessor": (
         "TextPreProcessor was removed in 0.16.0. Write a plain function that takes and "

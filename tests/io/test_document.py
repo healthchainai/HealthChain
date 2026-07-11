@@ -1,7 +1,6 @@
 import pytest
 
 from healthchain.io.containers.document import Document
-from unittest.mock import patch, MagicMock
 from fhir.resources.R4B.bundle import Bundle
 from healthchain.fhir import create_bundle, add_resource, create_condition
 
@@ -15,17 +14,6 @@ def test_document_initialization(sample_document):
     """Test basic Document initialization and properties."""
     assert sample_document.data == "This is a sample text for testing."
     assert sample_document.text == "This is a sample text for testing."
-    assert sample_document.nlp.get_tokens() == [
-        "This",
-        "is",
-        "a",
-        "sample",
-        "text",
-        "for",
-        "testing.",
-    ]
-    assert sample_document.nlp.get_entities() == []
-    assert sample_document.nlp.get_embeddings() is None
 
 
 @pytest.mark.parametrize(
@@ -80,7 +68,6 @@ def test_document_handles_various_data_inputs(
     elif expect_bundle is False:
         assert doc.fhir.bundle is None
         assert doc.text == expected_text
-        assert len(doc.nlp._tokens) > 0
     else:
         # empty list case: either no bundle or empty bundle
         assert doc.fhir.bundle is None or len(doc.fhir.bundle.entry) == 0
@@ -222,45 +209,61 @@ def test_document_patient_convenience_properties_param(num_patients):
     assert len(bundle_patients) == num_patients
 
 
-@patch("spacy.tokens.Span")
-def test_update_problem_list_from_nlp(mock_span_class, test_empty_document):
-    """Test updating problem list from NLP entities"""
+def test_update_problem_list_creates_conditions_from_entities(test_empty_document):
+    """update_problem_list creates FHIR conditions from entity dicts with codes."""
+    entities = [
+        {"text": "Hypertension", "cui": "38341003"},
+        {"text": "Aspirin", "cui": "123454"},
+        {"text": "Allergy to peanuts", "cui": "70618"},
+    ]
 
-    # Create mock spaCy entities
-    mock_ent1 = MagicMock()
-    mock_ent1.text = "Hypertension"
-    mock_ent1._.cui = "38341003"
+    test_empty_document.update_problem_list(entities, patient_ref="Patient/123")
 
-    mock_ent2 = MagicMock()
-    mock_ent2.text = "Aspirin"
-    mock_ent2._.cui = "123454"
-
-    mock_ent3 = MagicMock()
-    mock_ent3.text = "Allergy to peanuts"
-    mock_ent3._.cui = "70618"
-
-    # Create mock spaCy doc
-    mock_spacy_doc = MagicMock()
-    mock_spacy_doc.ents = [mock_ent1, mock_ent2, mock_ent3]
-
-    # Add the spaCy doc to the test document
-    test_empty_document.nlp.add_spacy_doc(mock_spacy_doc)
-
-    # Update problem list from NLP entities
-    test_empty_document.update_problem_list_from_nlp()
-
-    # Verify problems were added correctly
     conditions = test_empty_document.fhir.problem_list
-    assert len(conditions) == 3  # All entities are treated as problems by default
+    assert len(conditions) == 3
 
-    # Check each problem was added with correct attributes
     expected_problems = [
         ("Hypertension", "38341003"),
         ("Aspirin", "123454"),
         ("Allergy to peanuts", "70618"),
     ]
-
     for i, (text, cui) in enumerate(expected_problems):
         assert conditions[i].code.coding[0].display == text
         assert conditions[i].code.coding[0].code == cui
         assert conditions[i].code.coding[0].system == "http://snomed.info/sct"
+
+
+def test_update_problem_list_preserves_existing_conditions(
+    test_empty_document, test_condition
+):
+    """update_problem_list preserves conditions already on the problem list."""
+    test_empty_document.fhir.problem_list = [test_condition]
+
+    test_empty_document.update_problem_list(
+        [{"text": "fever", "cui": "C0015967"}], patient_ref="Patient/123"
+    )
+
+    conditions = test_empty_document.fhir.problem_list
+    assert len(conditions) == 2
+    assert test_condition in conditions
+
+
+def test_update_problem_list_skips_entities_without_code(test_empty_document):
+    """update_problem_list skips entities missing the code_attribute key or with a null value."""
+    entities = [
+        {"text": "fever", "cui": "C0015967"},  # valid
+        {"text": "patient"},  # missing code
+        {"text": "cough", "cui": None},  # null code
+    ]
+
+    test_empty_document.update_problem_list(entities, patient_ref="Patient/123")
+
+    conditions = test_empty_document.fhir.problem_list
+    assert len(conditions) == 1
+    assert conditions[0].code.coding[0].code == "C0015967"
+
+
+def test_update_problem_list_requires_patient_ref(test_empty_document):
+    """update_problem_list raises TypeError if patient_ref is omitted."""
+    with pytest.raises(TypeError):
+        test_empty_document.update_problem_list([{"text": "fever", "cui": "C0015967"}])

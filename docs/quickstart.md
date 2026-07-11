@@ -118,30 +118,26 @@ Bring your own NLP: load a model with the library you already use — spaCy, Hug
 
 [(Full Documentation on Components)](./reference/pipeline/components/components.md)
 
-<!--pytest.mark.skip-->
 ```python
-import spacy
 from healthchain.pipeline import Pipeline
-from healthchain.pipeline.components import FHIRProblemListExtractor
 from healthchain.io import Document
 
 pipeline = Pipeline()
 
-# Load your own spaCy model and wrap it in a node
-nlp = spacy.load("en_core_sci_sm")
-
 @pipeline.add_node
-def run_nlp(doc: Document) -> Document:
-    doc.nlp.add_spacy_doc(nlp(doc.text))
+def extract_problems(doc: Document) -> Document:
+    """Run your own NLP model, then hand off entities to the problem list."""
+    # Swap this for spaCy, HuggingFace, or any NER model of your choice
+    entities = [{"text": "hypertension", "cui": "38341003"}]
+    doc.update_problem_list(entities, patient_ref="Patient/example")
     return doc
-
-# Extract FHIR Condition resources from coded entities
-pipeline.add_node(FHIRProblemListExtractor(patient_ref="Patient/example"))
 
 pipe = pipeline.build()
 
 doc = Document("Patient presents with hypertension.")
 output = pipe(doc)
+
+print(output.fhir.problem_list)  # FHIR Condition resources
 ```
 
 Working with external or legacy data formats? [**Adapters**](./reference/io/adapters/adapters.md) interface them with your pipeline so you can parse, process, and format without worrying about low-level data conversion.

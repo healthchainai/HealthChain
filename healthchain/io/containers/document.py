@@ -1,7 +1,7 @@
 import logging
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterator, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 from uuid import uuid4
 
 from fhir.resources.R4B.condition import Condition
@@ -30,73 +30,6 @@ from healthchain.fhir import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class NlpAnnotations:
-    """
-    Container for NLP-specific annotations and results.
-
-    This class stores various NLP annotations and processing results from text analysis,
-    including preprocessed text, tokens, named entities, embeddings and spaCy documents.
-
-    Attributes:
-        _preprocessed_text (str): The preprocessed version of the input text.
-        _tokens (List[str]): List of tokenized words from the text.
-        _entities (List[Dict[str, Any]]): Named entities extracted from the text, with their labels and positions.
-        _embeddings (Optional[List[float]]): Vector embeddings generated from the text.
-        _spacy_doc (Optional[SpacyDoc]): The processed spaCy Doc object.
-
-    Methods:
-        add_spacy_doc(doc: SpacyDoc): Processes a spaCy Doc to extract tokens and entities.
-        get_spacy_doc() -> Optional[SpacyDoc]: Returns the stored spaCy Doc object.
-        get_tokens() -> List[str]: Returns the list of tokens.
-        set_tokens(tokens: List[str]): Sets the token list.
-        set_entities(entities: List[Dict[str, Any]]): Sets the named entities list.
-        get_entities() -> List[Dict[str, Any]]: Returns the list of named entities.
-        get_embeddings() -> Optional[List[float]]: Returns the vector embeddings.
-        set_embeddings(embeddings: List[float]): Sets the vector embeddings.
-    """
-
-    _preprocessed_text: str = ""
-    _tokens: List[str] = field(default_factory=list)
-    _entities: List[Dict[str, Any]] = field(default_factory=list)
-    _embeddings: Optional[List[float]] = None
-    _spacy_doc: Optional[Any] = None
-
-    def add_spacy_doc(self, doc: Any):
-        self._spacy_doc = doc
-        self._tokens = [token.text for token in doc]
-        self._entities = [
-            {
-                "text": ent.text,
-                "label": ent.label_,
-                "start": ent.start_char,
-                "end": ent.end_char,
-            }
-            for ent in doc.ents
-        ]
-
-    def get_spacy_doc(self) -> Optional[Any]:
-        return self._spacy_doc
-
-    def get_tokens(self) -> List[str]:
-        return self._tokens
-
-    def set_tokens(self, tokens: List[str]):
-        self._tokens = tokens
-
-    def set_entities(self, entities: List[Dict[str, Any]]):
-        self._entities = entities
-
-    def get_entities(self) -> List[Dict[str, Any]]:
-        return self._entities
-
-    def get_embeddings(self) -> Optional[List[float]]:
-        return self._embeddings
-
-    def set_embeddings(self, embeddings: List[float]):
-        self._embeddings = embeddings
 
 
 @dataclass
@@ -580,17 +513,15 @@ class Document(BaseDocument):
 
     The Document class is the primary structure used throughout annotation and analytics
     pipelines, accumulating transformations, extractions, and results from each stage. It
-    seamlessly integrates raw text, NLP annotations, FHIR resources, clinical decision
-    support (CDS) results, and ML model outputs in one object.
+    seamlessly integrates raw text, FHIR resources, clinical decision support (CDS)
+    results, and ML model outputs in one object.
 
     Features:
         - Accepts text, FHIR Bundles/resources, or lists of FHIR resources as input.
-        - Provides basic tokenization and supports integration with NLP models (spaCy, transformers).
         - Stores and manipulates clinical FHIR data via the .fhir property (access to bundles, problem lists, meds, allergies, etc.).
         - Encapsulates CDS Hooks-style decision support cards and suggested actions via the .cds property.
 
     Attributes:
-        nlp (NlpAnnotations): NLP output (tokens, entities, embeddings, spaCy doc)
         fhir (FhirData): FHIR resources and context (problem list, medication, allergy, etc.)
         cds (CdsAnnotations): Clinical decision support (cards and actions)
         text (str): The text content of the document (if available).
@@ -598,24 +529,15 @@ class Document(BaseDocument):
 
     Usage example:
         >>> doc = Document(data="Patient has hypertension")
-        >>> doc.nlp._tokens
-        ['Patient', 'has', 'hypertension']
         >>> doc.fhir.problem_list = [Condition(...)]
         >>> doc.cds.cards = [Card(...)]
-        >>> for token in doc:
-        ...     print(token)
 
     Inherits from:
         BaseDocument
     """
 
-    _nlp: NlpAnnotations = field(default_factory=NlpAnnotations)
     _fhir: FhirData = field(default_factory=FhirData)
     _cds: CdsAnnotations = field(default_factory=CdsAnnotations)
-
-    @property
-    def nlp(self) -> NlpAnnotations:
-        return self._nlp
 
     @property
     def fhir(self) -> FhirData:
@@ -632,7 +554,6 @@ class Document(BaseDocument):
         - If input data is a FHIR Bundle, stores it and extracts OperationOutcome and Provenance resources.
         - If input data is a list of FHIR resources, wraps them in a Bundle.
         - For text input, sets .text field accordingly.
-        - Performs basic whitespace tokenization if necessary.
         """
         super().__post_init__()
 
@@ -668,124 +589,64 @@ class Document(BaseDocument):
             # Handle text data
             self.text = self.data if isinstance(self.data, str) else str(self.data)
 
-        if not self._nlp._tokens and self.text:
-            self._nlp._tokens = self.text.split()  # Basic tokenization if not provided
-
-    def word_count(self) -> int:
-        """
-        Return the number of word tokens in the document.
-
-        Returns:
-            int: The count of tokenized words in the document.
-        """
-        return len(self._nlp._tokens)
-
-    def update_problem_list_from_nlp(
+    def update_problem_list(
         self,
-        patient_ref: str = "Patient/123",
+        entities: List[Dict[str, Any]],
+        patient_ref: str,
         coding_system: str = "http://snomed.info/sct",
         code_attribute: str = "cui",
-    ):
+    ) -> None:
         """
-        Populate or update the problem list using entities extracted via NLP.
+        Populate or update the problem list from a list of linked entities.
 
-        This method looks for entities with associated medical codes and creates FHIR Condition
-        resources from them. It supports a two-step process:
-        1. NER: Extract entities from text (spaCy, HuggingFace, etc.)
-        2. Entity Linking: Add medical codes to those entities
-        3. Problem List Creation: Convert linked entities to FHIR conditions (this method)
-
-        The method extracts from:
-        1. spaCy entities with extension attributes (e.g., ent._.cui)
-        2. Generic entities in the NLP annotations container (framework-agnostic)
-
-        TODO: make this more generic and support other resource types
+        Expects entities as plain dicts with a medical code under `code_attribute`
+        (e.g. from entity linking). Entities missing the code are skipped. Existing
+        problem list Conditions are preserved.
 
         Args:
-            patient_ref: FHIR reference to the patient (default: "Patient/123")
-            coding_system: Coding system URI for the conditions (default: SNOMED CT)
-            code_attribute: Name of the attribute containing the medical code (default: "cui")
+            entities: Entities to convert, each a dict with at least "text" and
+                the code under `code_attribute` (e.g. {"text": "fever", "cui": "386661006"}).
+            patient_ref: FHIR reference to the patient (e.g. "Patient/abc").
+            coding_system: Coding system URI for the conditions (default: SNOMED CT).
+            code_attribute: Dict key containing the medical code (default: "cui").
 
-        Notes:
-            - Preserves any existing problem list Conditions.
-            - Supports framework-agnostic extraction (spaCy and dict entities).
-            - For spaCy, looks for entity extension attribute (e.g. ent._.cui).
-            - For non-spaCy, expects codes as dict keys (ent["cui"], etc.).
+        Example:
+            >>> doc.update_problem_list(
+            ...     [{"text": ent.text, "cui": ent._.cui} for ent in spacy_doc.ents],
+            ...     patient_ref="Patient/abc",
+            ... )
         """
         # Start with existing conditions to preserve them
         existing_conditions = self.fhir.problem_list.copy()
         new_conditions = []
 
-        # 1. Extract from spaCy entities (if available)
-        if self.nlp._spacy_doc and self.nlp._spacy_doc.ents:
-            # spaCy is an optional dependency; only imported when a spaCy doc is present.
-            from spacy.tokens import Span
-
-            for ent in self.nlp._spacy_doc.ents:
-                if not Span.has_extension(code_attribute):
-                    logger.debug(
-                        f"Extension '{code_attribute}' not found for spaCy entity {ent.text}"
-                    )
-                    continue
-
-                code_value = getattr(ent._, code_attribute, None)
-                if code_value is None:
-                    logger.debug(
-                        f"No {code_attribute} found for spaCy entity {ent.text}"
-                    )
-                    continue
-
-                condition = create_condition(
-                    subject=patient_ref,
-                    code=code_value,
-                    display=ent.text,
-                    system=coding_system,
-                )
-                set_condition_category(condition, "problem-list-item")
+        for ent_dict in entities:
+            # Skip if no linked code
+            code_value = ent_dict.get(code_attribute)
+            if code_value is None:
                 logger.debug(
-                    f"Adding condition from spaCy: {condition.model_dump(exclude_none=True)}"
+                    f"No {code_attribute} found for entity {ent_dict.get('text', 'unknown')}"
                 )
-                new_conditions.append(condition)
+                continue
 
-        # 2. Extract from generic NLP entities (framework-agnostic)
-        generic_entities = self.nlp.get_entities()
-        if generic_entities:
-            for ent_dict in generic_entities:
-                # Skip if no linked code
-                code_value = ent_dict.get(code_attribute)
-                if code_value is None:
-                    logger.debug(
-                        f"No {code_attribute} found for entity {ent_dict.get('text', 'unknown')}"
-                    )
-                    continue
+            entity_text = ent_dict.get("text", "unknown")
 
-                entity_text = ent_dict.get("text", "unknown")
-
-                condition = create_condition(
-                    subject=patient_ref,
-                    code=code_value,
-                    display=entity_text,
-                    system=coding_system,
-                )
-                set_condition_category(condition, "problem-list-item")
-                logger.debug(
-                    f"Adding condition from entities: {condition.model_dump(exclude_none=True)}"
-                )
-                new_conditions.append(condition)
+            condition = create_condition(
+                subject=patient_ref,
+                code=code_value,
+                display=entity_text,
+                system=coding_system,
+            )
+            set_condition_category(condition, "problem-list-item")
+            logger.debug(
+                f"Adding condition from entities: {condition.model_dump(exclude_none=True)}"
+            )
+            new_conditions.append(condition)
 
         # Update problem list with combined conditions (replace to avoid duplication)
         if new_conditions:
             all_conditions = existing_conditions + new_conditions
             self.fhir.add_resources(all_conditions, "Condition", replace=True)
-
-    def __iter__(self) -> Iterator[str]:
-        """
-        Iterate through the document's tokens.
-
-        Returns:
-            Iterator[str]: Iterator over the document tokens.
-        """
-        return iter(self._nlp._tokens)
 
     def __len__(self) -> int:
         """

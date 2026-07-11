@@ -36,7 +36,7 @@ def create_clinical_pipeline():
     # Add a clinical entity extraction component
     @pipeline.add_node
     def extract_conditions(doc: Document) -> Document:
-        """Extract condition mentions from text."""
+        """Extract condition mentions from text and add them to the problem list."""
         # Simple keyword-based extraction for this tutorial
         # In production, you'd use a trained NLP model
         condition_keywords = {
@@ -47,19 +47,14 @@ def create_clinical_pipeline():
         }
 
         text_lower = doc.text.lower()
-        extracted = []
+        entities = [
+            {"text": display, "cui": code}
+            for keyword, (code, display) in condition_keywords.items()
+            if keyword in text_lower
+        ]
 
-        for keyword, (code, display) in condition_keywords.items():
-            if keyword in text_lower:
-                extracted.append({
-                    "text": keyword,
-                    "code": code,
-                    "display": display,
-                    "system": "http://snomed.info/sct"
-                })
-
-        # Store extracted conditions in document's NLP annotations
-        doc.nlp.set_entities(extracted)
+        # Convert extracted entities into FHIR Condition resources
+        doc.update_problem_list(entities, patient_ref="Patient/patient-001")
         return doc
 
     return pipeline.build()
@@ -86,10 +81,11 @@ doc = Document(
 # Run the pipeline
 result = nlp(doc)
 
-# Check extracted entities
+# Check extracted conditions
 print("Extracted conditions:")
-for entity in result.nlp.get_entities():
-    print(f"  - {entity['display']} (SNOMED: {entity['code']})")
+for condition in result.fhir.problem_list:
+    coding = condition.code.coding[0]
+    print(f"  - {coding.display} (SNOMED: {coding.code})")
 ```
 
 Run it:
@@ -127,10 +123,10 @@ Your pipeline now follows this flow:
 └─────────────┘     └─────────────┘     └─────────────┘
                                                │
                                                ▼
-                                        ┌─────────────┐
-                                        │  Document   │
-                                        │  + Entities │
-                                        └─────────────┘
+                                        ┌────────────────┐
+                                        │    Document    │
+                                        │ + Problem List │
+                                        └────────────────┘
 ```
 
 ## What's Next
