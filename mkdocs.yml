@@ -54,15 +54,7 @@ nav:
           - CDS FHIR Adapter: reference/io/adapters/cdsfhiradapter.md
       - Pipeline:
         - Overview: reference/pipeline/pipeline.md
-        - Components:
-          - Overview: reference/pipeline/components/components.md
-          - CdsCardCreator: reference/pipeline/components/cdscardcreator.md
-          - FHIRProblemListExtractor: reference/pipeline/components/fhirproblemextractor.md
-        - Prebuilt Pipelines:
-          - Medical Coding: reference/pipeline/prebuilt_pipelines/medicalcoding.md
-          - Summarization: reference/pipeline/prebuilt_pipelines/summarization.md
-      - Integrations:
-        - Overview: reference/pipeline/integrations/integrations.md
+        - Components: reference/pipeline/components/components.md
       - Interoperability:
         - Overview: reference/interop/interop.md
         - Engine: reference/interop/engine.md

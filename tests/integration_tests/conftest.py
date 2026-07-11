@@ -9,8 +9,6 @@ from healthchain.gateway.cds import CDSHooksService
 from healthchain.gateway.fhir import FHIRGateway
 from healthchain.gateway.events.dispatcher import EventDispatcher
 from healthchain.gateway import HealthChainAPI
-from healthchain.pipeline.medicalcodingpipeline import MedicalCodingPipeline
-from healthchain.pipeline.summarizationpipeline import SummarizationPipeline
 from healthchain.fhir import create_document_reference
 from fhir.resources.R4B.documentreference import DocumentReference
 from fhir.resources.R4B.patient import Patient
@@ -20,7 +18,7 @@ from fhir.resources.R4B.meta import Meta
 @pytest.fixture
 def mock_coding_pipeline(test_cda_response):
     """Mock medical coding pipeline that returns test CDA response."""
-    pipeline = MagicMock(spec=MedicalCodingPipeline)
+    pipeline = MagicMock()
     pipeline.process_request.return_value = test_cda_response
     return pipeline
 
@@ -28,7 +26,7 @@ def mock_coding_pipeline(test_cda_response):
 @pytest.fixture
 def mock_summarization_pipeline(test_cds_response_single_card):
     """Mock summarization pipeline that returns test CDS response."""
-    pipeline = MagicMock(spec=SummarizationPipeline)
+    pipeline = MagicMock()
     pipeline.process_request.return_value = test_cds_response_single_card
     return pipeline
 

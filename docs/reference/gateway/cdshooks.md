@@ -111,12 +111,11 @@ This example demonstrates how to build a custom CDS Hooks workflow that performs
 ```python
 from healthchain.io import CdsFhirAdapter, Document
 from healthchain.pipeline import Pipeline
-from healthchain.pipeline.components import CdsCardCreator
-from healthchain.models import CDSRequest, CDSResponse
+from healthchain.models import Card, CDSRequest, CDSResponse
 from healthchain.gateway import HealthChainAPI, CDSHooksService
 
 # Build custom pipeline with analysis and card creation
-pipeline = Pipeline([Document])
+pipeline = Pipeline()
 
 @pipeline.add_node
 def analyze_patient_data(doc: Document) -> Document:
@@ -134,10 +133,19 @@ def analyze_patient_data(doc: Document) -> Document:
             doc._custom_analysis = {"high_risk": False}
     return doc
 
-# Add card creator to format output
-pipeline.add_node(CdsCardCreator(
-    template='{"summary": "Risk Assessment", "detail": "Patient risk level: {{ high_risk }}"}'
-))
+# Format the analysis into a CDS Hooks card
+@pipeline.add_node
+def create_risk_card(doc: Document) -> Document:
+    analysis = getattr(doc, "_custom_analysis", {})
+    doc.cds.cards = [
+        Card(
+            summary="Risk Assessment",
+            detail=f"Patient risk level: {analysis.get('high_risk')}",
+            indicator="warning" if analysis.get("high_risk") else "info",
+            source={"label": "Risk assessment pipeline"},
+        )
+    ]
+    return doc
 
 pipe = pipeline.build()
 

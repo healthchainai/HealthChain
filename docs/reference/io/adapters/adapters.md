@@ -23,40 +23,23 @@ Each adapter is designed for specific healthcare integration scenarios.
 | `CdaAdapter` | [**Clinical Documentation**](../../gateway/soap_cda.md) | SOAP/CDA |
 | `CdsFhirAdapter` | [**Clinical Decision Support**](../../gateway/cdshooks.md) | CDS Hooks/FHIR |
 
-## Usage Patterns
+## Usage Pattern
 
-### 1. Simple End-to-End Processing
-
-Use prebuilt pipelines with the `process_request()` method for straightforward workflows:
-
-```python
-from healthchain.pipeline import MedicalCodingPipeline
-from healthchain.models import CdaRequest
-
-pipeline = MedicalCodingPipeline.from_model_id("en_core_sci_sm", source="spacy")
-cda_request = CdaRequest(document="<CDA XML content>")
-
-# Adapter used internally
-response = pipeline.process_request(cda_request)
-```
-
-### 2. Manual Adapter Control (Document Access)
-
-Use adapters `parse()` and `format()` methods directly when you need access to the intermediate `Document` object:
+Use an adapter's `parse()` and `format()` methods to convert between a healthcare format and a `Document`, running your pipeline in between. This gives you access to the intermediate `Document` and its extracted clinical data:
 
 ```python
 from healthchain.io import CdaAdapter
-from healthchain.pipeline import MedicalCodingPipeline
+from healthchain.pipeline import Pipeline
 from healthchain.models import CdaRequest
 
-pipeline = MedicalCodingPipeline.from_model_id("en_core_sci_sm", source="spacy")
+pipeline = Pipeline()   # add your own processing with pipeline.add_node(...)
 adapter = CdaAdapter()
 
 cda_request = CdaRequest(document="<CDA XML content>")
 
 # Manual adapter control
 doc = adapter.parse(cda_request)      # CdaRequest → Document
-doc = pipeline(doc)                   # Document → Document (pure ML)
+doc = pipeline(doc)                   # Document → Document
 
 # Access extracted clinical data
 print(f"Problems: {doc.fhir.problem_list}")

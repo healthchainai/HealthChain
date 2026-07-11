@@ -48,7 +48,7 @@ You can build pipelines with three different approaches:
 
 ### 1. Quick Inline Functions
 
-For quick experiments, start by picking the right [**Container**](./io/containers/containers.md) when you initialize your pipeline (e.g. `Pipeline[Document]()` for clinical text).
+For quick experiments, create a `Pipeline` and add your processing functions. Each step receives and returns a [**Document**](./io/containers/containers.md); raw input (text, a FHIR Bundle, or a list of resources) is wrapped into a `Document` automatically.
 
 Containers make your pipeline FHIR-native by loading and transforming your data (free text, EHR resources, etc.) into structured FHIR-ready formats. Just add your processing functions with `@add_node`, compile with `.build()`, and your pipeline is ready to process FHIR data end-to-end.
 
@@ -59,7 +59,7 @@ from healthchain.pipeline import Pipeline
 from healthchain.io import Document
 from healthchain.fhir import create_condition
 
-pipeline = Pipeline[Document]()
+pipeline = Pipeline()
 
 @pipeline.add_node
 def extract_diabetes(doc: Document) -> Document:
@@ -83,22 +83,29 @@ print(doc.fhir.problem_list)  # FHIR Condition
 
 ### 2. Build With Components and Adapters
 
-[**Components**](./pipeline/components/components.md) are reusable, stateful classes that encapsulate specific processing logic, model loading, or configuration for your pipeline. Use them to organize complex workflows, handle model state, or integrate third-party libraries with minimal setup.
+[**Components**](./pipeline/components/components.md) are reusable, stateful classes that encapsulate specific processing logic for your pipeline, and you can easily implement your own.
 
-HealthChain provides a set of ready-to-use [**NLP Integrations**](./pipeline/integrations/integrations.md) for common clinical NLP and ML tasks, and you can easily implement your own.
+Bring your own NLP: load a model with the library you already use — spaCy, HuggingFace Transformers, or a LangChain chain — and wrap it in a node with `add_node`.
 
 [(Full Documentation on Components)](./pipeline/components/components.md)
 
 ```python
+import spacy
 from healthchain.pipeline import Pipeline
-from healthchain.pipeline.components import TextPreProcessor, SpacyNLP, TextPostProcessor
 from healthchain.io import Document
 
-pipeline = Pipeline[Document]()
+pipeline = Pipeline()
 
-pipeline.add_node(TextPreProcessor())
-pipeline.add_node(SpacyNLP.from_model_id("en_core_sci_sm"))
-pipeline.add_node(TextPostProcessor())
+nlp = spacy.load("en_core_sci_sm")
+
+@pipeline.add_node
+def extract_problems(doc: Document) -> Document:
+    spacy_doc = nlp(doc.text)
+    doc.update_problem_list(
+        [{"text": ent.text, "cui": ent._.cui} for ent in spacy_doc.ents],
+        patient_ref="Patient/example",
+    )
+    return doc
 
 pipe = pipeline.build()
 
@@ -124,22 +131,11 @@ processed_doc = pipe(doc)
 output = adapter.format(processed_doc)
 ```
 
-### 3. Use Prebuilt Pipelines
+### 3. Copy a Cookbook Recipe
 
-Prebuilt pipelines are the fastest way to jump into healthcare AI with minimal setup: just load and run. Each pipeline bundles best-practice components and models for common clinical tasks (like coding or summarization) and handles all FHIR/CDA conversion for you. Easily customize or extend pipelines by adding/removing components, or swap models as needed.
+For complete, runnable examples of common clinical tasks — medical coding, discharge summarization, ML risk scoring — start from a [**cookbook recipe**](../cookbook/clinical_coding.md) and adapt it. Each recipe builds its pipeline from `Pipeline` + `add_node` directly, so every step is visible and easy to change.
 
-[(Full Documentation on Pipelines)](./pipeline/pipeline.md#prebuilt)
-
-```python
-from healthchain.pipeline import MedicalCodingPipeline
-from healthchain.models import CdaRequest
-
-# Or load from local model
-pipeline = MedicalCodingPipeline.from_local_model("./path/to/model", source="spacy")
-
-cda_request = CdaRequest(document="<CDA XML content>")
-output = pipeline.process_request(cda_request)
-```
+[(Full Documentation on Pipelines)](./pipeline/pipeline.md)
 
 ## Interoperability
 

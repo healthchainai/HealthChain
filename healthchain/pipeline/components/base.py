@@ -1,12 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
 
-from healthchain.io.containers import DataContainer
-
-T = TypeVar("T")
+from healthchain.io.containers import Document
 
 
-class BaseComponent(Generic[T], ABC):
+class BaseComponent(ABC):
     """
     Abstract base class for all components in the pipeline.
 
@@ -15,20 +12,20 @@ class BaseComponent(Generic[T], ABC):
     """
 
     @abstractmethod
-    def __call__(self, data: DataContainer[T]) -> DataContainer[T]:
+    def __call__(self, data: Document) -> Document:
         """
-        Process the input data and return the processed data.
+        Process the input document and return the processed document.
 
         Args:
-            data (DataContainer[T]): The input data to be processed.
+            data (Document): The input document to be processed.
 
         Returns:
-            DataContainer[T]: The processed data.
+            Document: The processed document.
         """
         pass
 
 
-class Component(BaseComponent[T]):
+class Component(BaseComponent):
     """
     A concrete implementation of the BaseComponent class.
 
@@ -36,10 +33,10 @@ class Component(BaseComponent[T]):
     that do not require any additional processing logic.
 
     Methods:
-        __call__(data: DataContainer[T]) -> DataContainer[T]:
-            Process the input data and return the processed data.
-            In this implementation, the input data is returned unmodified.
+        __call__(data: Document) -> Document:
+            Process the input document and return the processed document.
+            In this implementation, the input document is returned unmodified.
     """
 
-    def __call__(self, data: DataContainer[T]) -> DataContainer[T]:
+    def __call__(self, data: Document) -> Document:
         return data

@@ -71,10 +71,11 @@ def patient_alerts(request: CDSRequest) -> CDSResponse:
         result = nlp(doc)
 
         # Create cards for each extracted condition
-        for entity in result.nlp.get_entities():
+        for condition in result.fhir.problem_list:
+            coding = condition.code.coding[0]
             cards.append(Card(
-                summary=f"Condition detected: {entity['display']}",
-                detail=f"SNOMED code: {entity['code']}",
+                summary=f"Condition detected: {coding.display}",
+                detail=f"SNOMED code: {coding.code}",
                 indicator="info",
                 source={"label": "ClinicalFlow", "url": "https://healthchain.dev"}
             ))

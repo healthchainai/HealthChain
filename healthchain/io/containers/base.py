@@ -1,36 +1,30 @@
 import json
 from dataclasses import dataclass, field
-from typing import Any, Dict, Generic, TypeVar
-
-
-T = TypeVar("T")
+from typing import Any, Dict
 
 
 @dataclass
-class DataContainer(Generic[T]):
+class BaseDocument:
     """
-    A generic container for data.
+    Base container for document data flowing through a pipeline.
 
-    This class represents a container for data with a specific type T.
+    Holds the original input in ``data`` and a text view in ``text``. Serialization
+    helpers skip private (``_``-prefixed) attributes so pipeline-internal state
+    (e.g. the spaCy doc) is never emitted.
 
     Attributes:
-        data (T): The data stored in the container.
-
-    Methods:
-        to_dict() -> Dict[str, Any]:
-            Converts the container's data to a dictionary.
-
-        to_json() -> str:
-            Converts the container's data to a JSON string.
-
-        from_dict(cls, data: Dict[str, Any]) -> "DataContainer":
-            Creates a DataContainer instance from a dictionary.
-
-        from_json(cls, json_str: str) -> "DataContainer":
-            Creates a DataContainer instance from a JSON string.
+        data (Any): The original input supplied (raw text, FHIR Bundle, resource, or list).
+        text (str): Text view of the document, derived from ``data``.
     """
 
-    data: T
+    data: Any
+    text: str = field(init=False)
+
+    def __post_init__(self):
+        self.text = self.data
+
+    def char_count(self) -> int:
+        return len(self.text)
 
     def to_dict(self) -> Dict[str, Any]:
         return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
@@ -39,23 +33,9 @@ class DataContainer(Generic[T]):
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "DataContainer":
+    def from_dict(cls, data: Dict[str, Any]) -> "BaseDocument":
         return cls(**data)
 
     @classmethod
-    def from_json(cls, json_str: str) -> "DataContainer":
+    def from_json(cls, json_str: str) -> "BaseDocument":
         return cls.from_dict(json.loads(json_str))
-
-
-@dataclass
-class BaseDocument(DataContainer[str]):
-    """Base document container for raw text content."""
-
-    data: str
-    text: str = field(init=False)
-
-    def __post_init__(self):
-        self.text = self.data
-
-    def char_count(self) -> int:
-        return len(self.text)

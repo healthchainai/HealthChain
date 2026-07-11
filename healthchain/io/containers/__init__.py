@@ -1,4 +1,4 @@
-from .base import DataContainer, BaseDocument
+from .base import BaseDocument
 from .document import Document
 
-__all__ = ["DataContainer", "BaseDocument", "Document"]
+__all__ = ["BaseDocument", "Document"]

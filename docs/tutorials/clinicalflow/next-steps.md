@@ -16,16 +16,18 @@ In this tutorial, you:
 
 ### Improve the NLP
 
-The NLP was hard coded in our example but HealthChain has simple pipeline integrations for spacy, huggingface and Langchain. Try to replace keyword matching with trained models.
+The NLP was hard coded in our example. Load a trained model with the library you already use — spaCy, HuggingFace Transformers, LangChain — and run it directly inside your pipeline node in place of keyword matching.
 
 ### Add FHIR Output
 
-Convert extracted entities to FHIR resources:
+Convert extracted entities to FHIR resources by calling `update_problem_list` from within a pipeline node:
 
 ```python
-from healthchain.pipeline.components import FHIRProblemListExtractor
-
-pipeline.add_node(FHIRProblemListExtractor())
+@pipeline.add_node
+def extract_problems(doc: Document) -> Document:
+    entities = [{"text": "hypertension", "cui": "38341003"}]
+    doc.update_problem_list(entities, patient_ref="Patient/patient-001")
+    return doc
 
 # Now doc.fhir.problem_list contains FHIR Condition resources
 ```

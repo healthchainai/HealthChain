@@ -8,21 +8,16 @@ The `healthchain.io.containers` module provides FHIR-native containers for healt
 |-----------|---------|-----------|
 | [**Document**](document.md) | Clinical text + FHIR resources | Clinical notes, discharge summaries, CDS workflows |
 
-## DataContainer 📦
+## BaseDocument 📦
 
-`DataContainer` is a generic base class for storing data of any type. It provides serialization methods that other containers inherit.
+`BaseDocument` is the base container that `Document` inherits from. It holds the original input in `data`, exposes a text view in `text`, and provides serialization helpers that skip private (`_`-prefixed) attributes.
 
 ```python
-from healthchain.io.containers import DataContainer
+from healthchain.io.containers import BaseDocument
 
-# Create a DataContainer with string data
-container = DataContainer("Some data")
+doc = BaseDocument("Some data")
 
 # Convert to dictionary and JSON
-data_dict = container.to_dict()
-data_json = container.to_json()
-
-# Create from dictionary or JSON
-container_from_dict = DataContainer.from_dict(data_dict)
-container_from_json = DataContainer.from_json(data_json)
+data_dict = doc.to_dict()
+data_json = doc.to_json()
 ```

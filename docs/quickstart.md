@@ -70,15 +70,13 @@ healthchain mcp --bundle patient_bundle.json
 
 ### Pipeline 🛠️
 
-HealthChain [**Pipelines**](./reference/pipeline/pipeline.md) provide a flexible way to build and manage processing pipelines for NLP and ML tasks that can easily integrate with electronic health record (EHR) systems.
+HealthChain [**Pipelines**](./reference/pipeline/pipeline.md) are lightweight composition primitives for building FHIR-native processing steps that integrate with electronic health record (EHR) systems. Each step receives and returns a [**Document**](./reference/io/containers/containers.md), so raw text and FHIR resources flow through the same object.
 
-You can build pipelines with three different approaches:
+You can build pipelines with two approaches:
 
 #### 1. Quick Inline Functions
 
-For quick experiments, start by picking the right [**Container**](./reference/io/containers/containers.md) when you initialize your pipeline (e.g. `Pipeline[Document]()` for clinical text).
-
-Containers make your pipeline FHIR-native by loading and transforming your data (free text, EHR resources, etc.) into structured FHIR-ready formats. Just add your processing functions with `@add_node`, compile with `.build()`, and your pipeline is ready to process FHIR data end-to-end.
+Create a `Pipeline`, add processing functions with `@add_node`, and compile with `.build()`. Raw input (text, a FHIR Bundle, or a list of resources) is wrapped into a `Document` automatically, and each node returns FHIR-ready data end-to-end.
 
 [(Full Documentation on Containers)](./reference/io/containers/containers.md)
 
@@ -87,7 +85,7 @@ from healthchain.pipeline import Pipeline
 from healthchain.io import Document
 from healthchain.fhir import create_condition
 
-pipeline = Pipeline[Document]()
+pipeline = Pipeline()
 
 @pipeline.add_node
 def extract_diabetes(doc: Document) -> Document:
@@ -114,35 +112,39 @@ print(doc.fhir.problem_list)  # FHIR Condition
 
 #### 2. Build With Components and Adapters
 
-[**Components**](./reference/pipeline/components/components.md) are reusable, stateful classes that encapsulate specific processing logic, model loading, or configuration for your pipeline. Use them to organize complex workflows, handle model state, or integrate third-party libraries with minimal setup.
+[**Components**](./reference/pipeline/components/components.md) are reusable, stateful classes that encapsulate specific processing logic for your pipeline, and you can easily implement your own.
 
-HealthChain provides a set of ready-to-use [**NLP Integrations**](./reference/pipeline/integrations/integrations.md) for common clinical NLP and ML tasks, and you can easily implement your own.
+Bring your own NLP: load a model with the library you already use — spaCy, HuggingFace Transformers, or a LangChain chain — and wrap it in a node with `add_node`.
 
 [(Full Documentation on Components)](./reference/pipeline/components/components.md)
 
-<!--pytest.mark.skip-->
 ```python
 from healthchain.pipeline import Pipeline
-from healthchain.pipeline.components import TextPreProcessor, SpacyNLP, TextPostProcessor
 from healthchain.io import Document
 
-pipeline = Pipeline[Document]()
+pipeline = Pipeline()
 
-pipeline.add_node(TextPreProcessor())
-pipeline.add_node(SpacyNLP.from_model_id("en_core_sci_sm"))
-pipeline.add_node(TextPostProcessor())
+@pipeline.add_node
+def extract_problems(doc: Document) -> Document:
+    """Run your own NLP model, then hand off entities to the problem list."""
+    # Swap this for spaCy, HuggingFace, or any NER model of your choice
+    entities = [{"text": "hypertension", "cui": "38341003"}]
+    doc.update_problem_list(entities, patient_ref="Patient/example")
+    return doc
 
 pipe = pipeline.build()
 
 doc = Document("Patient presents with hypertension.")
 output = pipe(doc)
+
+print(output.fhir.problem_list)  # FHIR Condition resources
 ```
 
 Working with external or legacy data formats? [**Adapters**](./reference/io/adapters/adapters.md) interface them with your pipeline so you can parse, process, and format without worrying about low-level data conversion.
 
-#### 3. Use Prebuilt Pipelines
+#### 3. Copy a Cookbook Recipe
 
-[**Prebuilt pipelines**](./reference/pipeline/pipeline.md#prebuilt) bundle best-practice components for common clinical tasks (like coding or summarization) and handle data conversion for you — load, run, and customize by swapping components or models as needed.
+For complete, runnable examples of common clinical tasks — medical coding, discharge summarization, ML risk scoring — start from a [**cookbook recipe**](./cookbook/clinical_coding.md) and adapt it. Each recipe builds its pipeline from `Pipeline` + `add_node` directly, so every step is visible and easy to change.
 
 ## Utilities ⚙️
 

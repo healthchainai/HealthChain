@@ -1,16 +1,8 @@
 # Component
 
-Components are the building blocks of the healthchain pipeline. They are designed to process data in a consistent manner, allowing for easy composition and reusability.
+Components are the building blocks of the healthchain pipeline. A component is anything callable that takes a [`Document`](../../io/containers/document.md) and returns a `Document` — `.add_node()` accepts a plain function just as readily as a component instance.
 
-
-## Available Components
-
-| Component | Description | Methods |
-|-----------|-------------|---------|
-| `TextPreprocessor` | Handles text preprocessing tasks | `tokenizer`: Specifies the tokenization method (e.g., `"basic"` or `"spacy"`) <br> `lowercase`: Converts text to lowercase if `True` <br> `remove_punctuation`: Removes punctuation if `True` <br> `standardize_spaces`: Standardizes spaces if `True` <br> `regex`: List of custom regex patterns and replacements |
-| `TextPostProcessor` | Handles text postprocessing tasks | `postcoordination_lookup`: Dictionary for entity refinement lookups |
-| [CdsCardCreator](cdscardcreator.md) | Formats model outputs into CDS cards for clinical decision support | `create_card`: Creates a CDS card |
-| [FHIRProblemListExtractor](fhirproblemextractor.md) | Extracts entities with medical codes and creates FHIR Condition resources with the problem_list extension | `__call__`: Extracts the problem list |
+HealthChain doesn't ship prebuilt components. Bring your own NLP or ML library (spaCy, HuggingFace Transformers, LangChain), run it inside a node, and hand off the results explicitly using `Document`'s FHIR methods (e.g. `doc.update_problem_list(...)`, `doc.fhir.problem_list`).
 
 ## Creating Custom Components
 
