@@ -151,9 +151,11 @@ class EncounterGenerator(BaseGenerator):
             status=faker.random_element(
                 elements=(
                     "planned",
+                    "arrived",
+                    "triaged",
                     "in-progress",
-                    "on-hold",
-                    "discharged",
+                    "onleave",
+                    "finished",
                     "cancelled",
                 )
             ),

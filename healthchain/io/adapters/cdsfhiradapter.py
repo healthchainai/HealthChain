@@ -78,16 +78,15 @@ class CdsFhirAdapter(BaseAdapter[CDSRequest, CDSResponse]):
         if cds_request.fhirServer is not None:
             raise NotImplementedError("FHIR server is not implemented yet!")
 
-        # Create an empty Document object
-        doc = Document(data="")
-
         # Convert prefetch dict resources to FHIR objects
-        doc.fhir.prefetch_resources = convert_prefetch_to_fhir_objects(
+        prefetch_resources = convert_prefetch_to_fhir_objects(
             cds_request.prefetch or {}
         )
 
-        # Extract text content from DocumentReference resource if provided
-        document_resource = doc.fhir.prefetch_resources.get(prefetch_document_key)
+        # Extract text content from DocumentReference resource first, so the
+        # Document is constructed once with its final text
+        note_text = ""
+        document_resource = prefetch_resources.get(prefetch_document_key)
 
         if not document_resource:
             log.warning(
@@ -100,11 +99,14 @@ class CdsFhirAdapter(BaseAdapter[CDSRequest, CDSResponse]):
                 )
                 for attachment in attachments:
                     if len(attachments) > 1:
-                        doc.data += attachment.get("data", "") + "\n"
+                        note_text += attachment.get("data", "") + "\n"
                     else:
-                        doc.data += attachment.get("data", "")
+                        note_text += attachment.get("data", "")
             except Exception as e:
                 log.warning(f"Error extracting text from DocumentReference: {e}")
+
+        doc = Document(data=note_text)
+        doc.fhir.prefetch_resources = prefetch_resources
 
         return doc
 

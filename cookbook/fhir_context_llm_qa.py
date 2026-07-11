@@ -6,7 +6,7 @@ Pulls patient data from a FHIR store, formats it as context, and serves
 a Q&A endpoint powered by any LangChain-compatible LLM.
 
 Requirements:
-    pip install healthchain langchain-core langchain-anthropic python-dotenv
+    pip install healthchain langchain-core langchain-anthropic
 
 Setup:
     1. Add to .env:
@@ -57,9 +57,9 @@ class PatientAnswer(BaseModel):
     answer: str
 
 
-def create_pipeline() -> Pipeline[Document]:
+def create_pipeline() -> Pipeline:
     """Format a FHIR patient bundle into a structured LLM context string."""
-    pipeline = Pipeline[Document]()
+    pipeline = Pipeline()
 
     @pipeline.add_node
     def format_context(doc: Document) -> Document:

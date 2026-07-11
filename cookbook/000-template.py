@@ -19,14 +19,11 @@ Run:
     python cookbook/[your_cookbook].py
 """
 
-from dotenv import load_dotenv
 from healthchain.gateway import FHIRGateway, HealthChainAPI
 from healthchain.gateway.clients import FHIRAuthConfig
 from healthchain.fhir.r4b import Patient  # replace with the resources you need
 
-load_dotenv()
-
-# --- Setup ---
+# --- Setup --- (.env is read automatically by FHIRAuthConfig.from_env)
 
 gateway = FHIRGateway()
 gateway.add_source("medplum", FHIRAuthConfig.from_env("MEDPLUM").to_connection_string())

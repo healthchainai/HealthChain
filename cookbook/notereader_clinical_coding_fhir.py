@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """
-A complete CDI service that processes clinical notes and extracts FHIR conditions.
-Demonstrates FHIR-native pipelines, legacy system integration, and multi-source data handling.
+A complete medical coding pipeline: process clinical notes from Epic NoteReader
+and write extracted conditions as validated FHIR.
+Demonstrates bring-your-own-NLP pipelines, legacy CDA integration, and FHIR write-back.
 
 Requirements:
-    pip install healthchain scispacy python-dotenv
-    pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_sm-0.5.4.tar.gz
+    pip install "healthchain[cda,examples]" "spacy>=3.7,<3.8" \
+        https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_sm-0.5.4.tar.gz
+    # The en_core_sci_sm 0.5.4 model needs spaCy <3.8 to load; install in one
+    # command so pip resolves a compatible set.
 
 Run:
     python cookbook/notereader_clinical_coding_fhir.py
@@ -18,8 +21,6 @@ import logging
 from pathlib import Path
 
 import spacy
-from spacy.tokens import Span
-from dotenv import load_dotenv
 
 from healthchain.fhir import add_provenance_metadata
 from healthchain.gateway.api import HealthChainAPI
@@ -28,15 +29,17 @@ from healthchain.gateway.clients import FHIRAuthConfig
 from healthchain.gateway.soap import NoteReaderService
 from healthchain.io import CdaAdapter, Document
 from healthchain.models import CdaRequest
-from healthchain.pipeline.medicalcodingpipeline import MedicalCodingPipeline
+from healthchain.pipeline import Pipeline
 
 
 # Suppress Spyne warnings
 logging.getLogger("spyne.model.complex").setLevel(logging.ERROR)
 
-load_dotenv()
-
 _DATA_DIR = Path(__file__).parent / "data"
+
+# The patient the extracted Conditions are written against. In production,
+# resolve this from the incoming document's patient context.
+PATIENT_REF = "Patient/123"
 
 # Load configuration from environment variables
 config = FHIRAuthConfig.from_env("MEDPLUM")
@@ -44,42 +47,38 @@ MEDPLUM_URL = config.to_connection_string()
 
 
 def create_pipeline():
-    """Build FHIR-native ML pipeline with automatic problem extraction."""
-    pipeline = MedicalCodingPipeline.from_model_id("en_core_sci_sm", source="spacy")
+    """Build the medical coding pipeline: clinical NER + entity linking + FHIR problem list."""
     nlp = spacy.load("en_core_sci_sm")
+    pipeline = Pipeline()
 
-    # Add custom entity linking + problem list extraction
-    @pipeline.add_node(position="after", reference="SpacyNLP")
-    def link_entities(doc: Document) -> Document:
-        """Run NER, add CUI codes to medical entities, and update the problem list."""
-        if not Span.has_extension("cui"):
-            Span.set_extension("cui", default=None)
+    # Simple dummy linker for demo purposes — swap for a real entity linker
+    # (e.g. scispacy's UmlsEntityLinker) in production
+    dummy_linker = {
+        "pneumonia": "233604007",
+        "type 2 diabetes mellitus": "44054006",
+        "congestive heart failure": "42343007",
+        "chronic kidney disease": "431855005",
+        "hypertension": "38341003",
+        "community acquired pneumonia": "385093006",
+        "ventilator associated pneumonia": "233717007",
+        "anaphylaxis": "39579001",
+        "delirium": "2776000",
+        "depression": "35489007",
+        "asthma": "195967001",
+        "copd": "13645005",
+    }
 
+    @pipeline.add_node
+    def extract_problems(doc: Document) -> Document:
+        """Run NER, link entities to SNOMED CT codes, and update the FHIR problem list."""
         spacy_doc = nlp(doc.text)
 
-        # Simple dummy linker for demo purposes
-        dummy_linker = {
-            "pneumonia": "233604007",
-            "type 2 diabetes mellitus": "44054006",
-            "congestive heart failure": "42343007",
-            "chronic kidney disease": "431855005",
-            "hypertension": "38341003",
-            "community acquired pneumonia": "385093006",
-            "ventilator associated pneumonia": "233717007",
-            "anaphylaxis": "39579001",
-            "delirium": "2776000",
-            "depression": "35489007",
-            "asthma": "195967001",
-            "copd": "13645005",
-        }
-
-        for ent in spacy_doc.ents:
-            if ent.text.lower() in dummy_linker:
-                ent._.cui = dummy_linker[ent.text.lower()]
-
         doc.update_problem_list(
-            [{"text": ent.text, "cui": ent._.cui} for ent in spacy_doc.ents],
-            patient_ref="Patient/123",
+            [
+                {"text": ent.text, "cui": dummy_linker.get(ent.text.lower())}
+                for ent in spacy_doc.ents
+            ],
+            patient_ref=PATIENT_REF,
         )
 
         return doc

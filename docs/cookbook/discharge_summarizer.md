@@ -4,7 +4,7 @@
 
 This example shows you how to build a CDS service that integrates with EHR systems. We'll automatically summarize discharge notes and return actionable recommendations using the [CDS Hooks standard](https://cds-hooks.org/).
 
-Check out the full working example [here](https://github.com/healthchainai/HealthChain/tree/main/cookbook/cds_discharge_summarizer_hf_chat.py)!
+Check out the full working example [here](https://github.com/healthchainai/HealthChain/tree/main/cookbook/cds_discharge_summarizer_hf_trf.py)!
 
 ![](../assets/images/hc-use-cases-clinical-integration.png) *Illustrative Architecture - actual implementation may vary.*
 
@@ -13,17 +13,10 @@ Check out the full working example [here](https://github.com/healthchainai/Healt
 ### Install Dependencies
 
 ```bash
-pip install healthchain python-dotenv
+pip install "healthchain[examples,sandbox]" torch
 ```
 
-This example uses a Hugging Face model for the summarization task, so make sure you have a [Hugging Face API token](https://huggingface.co/docs/hub/security-tokens) and set it as the `HUGGINGFACEHUB_API_TOKEN` environment variable.
-
-
-If you are using a chat model, make sure you have the necessary `langchain` packages installed.
-
-```bash
-pip install langchain langchain-huggingface
-```
+The `[examples]` extra provides `transformers`, and `[sandbox]` provides the test data generator used to fire sample requests. The model runs locally — no API tokens or accounts needed.
 
 ### Download Sample Data
 
@@ -35,62 +28,42 @@ cd data
 wget https://github.com/healthchainai/HealthChain/raw/main/cookbook/data/discharge_notes.csv
 ```
 
-## Initialize the pipeline
+## Build the Summarization Pipeline
 
-First, we'll create a [summarization pipeline](../reference/pipeline/pipeline.md) with domain-specific prompting for discharge workflows. You can choose between:
+First, we'll build the summarization pipeline: run the model in a single [Pipeline](../reference/pipeline/pipeline.md) node that summarizes the note and builds the CDS [Card](../reference/gateway/cdshooks.md) inline.
 
-- **Transformer models** fine-tuned for clinical summarization (like `google/pegasus-xsum`)
-- **Large Language Models** with custom clinical prompting (like `zephyr-7b-beta`)
+```python
+from transformers import pipeline as hf_pipeline
 
-For LLM approaches, we'll use [LangChain](https://python.langchain.com/docs/integrations/chat/huggingface/) for better prompting.
+from healthchain.io import Document
+from healthchain.models import Card, Source
+from healthchain.pipeline import Pipeline
 
-=== "Non-chat model"
-    ```python
-    from healthchain.pipeline import SummarizationPipeline
+summarizer = hf_pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
+pipeline = Pipeline()
 
-    pipeline = SummarizationPipeline.from_model_id(
-      "google/pegasus-xsum", source="huggingface", task="summarization"
-      )
-    ```
+@pipeline.add_node
+def summarize_to_card(doc: Document) -> Document:
+    if not doc.text:
+        return doc
 
+    summary = summarizer(doc.text)[0]["summary_text"]
 
-=== "Chat model"
-    ```python
-    from healthchain.pipeline import SummarizationPipeline
+    doc.cds.cards = [
+        Card(
+            summary=summary[:140],  # CDS Hooks caps summary at 140 chars
+            indicator="info",
+            source=Source(label="Discharge Note Summarizer"),
+            detail=summary,
+        )
+    ]
+    return doc
+```
 
-    from langchain_huggingface.llms import HuggingFaceEndpoint
-    from langchain_huggingface import ChatHuggingFace
-    from langchain_core.prompts import PromptTemplate
-    from langchain_core.output_parsers import StrOutputParser
+The model runs inside your node — HealthChain's job is the protocol on either side: the adapter parses FHIR out of the CDS Hooks request and formats your validated `Card` back into a spec-compliant response.
 
-    hf = HuggingFaceEndpoint(
-        repo_id="deepseek-ai/DeepSeek-R1-0528",
-        task="text-generation",
-        max_new_tokens=512,
-        do_sample=False,
-        repetition_penalty=1.03,
-    )
-
-    model = ChatHuggingFace(llm=hf)
-
-    template = """
-    You are a discharge planning assistant for hospital operations.
-    Provide a concise, objective summary focusing on actionable items
-    for care coordination, including appointments, medications, and
-    follow-up instructions. Format as bullet points.\n'''{text}'''
-    """
-    prompt = PromptTemplate.from_template(template)
-
-    chain = prompt | model | StrOutputParser()
-
-    pipeline = SummarizationPipeline.load(chain, source="langchain")
-    ```
-
-The `SummarizationPipeline` automatically:
-
-- Parses FHIR resources from CDS Hooks requests
-- Extracts clinical text from discharge documents
-- Formats outputs as CDS cards
+!!! tip "Prefer an LLM?"
+    The node body is yours — swap the transformer call for any LangChain chain or LLM client and build the same `Card` from its output. The [FHIR-Grounded Patient Q&A](./fhir_qa.md) cookbook shows the LLM-in-a-node pattern end to end.
 
 ## Add the CDS FHIR Adapter
 

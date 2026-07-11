@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 """
-Discharge Note Summarizer (Transformer)
-
-CDS Hooks service that summarises discharge notes using a fine-tuned
-HuggingFace transformer model (PEGASUS).
+Discharge Note Summarizer (Transformer) — a summarization pipeline served
+as a CDS Hooks service, using a HuggingFace transformer model directly.
 
 Requirements:
-    pip install healthchain transformers torch python-dotenv
-    # HUGGINGFACEHUB_API_TOKEN env var required
+    pip install "healthchain[examples,sandbox]" torch
     # Note: downloads ~1GB on first run (sshleifer/distilbart-cnn-12-6)
 
 Run:
@@ -17,38 +14,53 @@ Run:
     # `with app.sandbox(...)` with `app.run()` in the __main__ block.
 """
 
-import os
-import getpass
 from pathlib import Path
 
-from dotenv import load_dotenv
+from transformers import pipeline as hf_pipeline
 
 from healthchain.gateway import HealthChainAPI, CDSHooksService
-from healthchain.pipeline import SummarizationPipeline
-from healthchain.models import CDSRequest, CDSResponse
-
-load_dotenv()
+from healthchain.io import CdsFhirAdapter, Document
+from healthchain.models import Card, CDSRequest, CDSResponse, Source
+from healthchain.pipeline import Pipeline
 
 _DATA_DIR = Path(__file__).parent / "data"
 
 
-def create_pipeline() -> SummarizationPipeline:
-    if not os.getenv("HUGGINGFACEHUB_API_TOKEN"):
-        os.environ["HUGGINGFACEHUB_API_TOKEN"] = getpass.getpass(
-            "Enter your HuggingFace token: "
-        )
-    return SummarizationPipeline.from_model_id(
-        "sshleifer/distilbart-cnn-12-6", source="huggingface", task="summarization"
-    )
+def create_pipeline() -> Pipeline:
+    """One node: run the summarizer and build the CDS card inline."""
+    summarizer = hf_pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
+    pipeline = Pipeline()
+
+    @pipeline.add_node
+    def summarize_to_card(doc: Document) -> Document:
+        if not doc.text:
+            return doc
+
+        summary = summarizer(doc.text)[0]["summary_text"]
+
+        doc.cds.cards = [
+            Card(
+                summary=summary[:140],
+                indicator="info",
+                source=Source(label="Discharge Note Summarizer"),
+                detail=summary,
+            )
+        ]
+        return doc
+
+    return pipeline
 
 
 def create_app() -> HealthChainAPI:
     pipeline = create_pipeline()
+    adapter = CdsFhirAdapter()
     cds = CDSHooksService()
 
     @cds.hook("encounter-discharge", id="discharge-summarizer")
     def discharge_summarizer(request: CDSRequest) -> CDSResponse:
-        return pipeline.process_request(request)
+        doc = adapter.parse(request)
+        doc = pipeline(doc)
+        return adapter.format(doc)
 
     app = HealthChainAPI(
         title="Discharge Note Summarizer",

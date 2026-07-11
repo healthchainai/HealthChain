@@ -45,30 +45,6 @@ class LLMConfig(BaseModel):
             raise ValueError(f"provider must be one of: {', '.join(sorted(allowed))}")
         return v
 
-    def to_langchain(self):
-        """Instantiate the configured LangChain chat model."""
-        if self.provider == "anthropic":
-            from langchain_anthropic import ChatAnthropic
-
-            return ChatAnthropic(model=self.model, max_tokens=self.max_tokens)
-        elif self.provider == "openai":
-            from langchain_openai import ChatOpenAI
-
-            return ChatOpenAI(model=self.model, max_tokens=self.max_tokens)
-        elif self.provider == "google":
-            from langchain_google_genai import ChatGoogleGenerativeAI
-
-            return ChatGoogleGenerativeAI(
-                model=self.model, max_output_tokens=self.max_tokens
-            )
-        elif self.provider == "huggingface":
-            from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
-
-            llm = HuggingFaceEndpoint(
-                repo_id=self.model, max_new_tokens=self.max_tokens
-            )
-            return ChatHuggingFace(llm=llm)
-
 
 class ServiceConfig(BaseModel):
     type: str = "fhir-gateway"

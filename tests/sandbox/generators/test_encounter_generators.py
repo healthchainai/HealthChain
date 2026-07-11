@@ -27,9 +27,11 @@ def test_EncounterModel():
     assert encounter.id is not None
     assert encounter.status in (
         "planned",
+        "arrived",
+        "triaged",
         "in-progress",
-        "on-hold",
-        "discharged",
+        "onleave",
+        "finished",
         "cancelled",
     )
     assert encounter.subject.reference == "Patient/123"

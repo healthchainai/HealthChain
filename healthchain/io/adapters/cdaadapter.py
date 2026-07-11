@@ -92,14 +92,9 @@ class CdaAdapter(BaseAdapter[CdaRequest, CdaResponse]):
             attachment_title="Original CDA document in XML format",
         )
 
-        # Extract any DocumentReference resources for notes
+        # Extract clinical resources and any DocumentReference note text first,
+        # so the Document is constructed once with its final text
         note_text = ""
-        doc = Document(data=note_text)  # Create document with empty text initially
-
-        # Create FHIR Bundle and add documents
-        doc.fhir.bundle = create_bundle()
-        doc.fhir.add_document_reference(cda_document_reference)
-
         problem_list = []
         medication_list = []
         allergy_list = []
@@ -128,12 +123,15 @@ class CdaAdapter(BaseAdapter[CdaRequest, CdaResponse]):
                             f"No content found in DocumentReference: {resource.id}"
                         )
 
+        doc = Document(data=note_text)
+
+        # Create FHIR Bundle and add documents
+        doc.fhir.bundle = create_bundle()
+        doc.fhir.add_document_reference(cda_document_reference)
+
         doc.fhir.problem_list = problem_list
         doc.fhir.medication_list = medication_list
         doc.fhir.allergy_list = allergy_list
-
-        # Update document text
-        doc.data = note_text
 
         # Add the note document reference
         if self.note_document_reference is not None:

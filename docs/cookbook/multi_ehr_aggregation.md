@@ -11,7 +11,7 @@ Check out the full working example [here](https://github.com/healthchainai/Healt
 ## Setup
 
 ```bash
-pip install healthchain python-dotenv
+pip install healthchain
 ```
 
 We'll use Epic's public FHIR sandbox. If you haven't set up Epic sandbox access yet, see the [FHIR Sandbox Setup Guide](./setup_fhir_sandboxes.md#epic-on-fhir-sandbox) for detailed instructions.
@@ -169,7 +169,7 @@ Add processing nodes using decorators:
 from healthchain.pipeline import Pipeline
 from healthchain.io.containers import Document
 
-pipeline = Pipeline[Document]()
+pipeline = Pipeline()
 
 @pipeline.add_node
 def deduplicate(doc: Document) -> Document:
