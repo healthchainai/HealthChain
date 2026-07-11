@@ -48,7 +48,9 @@ class MedicationRequestGenerator(BaseGenerator):
         return MedicationRequest(
             resourceType="MedicationRequest",
             id=generator_registry.get("IdGenerator").generate(),
-            status=generator_registry.get("EventStatusGenerator").generate(),
+            # EventStatusGenerator emits event statuses ("in-progress") that are
+            # invalid for MedicationRequest, which has its own required binding
+            status=faker.random_element(elements=("active", "completed")),
             intent=generator_registry.get("IntentGenerator").generate(),
             medicationCodeableConcept=generator_registry.get(
                 "MedicationRequestContainedGenerator"

@@ -106,6 +106,9 @@ class CdsFhirAdapter(BaseAdapter[CDSRequest, CDSResponse]):
             except Exception as e:
                 log.warning(f"Error extracting text from DocumentReference: {e}")
 
+        # Keep text in sync (text is only derived from data at construction)
+        doc.text = doc.data
+
         return doc
 
     def format(self, document: Document) -> CDSResponse:

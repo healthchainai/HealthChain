@@ -190,10 +190,12 @@ from healthchain.pipeline import Pipeline
 config = AppConfig.load()
 gateway = FHIRGateway.from_config(config)
 
-# To enable LLM processing: add an llm: section to healthchain.yaml, then uncomment:
-# llm = config.llm.to_langchain() if config.llm else None
+# To enable LLM processing: add an llm: section to healthchain.yaml,
+# pip install langchain, then uncomment:
+# from langchain.chat_models import init_chat_model
+# llm = init_chat_model(f"{config.llm.provider}:{config.llm.model}") if config.llm else None
 
-pipeline = Pipeline[Document]()
+pipeline = Pipeline()
 
 
 @pipeline.add_node
@@ -283,7 +285,7 @@ site:
 
 {sources_block}
 
-# LLM provider — uncomment and set llm = config.llm.to_langchain() in app.py to enable
+# LLM provider — uncomment and wire up with LangChain's init_chat_model in app.py to enable
 # llm:
 #   provider: anthropic     # anthropic | openai | google | huggingface
 #   model: claude-opus-4-6

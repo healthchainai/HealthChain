@@ -132,8 +132,9 @@ class CdaAdapter(BaseAdapter[CdaRequest, CdaResponse]):
         doc.fhir.medication_list = medication_list
         doc.fhir.allergy_list = allergy_list
 
-        # Update document text
+        # Update document text (text is only derived from data at construction)
         doc.data = note_text
+        doc.text = note_text
 
         # Add the note document reference
         if self.note_document_reference is not None:
