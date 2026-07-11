@@ -2,30 +2,26 @@
 
 The HealthChain interoperability module uses a template system based on [**Liquid**](https://shopify.github.io/liquid/), an open-source templating language to generate healthcare data in various formats. This allows for flexible and customizable document generation on a syntactic level.
 
+The interop/CDA layer requires the `cda` extra: `pip install healthchain[cda]`.
+
 ## Template Directory Structure
 
 Templates are stored in the `configs/templates` directory by default. The directory structure follows a convention based on format and resource type:
 
 ```text
 templates/
-├── cda_fhir/
+├── fhir_cda/
 │   ├── document.liquid
 │   ├── section.liquid
 │   ├── problem_entry.liquid
 │   ├── medication_entry.liquid
-│   └── allergy_entry.liquid
+│   └── note_entry.liquid
 ├── cda_fhir/
 │   ├── condition.liquid
 │   ├── medication_statement.liquid
-│   └── allergy_intolerance.liquid
-├── hl7v2_fhir/
-│   ├── adt_a01.liquid
-│   ├── oru_r01.liquid
-│   └── obx_r01.liquid
-├── fhir_hl7v2/
-│   ├── patient_adt.liquid
-│   ├── encounter_adt.liquid
-│   └── observation_oru.liquid
+│   └── document_reference.liquid
+├── hl7v2_fhir/  # Coming soon
+└── fhir_hl7v2/  # Coming soon
 ```
 Templates can be accessed through the `TemplateRegistry`:
 
@@ -39,8 +35,6 @@ Using full paths is recommended for clarity and to avoid confusion when template
 HealthChain provides default templates for the transformation of Problems, Medications, and Notes sections in a Continuity of Care (CCD) CDA to FHIR and the reverse. They are configured to work out of the box with the default configuration and the example CDAs [here](https://github.com/healthchainai/HealthChain/tree/main/resources).
 
 You are welcome to modify these templates at your own discretion or use them as a starting reference point for your writing your own templates. **Always verify that templates work for your use case.**
-
-**Note:** Some templates are experimental and not included in the default configs. See [Experimental Templates](experimental.md) for details on templates under development.
 
 | CDA Section | FHIR Resource |
 |-------------|---------------|
@@ -191,14 +185,12 @@ The template system provides several custom filters for common healthcare docume
 |--------|-------------|
 | `map_system` | Maps between CDA and FHIR code systems |
 | `map_status` | Maps between CDA and FHIR status codes |
-| `map_severity` | Maps between CDA and FHIR severity codes |
 | `format_date` | Formats a date in the correct format for the output document |
 | `format_timestamp` | Formats a timestamp or uses current time |
 | `generate_id` | Generates an ID or uses provided value |
 | `to_json` | Converts object to JSON string |
 | `extract_effective_period` | Extracts effective period data from CDA effectiveTime elements |
 | `extract_effective_timing` | Extracts timing data from effectiveTime elements |
-| `extract_clinical_status` | Extracts clinical status from an observation |
 | `clean_empty` | Recursively removes empty values from dictionaries and lists |
 | `to_base64` | Encodes text to base64 |
 | `from_base64` | Decodes base64 to text |

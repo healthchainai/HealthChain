@@ -9,7 +9,6 @@ The mappings are organized by the formats they translate between:
 - `cda_default/` - Default mappings for CDA format
   - `systems.yaml` - Code system mappings (SNOMED CT, LOINC, etc.)
   - `status_codes.yaml` - Status code mappings (active, inactive, resolved)
-  - `severity_codes.yaml` - Severity code mappings (mild, moderate, severe)
 
 
 ## Configuration

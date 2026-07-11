@@ -100,6 +100,11 @@ class CDAParser(BaseParser):
             log.warning("No sections found in configuration")
             return section_entries
 
+        # Warn (never silently drop) about any sections present in the document
+        # that don't match a configured section, e.g. an allergies section when
+        # only problems/medications/notes are configured
+        self._warn_unconfigured_sections(sections)
+
         # Process each section from the configuration
         for section_key in sections.keys():
             try:
@@ -212,6 +217,67 @@ class CDAParser(BaseParser):
         except Exception as e:
             log.error(f"Error parsing section {section_key}: {str(e)}")
             return entries_dicts
+
+    def _warn_unconfigured_sections(self, sections_config: Dict) -> None:
+        """Log a warning for each CDA section in the document with no matching
+        section configuration, so unconfigured content (e.g. an allergies
+        section when only problems/medications/notes are configured) is
+        surfaced rather than silently skipped.
+
+        Args:
+            sections_config: Mapping of configured section keys to their
+                configuration, as returned by
+                InteropConfigManager.get_cda_section_configs()
+        """
+        if not self.clinical_document:
+            return
+
+        try:
+            components = self.clinical_document.component.structuredBody.component
+        except AttributeError:
+            return
+
+        if not isinstance(components, list):
+            components = [components]
+
+        # Collect (template_id, code) identifiers for all configured sections once
+        configured_identifiers = [
+            (
+                section_config.get("identifiers", {}).get("template_id")
+                if isinstance(section_config, dict)
+                else None,
+                section_config.get("identifiers", {}).get("code")
+                if isinstance(section_config, dict)
+                else None,
+            )
+            for section_config in sections_config.values()
+        ]
+
+        for component in components:
+            section = component.section
+
+            matched = any(
+                (
+                    template_id
+                    and self._find_section_by_template_id(section, template_id)
+                )
+                or (code and self._find_section_by_code(section, code))
+                for template_id, code in configured_identifiers
+            )
+
+            if matched:
+                continue
+
+            section_code = section.code.code if section.code else None
+            section_display = section.code.displayName if section.code else None
+
+            log.warning(
+                "Skipping CDA section not configured for conversion: "
+                f"title={section.title!r}, code={section_code!r}, "
+                f"display={section_display!r}. This section will not be "
+                "converted to FHIR. Configure it under "
+                "cda.sections.<key>.identifiers to include it."
+            )
 
     def _find_section_by_template_id(self, section: Section, template_id: str) -> bool:
         """Returns True if section has matching template ID"""

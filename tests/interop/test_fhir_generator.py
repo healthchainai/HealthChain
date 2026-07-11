@@ -12,14 +12,10 @@ def mock_config_manager():
     config.get_config_value.side_effect = lambda key, default=None: {
         "cda.sections.problems.resource": "Condition",
         "cda.sections.medications.resource": "MedicationStatement",
-        "cda.sections.allergies.resource": "AllergyIntolerance",
         "defaults.common.id_prefix": "test-",
         "defaults.common.subject": {"reference": "Patient/123"},
         "defaults.resources.Condition.clinicalStatus": {"coding": [{"code": "active"}]},
         "defaults.resources.MedicationStatement.status": "active",
-        "defaults.resources.AllergyIntolerance.clinicalStatus": {
-            "coding": [{"code": "active"}]
-        },
     }.get(key, default)
 
     config.get_cda_section_configs.return_value = {
@@ -250,23 +246,6 @@ def test_add_required_fields_medication_statement(fhir_generator):
     assert result["subject"] == {"reference": "Patient/123"}
     assert "status" in result
     assert result["status"] == "active"
-
-
-def test_add_required_fields_allergy_intolerance(fhir_generator):
-    """Test adding required fields to an AllergyIntolerance resource."""
-    # Prepare minimal resource
-    resource_dict = {"resourceType": "AllergyIntolerance"}
-
-    # Call the method
-    result = fhir_generator._add_required_fields(resource_dict, "AllergyIntolerance")
-
-    # Verify fields were added
-    assert "id" in result
-    assert result["id"].startswith("test-")
-    assert "patient" in result
-    assert result["patient"] == {"reference": "Patient/123"}
-    assert "clinicalStatus" in result
-    assert result["clinicalStatus"] == {"coding": [{"code": "active"}]}
 
 
 def test_add_required_fields_with_existing_values(fhir_generator):

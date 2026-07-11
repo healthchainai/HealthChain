@@ -8,7 +8,6 @@ Request constructors for different clinical integration protocols.
 import logging
 import base64
 import pkgutil
-import xmltodict
 
 from typing import Any, Dict, Optional
 
@@ -123,6 +122,13 @@ class ClinDocRequestConstructor(BaseRequestConstructor):
         self.soap_envelope: Dict = self._load_soap_envelope()
 
     def _load_soap_envelope(self):
+        try:
+            import xmltodict
+        except (ImportError, ModuleNotFoundError) as e:
+            raise ImportError(
+                "CDA support requires the cda extra. Install it with: "
+                "pip install healthchain[cda]"
+            ) from e
         data = pkgutil.get_data("healthchain", "templates/soap_envelope.xml")
         return xmltodict.parse(data.decode("utf-8"))
 

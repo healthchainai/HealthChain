@@ -78,41 +78,6 @@ def map_status(
     return status
 
 
-def map_severity(
-    severity_code: str, mappings: Dict = None, direction: str = "cda_to_fhir"
-) -> Optional[str]:
-    """Maps between CDA and FHIR severity codes
-
-    Args:
-        severity_code: The severity code to map
-        mappings: Mappings dictionary (if None, returns severity code unchanged)
-        direction: Direction of mapping ('fhir_to_cda' or 'cda_to_fhir')
-
-    Returns:
-        Mapped severity code or original if no mapping found
-    """
-    if not severity_code:
-        return None
-
-    if not mappings:
-        return severity_code
-
-    # Get the severity codes mapping from the cda_fhir subfolder
-    severity_codes = mappings.get("severity_codes", {})
-
-    if direction == "fhir_to_cda":
-        # For FHIR to CDA, get the value directly
-        if severity_code in severity_codes:
-            return severity_codes[severity_code].get("code", severity_code)
-    else:
-        # For CDA to FHIR, find FHIR code by CDA value
-        for fhir_code, info in severity_codes.items():
-            if info.get("code") == severity_code:
-                return fhir_code
-
-    return severity_code
-
-
 # TODO: Make this date formatter more complete
 def format_date(
     date_str: str, input_format: str = "%Y%m%d", output_format: str = "iso"
@@ -283,124 +248,6 @@ def clean_empty(d: Any) -> Any:
     return d
 
 
-def _ensure_list(value: Any) -> List:
-    """Convert a value to a list if it isn't already one"""
-    if not isinstance(value, list):
-        return [value]
-    return value
-
-
-def _get_template_ids(section: Dict) -> List[Dict]:
-    """Get template IDs from a section, ensuring they are in list form"""
-    if not section.get("templateId"):
-        return []
-    return _ensure_list(section["templateId"])
-
-
-def _get_entry_relationships(observation: Dict) -> List[Dict]:
-    """Get entry relationships from an observation, ensuring they are in list form"""
-    relationships = observation.get("entryRelationship")
-    if not relationships:
-        return []
-    return _ensure_list(relationships)
-
-
-def extract_clinical_status(observation: Dict, config: Dict) -> Optional[str]:
-    """Extract clinical status from a CDA allergy entry.
-    Not sure how to do this in liquid, so doing it here for now.
-
-    Args:
-        observation: CDA observation containing allergy information
-        config: Config dictionary
-
-    Returns:
-        Clinical status code or None if not found
-    """
-    if not observation or not isinstance(observation, dict):
-        return None
-
-    # Look for clinical status in entry relationships
-    for rel in _get_entry_relationships(observation):
-        if not rel.get("observation", {}).get("templateId"):
-            continue
-
-        # Check each template ID
-        for template in _get_template_ids(rel["observation"]):
-            if template.get("@root") == config.get("template", {}).get(
-                "clinical_status_obs", {}
-            ).get("template_id"):
-                if rel.get("observation", {}).get("value", {}).get("@code"):
-                    return rel["observation"]["value"]["@code"]
-
-    return None
-
-
-def extract_reactions(observation: Dict, config: Dict) -> List[Dict]:
-    """Extract reaction information from a CDA allergy entry
-
-    Args:
-        observation: CDA observation containing allergy information
-        config: Config dictionary
-
-    Returns:
-        List of reaction dictionaries, each with system, code, display, and severity
-    """
-    if not observation or not isinstance(observation, dict):
-        return []
-
-    reactions = []
-
-    # Process each entry relationship
-    for rel in _get_entry_relationships(observation):
-        if not rel.get("observation", {}).get("templateId"):
-            continue
-
-        # Look for reaction template ID
-        for template in _get_template_ids(rel["observation"]):
-            if template.get("@root") == config.get("identifiers", {}).get(
-                "reaction", {}
-            ).get("template_id"):
-                # Found a reaction observation
-                reaction = {}
-
-                # Extract manifestation
-                if rel.get("observation", {}).get("value"):
-                    value = rel["observation"]["value"]
-                    reaction = {
-                        "system": value.get("@codeSystem"),
-                        "code": value.get("@code"),
-                        "display": value.get("@displayName"),
-                        "severity": None,
-                    }
-
-                    # Check for severity in nested entry relationship
-                    for sev in _get_entry_relationships(rel["observation"]):
-                        # Ensure observation and templateId exist
-                        if not sev.get("observation", {}).get("templateId"):
-                            continue
-
-                        # Look for severity template ID
-                        for sev_template in _get_template_ids(sev["observation"]):
-                            if sev_template.get("@root") == config.get(
-                                "identifiers", {}
-                            ).get("severity", {}).get("template_id"):
-                                if (
-                                    sev.get("observation", {})
-                                    .get("value", {})
-                                    .get("@code")
-                                ):
-                                    reaction["severity"] = sev["observation"]["value"][
-                                        "@code"
-                                    ]
-                                    break
-
-                if "system" in reaction and "code" in reaction:
-                    reactions.append(reaction)
-                break
-
-    return reactions
-
-
 def to_base64(text: str) -> str:
     """Encodes text to base64
 
@@ -541,15 +388,6 @@ def create_default_filters(mappings, id_prefix) -> Dict[str, Callable]:
     def extract_effective_timing_filter(effective_times):
         return extract_effective_timing(effective_times)
 
-    def extract_clinical_status_filter(entry, config):
-        return extract_clinical_status(entry, config)
-
-    def extract_reactions_filter(observation, config):
-        return extract_reactions(observation, config)
-
-    def map_severity_filter(severity_code, direction="cda_to_fhir"):
-        return map_severity(severity_code, mappings, direction)
-
     # Return dictionary of filters
     return {
         "map_system": map_system_filter,
@@ -561,9 +399,6 @@ def create_default_filters(mappings, id_prefix) -> Dict[str, Callable]:
         "clean_empty": clean_empty_filter,
         "extract_effective_period": extract_effective_period_filter,
         "extract_effective_timing": extract_effective_timing_filter,
-        "extract_clinical_status": extract_clinical_status_filter,
-        "extract_reactions": extract_reactions_filter,
-        "map_severity": map_severity_filter,
         "to_base64": to_base64,
         "from_base64": from_base64,
         "xmldict_to_html": xmldict_to_html,

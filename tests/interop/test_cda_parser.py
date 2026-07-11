@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 from unittest.mock import Mock
 
@@ -163,6 +165,27 @@ def test_no_section_found(cda_parser, sample_cda_document, mock_config):
 
     # Verify no sections were found
     assert sections == {}
+
+
+def test_warns_on_unconfigured_section(cda_parser, sample_cda_document, caplog):
+    """Test that a CDA section with no matching configuration (e.g. allergies,
+    which is not one of the shipped problems/medications/notes sections) logs a
+    warning rather than being silently dropped, while configured sections still
+    convert successfully."""
+    with caplog.at_level(logging.WARNING, logger="healthchain.interop.parsers.cda"):
+        sections = cda_parser.parse_document(sample_cda_document)
+
+    # Configured sections are still parsed
+    assert "problems" in sections
+    assert len(sections["problems"]) > 0
+
+    # The unconfigured allergies section triggers a warning naming it, not a silent drop
+    warning_messages = [record.message for record in caplog.records]
+    assert any(
+        "not configured" in message.lower() or "skipping" in message.lower()
+        for message in warning_messages
+    )
+    assert any("48765-2" in message for message in warning_messages)
 
 
 def test_section_defined_but_not_found(cda_parser, sample_cda_document, mock_config):

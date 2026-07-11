@@ -6,7 +6,6 @@ This directory contains default mapping configurations used to translate between
 
 - `systems.yaml` - Code system mappings between FHIR URLs and CDA OIDs
 - `status_codes.yaml` - Status code mappings (FHIR status codes to CDA status codes)
-- `severity_codes.yaml` - Severity code mappings (FHIR severity codes to CDA severity codes)
 
 ## Structure
 
@@ -32,17 +31,6 @@ Each mapping file uses a flat structure designed for clarity and simplicity, con
 "resolved":
   code: "413322009"
   display: "Resolved"
-```
-
-### severity_codes.yaml
-```yaml
-"severe":
-  code: "H"
-  display: "Severe"
-
-"moderate":
-  code: "M"
-  display: "Moderate"
 ```
 
 ## Usage

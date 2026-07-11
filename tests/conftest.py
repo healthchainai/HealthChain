@@ -673,49 +673,6 @@ def config_fixtures():
             },
         }
 
-        # Allergies section - needs to comply with AllergySectionTemplateConfig
-        allergies_file = sections_dir / "allergies.yaml"
-        allergies_content = {
-            "resource": "AllergyIntolerance",
-            "resource_template": "cda_fhir/allergy",
-            "entry_template": "cda_fhir/allergy_entry",
-            "identifiers": {
-                "template_id": "2.16.840.1.113883.10.20.1.2",
-                "code": "48765-2",
-                "code_system": "2.16.840.1.113883.6.1",
-                "code_system_name": "LOINC",
-                "display": "Allergies",
-            },
-            "template": {
-                "act": {
-                    "template_id": ["2.16.840.1.113883.10.20.1.27"],
-                    "status_code": "completed",
-                },
-                "allergy_obs": {
-                    "template_id": ["2.16.840.1.113883.10.20.1.18"],
-                    "code": "416098002",
-                    "code_system": "2.16.840.1.113883.6.96",
-                    "status_code": "completed",
-                },
-                "reaction_obs": {
-                    "template_id": ["2.16.840.1.113883.10.20.1.54"],
-                    "code": "59037007",
-                    "code_system": "2.16.840.1.113883.6.96",
-                },
-                "severity_obs": {
-                    "template_id": ["2.16.840.1.113883.10.20.1.55"],
-                    "code": "39579001",
-                    "code_system": "2.16.840.1.113883.6.96",
-                },
-                "clinical_status_obs": {
-                    "template_id": "2.16.840.1.113883.10.20.1.39",
-                    "code": "33999-4",
-                    "code_system": "2.16.840.1.113883.6.1",
-                    "status_code": "completed",
-                },
-            },
-        }
-
         # Create document directory and file
         document_dir = cda_dir / "document"
         document_dir.mkdir()
@@ -773,9 +730,6 @@ def config_fixtures():
 
         with open(medications_file, "w") as f:
             yaml.dump(medications_content, f)
-
-        with open(allergies_file, "w") as f:
-            yaml.dump(allergies_content, f)
 
         with open(ccd_file, "w") as f:
             yaml.dump(ccd_content, f)

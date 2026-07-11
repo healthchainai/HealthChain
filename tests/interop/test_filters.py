@@ -3,7 +3,6 @@ import pytest
 from healthchain.interop.filters import (
     map_system,
     map_status,
-    map_severity,
     format_date,
     generate_id,
     clean_empty,
@@ -28,11 +27,6 @@ def test_mappings():
         "status_codes": {
             "active": {"code": "completed", "display": "Active"},
             "inactive": {"code": "cancelled", "display": "Inactive"},
-        },
-        "severity_codes": {
-            "high": {"code": "H", "display": "High"},
-            "moderate": {"code": "M", "display": "Moderate"},
-            "low": {"code": "L", "display": "Low"},
         },
     }
 
@@ -66,17 +60,6 @@ def test_map_status(test_mappings):
 
     # Test unknown status (should return original)
     assert map_status("unknown", test_mappings) == "unknown"
-
-
-def test_map_severity(test_mappings):
-    # Test CDA to FHIR mapping
-    assert map_severity("H", test_mappings) == "high"
-
-    # Test FHIR to CDA mapping
-    assert map_severity("high", test_mappings, "fhir_to_cda") == "H"
-
-    # Test unknown severity (should return original)
-    assert map_severity("unknown", test_mappings) == "unknown"
 
 
 def test_format_date():

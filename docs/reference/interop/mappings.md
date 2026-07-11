@@ -2,6 +2,8 @@
 
 Mapping tables are used to translate between different healthcare terminology systems, code sets, and formats. These mappings are essential for semantic interoperability between CDA, HL7v2, and FHIR formats where the same concept may be represented differently.
 
+The interop/CDA layer requires the `cda` extra: `pip install healthchain[cda]`.
+
 ## Mapping Types
 
 The system supports several types of mappings:
@@ -10,7 +12,6 @@ The system supports several types of mappings:
 |--------------|-------------|---------|
 | **Code Systems** | Maps between URI-based systems (FHIR) and OID-based systems (CDA) | SNOMED CT: `http://snomed.info/sct` ↔ `2.16.840.1.113883.6.96` |
 | **Status Codes** | Maps status codes between formats | `active` ↔ `55561003` |
-| **Severity Codes** | Maps severity designations between formats | `moderate` ↔ `6736007` |
 
 ## Mapping Directory Structure
 
@@ -18,10 +19,9 @@ Mappings are stored in YAML files in the `configs/mappings/` directory, organize
 
 ```text
 configs/mappings/
-├── cda_fhir/
+├── cda_default/
 │   ├── systems.yaml
-│   ├── status_codes.yaml
-│   └── severity_codes.yaml
+│   └── status_codes.yaml
 ├── hl7v2_fhir/
 │   └── ...
 └── README.md
@@ -69,26 +69,6 @@ The `status_codes.yaml` file maps between different formats' status codes:
   display: "Resolved"
 ```
 
-### Severity Codes Mapping
-
-The `severity_codes.yaml` file maps severity designations between formats:
-
-```yaml
-# mappings/cda_fhir/severity_codes.yaml
-# Allergy and reaction severity codes (CDA to FHIR)
-"255604002":  # Mild (SNOMED CT)
-  code: "mild"
-  display: "Mild"
-
-"6736007":  # Moderate (SNOMED CT)
-  code: "moderate"
-  display: "Moderate"
-
-"24484000":  # Severe (SNOMED CT)
-  code: "severe"
-  display: "Severe"
-```
-
 ## Using Mappings
 
 The `InteropEngine` automatically loads and applies mappings during the conversion process. You can also access mappings directly through the configuration manager:
@@ -116,7 +96,6 @@ The mapping system provides several Liquid template filters to help with code tr
 |--------|-------------|---------------|
 | `map_system` | Maps between CDA and FHIR code systems | `{{ "http://snomed.info/sct" | map_system: 'fhir_to_cda' }}` |
 | `map_status` | Maps between CDA and FHIR status codes | `{{ "active" | map_status: 'fhir_to_cda' }}` |
-| `map_severity` | Maps between CDA and FHIR severity codes | `{{ "moderate" | map_severity: 'fhir_to_cda' }}` |
 
 Example in a template:
 
