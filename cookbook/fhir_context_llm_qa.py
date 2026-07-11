@@ -6,7 +6,7 @@ Pulls patient data from a FHIR store, formats it as context, and serves
 a Q&A endpoint powered by any LangChain-compatible LLM.
 
 Requirements:
-    pip install healthchain langchain-core langchain-anthropic python-dotenv
+    pip install healthchain langchain-core langchain-anthropic
 
 Setup:
     1. Add to .env:

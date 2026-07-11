@@ -6,7 +6,7 @@ Demonstrates aggregating patient data from multiple FHIR sources with
 simple pipeline processing and provenance tracking.
 
 Requirements:
-- pip install healthchain python-dotenv
+- pip install healthchain
 
 FHIR Sources:
 - Epic Sandbox: Set EPIC_* environment variables
@@ -21,8 +21,6 @@ Run:
 
 from typing import List
 
-from dotenv import load_dotenv
-
 from healthchain.fhir.r4b import Bundle, Condition, Annotation
 
 from healthchain.gateway import FHIRGateway, HealthChainAPI
@@ -30,9 +28,6 @@ from healthchain.gateway.clients import FHIRAuthConfig
 from healthchain.pipeline import Pipeline
 from healthchain.io.containers import Document
 from healthchain.fhir import merge_bundles
-
-
-load_dotenv()
 
 
 # Epic FHIR Sandbox - configure via environment, then build connection string

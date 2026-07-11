@@ -21,7 +21,7 @@ A clinical note arrives from NoteReader as CDA XML → gets parsed and processed
 We'll use [scispacy](https://allenai.github.io/scispacy/)'s `en_core_sci_sm` model for medical entity extraction. Install everything in one command so pip resolves a compatible set:
 
 ```bash
-pip install "healthchain[cda,examples]" "spacy>=3.7,<3.8" python-dotenv \
+pip install "healthchain[cda,examples]" "spacy>=3.7,<3.8" \
     https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_sm-0.5.4.tar.gz
 ```
 
@@ -143,11 +143,8 @@ Use `.add_source` to register a FHIR endpoint you want to connect to with its co
 ```python
 from healthchain.gateway import FHIRGateway
 from healthchain.gateway.clients import FHIRAuthConfig
-from dotenv import load_dotenv
 
-load_dotenv()
-
-# Load configuration from environment variables
+# Load configuration from environment variables (.env is read automatically)
 config = FHIRAuthConfig.from_env("MEDPLUM")
 MEDPLUM_URL = config.to_connection_string()
 

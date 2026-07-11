@@ -227,11 +227,8 @@ MEDPLUM_SCOPE=openid
 ```python
 from healthchain.gateway import FHIRGateway
 from healthchain.gateway.clients import FHIRAuthConfig
-from dotenv import load_dotenv
 
-load_dotenv()
-
-# Load configuration from environment variables
+# Load configuration from environment variables (.env is read automatically)
 config = FHIRAuthConfig.from_env("MEDPLUM")
 MEDPLUM_URL = config.to_connection_string()
 

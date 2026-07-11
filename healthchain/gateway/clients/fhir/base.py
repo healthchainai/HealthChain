@@ -137,6 +137,15 @@ class FHIRAuthConfig(BaseModel):
         """
         import os
 
+        # Load .env into the environment first, so credentials files work
+        # without an explicit load_dotenv() call (mirrors AppConfig.load)
+        try:
+            from dotenv import load_dotenv
+
+            load_dotenv()
+        except ImportError:
+            pass
+
         # Read required environment variables
         client_id = os.getenv(f"{env_prefix}_CLIENT_ID")
         client_secret = os.getenv(f"{env_prefix}_CLIENT_SECRET")

@@ -111,8 +111,8 @@ def test_parse(
     # 7. Verify document reference content was read
     mock_read_content.assert_called_once_with(note_doc_ref)
 
-    # 8. Verify document data was set to the extracted text
-    assert mock_doc.data == "Extracted note text"
+    # 8. Verify the document was constructed with the extracted text
+    mock_document_class.assert_called_once_with(data="Extracted note text")
 
     # 9. Verify that the document was returned
     assert result is mock_doc

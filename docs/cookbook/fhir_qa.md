@@ -11,10 +11,10 @@ Check out the full working example [here](https://github.com/healthchainai/Healt
 ## Setup
 
 ```bash
-pip install healthchain langchain-core langchain-anthropic python-dotenv
+pip install healthchain langchain-core langchain-anthropic
 
 # or for HuggingFace models
-pip install healthchain langchain-core langchain-huggingface python-dotenv
+pip install healthchain langchain-core langchain-huggingface
 ```
 
 We'll use [Medplum](https://www.medplum.com/) as our FHIR sandbox — it lets you seed your own synthetic patients and query them over a standard FHIR R4 API. If you haven't set up Medplum access yet, see the [FHIR Sandbox Setup Guide](./setup_fhir_sandboxes.md#medplum) for step-by-step instructions.

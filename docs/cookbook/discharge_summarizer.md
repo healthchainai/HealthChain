@@ -13,7 +13,7 @@ Check out the full working example [here](https://github.com/healthchainai/Healt
 ### Install Dependencies
 
 ```bash
-pip install "healthchain[examples,sandbox]" torch python-dotenv
+pip install "healthchain[examples,sandbox]" torch
 ```
 
 The `[examples]` extra provides `transformers`, and `[sandbox]` provides the test data generator used to fire sample requests. The model runs locally — no API tokens or accounts needed.

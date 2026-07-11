@@ -4,7 +4,7 @@ Discharge Note Summarizer (Transformer) — a summarization pipeline served
 as a CDS Hooks service, using a HuggingFace transformer model directly.
 
 Requirements:
-    pip install "healthchain[examples,sandbox]" torch python-dotenv
+    pip install "healthchain[examples,sandbox]" torch
     # Note: downloads ~1GB on first run (sshleifer/distilbart-cnn-12-6)
 
 Run:
@@ -16,15 +16,12 @@ Run:
 
 from pathlib import Path
 
-from dotenv import load_dotenv
 from transformers import pipeline as hf_pipeline
 
 from healthchain.gateway import HealthChainAPI, CDSHooksService
 from healthchain.io import CdsFhirAdapter, Document
 from healthchain.models import Card, CDSRequest, CDSResponse, Source
 from healthchain.pipeline import Pipeline
-
-load_dotenv()
 
 _DATA_DIR = Path(__file__).parent / "data"
 

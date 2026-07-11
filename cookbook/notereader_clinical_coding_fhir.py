@@ -5,7 +5,7 @@ and write extracted conditions as validated FHIR.
 Demonstrates bring-your-own-NLP pipelines, legacy CDA integration, and FHIR write-back.
 
 Requirements:
-    pip install "healthchain[cda,examples]" "spacy>=3.7,<3.8" python-dotenv \
+    pip install "healthchain[cda,examples]" "spacy>=3.7,<3.8" \
         https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_sm-0.5.4.tar.gz
     # The en_core_sci_sm 0.5.4 model needs spaCy <3.8 to load; install in one
     # command so pip resolves a compatible set.
@@ -21,7 +21,6 @@ import logging
 from pathlib import Path
 
 import spacy
-from dotenv import load_dotenv
 
 from healthchain.fhir import add_provenance_metadata
 from healthchain.gateway.api import HealthChainAPI
@@ -35,8 +34,6 @@ from healthchain.pipeline import Pipeline
 
 # Suppress Spyne warnings
 logging.getLogger("spyne.model.complex").setLevel(logging.ERROR)
-
-load_dotenv()
 
 _DATA_DIR = Path(__file__).parent / "data"
 

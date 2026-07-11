@@ -449,6 +449,9 @@ def test_to_connection_string_roundtrip():
 
 def test_from_env_missing_vars_raises(monkeypatch):
     """from_env raises when required env vars are missing."""
+    # from_env auto-loads .env; neutralize it so the developer's local
+    # .env can't re-populate the deleted variables
+    monkeypatch.setattr("dotenv.load_dotenv", lambda *args, **kwargs: None)
     for key in ["EPIC_CLIENT_ID", "EPIC_TOKEN_URL", "EPIC_BASE_URL"]:
         monkeypatch.delenv(key, raising=False)
     with pytest.raises(ValueError, match="Missing required environment variables"):
