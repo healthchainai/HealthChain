@@ -1,4 +1,3 @@
-from collections import deque
 from typing import Dict, Optional
 
 
@@ -11,22 +10,6 @@ def search_key(dictionary: Dict, key: str) -> Optional[str]:
             result = search_key(v, key)
             if result is not None:
                 return result
-
-    return None
-
-
-def search_key_breadth_first(dictionary: Dict, key: str) -> Optional[str]:
-    queue = deque([dictionary])
-
-    while queue:
-        current_dict = queue.popleft()
-
-        if key in current_dict:
-            return current_dict[key]
-
-        for k, v in current_dict.items():
-            if isinstance(v, dict):
-                queue.append(v)
 
     return None
 

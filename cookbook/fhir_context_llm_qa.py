@@ -149,6 +149,6 @@ def create_app(llm: BaseChatModel) -> HealthChainAPI:
 
 
 if __name__ == "__main__":
-    llm = ChatAnthropic(model="claude-opus-4-6", max_tokens=512)
+    llm = ChatAnthropic(model="claude-opus-4-8", max_tokens=512)
     app = create_app(llm)
     app.run(port=8888)
