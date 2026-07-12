@@ -23,7 +23,7 @@ Each mapping file uses a flat structure designed for clarity and simplicity. See
 
 To add mappings for new format combinations:
 
-1. Create a new subdirectory (e.g., `hl7v2/` for HL7v2 mappings, or `cda_local/` for local CDA mappings)
+1. Create a new subdirectory (e.g., `cda_local/` for local CDA mappings)
 2. Add yaml files for each mapping type needed
 3. Update the mapping directory in your configuration to use the new mappings
 

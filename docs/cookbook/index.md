@@ -1,6 +1,6 @@
 # Cookbook
 
-Hands-on, production-ready examples for building healthcare AI applications with HealthChain.
+Hands-on, runnable recipes for building healthcare AI applications with HealthChain.
 
 !!! tip "Getting started"
     Cookbooks are runnable scripts in the HealthChain repository. Clone the repo to get started:
@@ -158,7 +158,7 @@ healthchain serve
 gateway = FHIRGateway()
 gateway.add_source("medplum", FHIRAuthConfig.from_env("MEDPLUM").to_connection_string())
 
-llm = ChatAnthropic(model="claude-opus-4-6", max_tokens=512)
+llm = ChatAnthropic(model="claude-opus-4-8", max_tokens=512)
 
 app = HealthChainAPI(title="My App", service_type="fhir-gateway")
 app.run(port=8000)
@@ -176,7 +176,7 @@ sources:
 
 llm:
   provider: anthropic
-  model: claude-opus-4-6
+  model: claude-opus-4-8
   max_tokens: 512
 ```
 

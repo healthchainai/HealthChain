@@ -1,6 +1,6 @@
 # Generators
 
-Generators in the interoperability module are responsible for producing healthcare data in various formats from FHIR resources. The module includes built-in generators for common formats including CDA, HL7v2, and FHIR.
+Generators in the interoperability module are responsible for producing healthcare data in various formats from FHIR resources. The module includes built-in generators for CDA and FHIR.
 
 The interop/CDA layer requires the `cda` extra: `pip install healthchain[cda]`.
 
@@ -12,7 +12,6 @@ The generators are largely configuration-driven, with rendering done using Liqui
 |-----------|-------------|
 | `CDAGenerator` | Generates CDA XML documents from FHIR resources |
 | `FHIRGenerator` | Generates FHIR JSON/XML from FHIR resources |
-<!-- | `HL7v2Generator` | Generates HL7v2 messages from FHIR resources | -->
 
 
 ## CDA Generator
@@ -187,11 +186,6 @@ fhir_resources = fhir_generator.transform(cda_section_entries, src_format=Format
     }
     ```
 
-
-
-<!-- ## HL7v2 Generator
-
-The HL7v2 Generator produces HL7 version 2 messages from FHIR resources (Coming soon!) -->
 
 
 ## Creating a Custom Generator

@@ -91,6 +91,7 @@ docs = [
     "mkdocstrings>=0.26.0,<0.27",
     "mkdocstrings-python>=1.11.1,<2",
     "griffe<1.15",
+    "mkdocs-llmstxt>=0.5.0",
 ]
 
 [tool.uv]

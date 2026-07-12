@@ -176,3 +176,7 @@ local/
 
 # Personal AI context (keep local)
 CLAUDE.LOCAL.MD
+
+# Local working material (brand sources, scaffold smoke-test output)
+brand-kit/
+my-app/

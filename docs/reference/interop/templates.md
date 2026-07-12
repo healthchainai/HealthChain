@@ -16,12 +16,10 @@ templates/
 │   ├── problem_entry.liquid
 │   ├── medication_entry.liquid
 │   └── note_entry.liquid
-├── cda_fhir/
-│   ├── condition.liquid
-│   ├── medication_statement.liquid
-│   └── document_reference.liquid
-├── hl7v2_fhir/  # Coming soon
-└── fhir_hl7v2/  # Coming soon
+└── cda_fhir/
+    ├── condition.liquid
+    ├── medication_statement.liquid
+    └── document_reference.liquid
 ```
 Templates can be accessed through the `TemplateRegistry`:
 

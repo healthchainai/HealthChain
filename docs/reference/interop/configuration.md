@@ -49,7 +49,7 @@ This gives you editable copies of:
 | `InteropConfigManager` | Manages access to configuration files and values |
 | `defaults.yaml` | Default configuration values for FHIR required fields |
 | `environments/` | Environment-specific configuration values |
-| `interop/` | Configuration for format specific settings (e.g. CDA, HL7v2) |
+| `interop/` | Configuration for format specific settings (e.g. CDA) |
 | `mappings/` | Mapping tables for codes, identifiers, and terminology systems |
 | `templates/` | Templates for generating healthcare documents |
 

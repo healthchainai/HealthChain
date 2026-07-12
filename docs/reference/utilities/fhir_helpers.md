@@ -1,6 +1,12 @@
 # FHIR Utilities
 
-The `fhir` module provides a set of helper functions to make it easier for you to work with FHIR resources.
+The `fhir` module makes FHIR resources easy to create, read, and validate. The underlying [`fhir.resources`](https://github.com/nazrulworld/fhir.resources) Pydantic models already enforce structure — required fields, types, unknown fields. The helpers add the three things structure alone can't give you:
+
+- **Flat constructors** — `create_condition("Patient/123", code="38341003", display="Hypertension")` instead of hand-building nested `Reference` → `CodeableConcept` → `Coding` structures. Scalars in, the right terminology systems in the right places out. Flat signatures are also what make these functions servable as [agent tools](tools.md): a model can fill them reliably where it can't reliably emit deep nested FHIR JSON.
+- **No invented facts** — helpers never add clinical claims you didn't pass: no auto-generated timestamps, no guessed statuses. What enters the record is exactly what your code or model produced.
+- **Semantic validation** — Pydantic doesn't check most value-set bindings (a spec-invalid status code passes structurally). Helpers check required bindings and warn on spec-invalid codes at build time, and `validate_resource` (see [Validation & Loading](#validation-loading)) returns the same checks as a report your code — or your agent's correction loop — can act on.
+
+For profile conformance (US Core, UK Core) and full invariant checking, use a FHIR server's `$validate` operation — the helpers deliberately stop at what can be checked offline.
 
 ## FHIR Version Support
 
@@ -824,6 +830,9 @@ payload = [med.model_dump() for med in get_medications(bundle)]
 ## Validation & Loading
 
 Constructing a resource through `fhir.resources` validates *structure* (types, required fields, cardinality) — but it does not check required terminology bindings, and it reports problems by raising Pydantic exceptions. These helpers give you validation as **data you can act on**: a report for agent loops and UIs, or a single rich exception for loaders.
+
+![Validation loop: raw LLM output becomes a typed FHIR resource, validate_resource either returns a report of errors to fix or production-ready FHIR](../../assets/images/cards/hc-flow-validation-light.svg#only-light)
+![Validation loop: raw LLM output becomes a typed FHIR resource, validate_resource either returns a report of errors to fix or production-ready FHIR](../../assets/images/cards/hc-flow-validation-dark.svg#only-dark)
 
 !!! warning "What is and isn't checked"
     **Checked**: structure (via the Pydantic models) and required bindings on primitive `code` fields (e.g. `MedicationStatement.status`).

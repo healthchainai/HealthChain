@@ -7,6 +7,12 @@ site_author: Jennifer Jiang-Kells
 repo_name: healthchainai/healthchain
 repo_url: https://github.com/healthchainai/healthchain
 
+# Fail loudly on broken internal links and anchors
+validation:
+  links:
+    not_found: warn
+    anchors: warn
+
 nav:
   - Home: index.md
   - Getting Started:
@@ -26,7 +32,6 @@ nav:
           - Next Steps: tutorials/clinicalflow/next-steps.md
   - Cookbook:
       - cookbook/index.md
-      - Setup FHIR Sandbox: cookbook/setup_fhir_sandboxes.md
       - FHIR-Grounded Patient Q&A: cookbook/fhir_qa.md
       - Multi-Source Data Integration: cookbook/multi_ehr_aggregation.md
       - Research Extract to FHIR API: cookbook/research_extract_fhir_api.md
@@ -35,8 +40,7 @@ nav:
       - ML Model Deployment: cookbook/ml_model_deployment.md
   - Docs:
       - Welcome: reference/index.md
-      - Configuration: reference/config.md
-      - Security & Compliance: security.md
+      - Core Concepts: reference/concepts.md
       - Gateway:
         - Overview: reference/gateway/gateway.md
         - HealthChainAPI: reference/gateway/api.md
@@ -45,7 +49,17 @@ nav:
         - Protocols:
           - CDS Hooks: reference/gateway/cdshooks.md
           - SOAP/CDA: reference/gateway/soap_cda.md
-      - I/O:
+      - FHIR & Validation:
+        - FHIR Helpers: reference/utilities/fhir_helpers.md
+        - Terminology: reference/utilities/terminology.md
+      - Agent Tools: reference/utilities/tools.md
+      - Sandbox:
+        - Sandbox Client: reference/utilities/sandbox.md
+        - Test Data Generators: reference/utilities/data_generator.md
+        - Connecting to FHIR Sandboxes: cookbook/setup_fhir_sandboxes.md
+      - Pipeline & I/O:
+        - Pipeline: reference/pipeline/pipeline.md
+        - Components: reference/pipeline/components/components.md
         - Containers:
           - Overview: reference/io/containers/containers.md
           - Document: reference/io/containers/document.md
@@ -53,10 +67,9 @@ nav:
           - Overview: reference/io/adapters/adapters.md
           - CDA Adapter: reference/io/adapters/cdaadapter.md
           - CDS FHIR Adapter: reference/io/adapters/cdsfhiradapter.md
-      - Pipeline:
-        - Overview: reference/pipeline/pipeline.md
-        - Components: reference/pipeline/components/components.md
-      - Interoperability:
+      - Configuration: reference/config.md
+      - Security & Compliance: security.md
+      - Interoperability (CDA):
         - Overview: reference/interop/interop.md
         - Engine: reference/interop/engine.md
         - Configuration: reference/interop/configuration.md
@@ -65,12 +78,6 @@ nav:
         - Parsers: reference/interop/parsers.md
         - Generators: reference/interop/generators.md
         - Working with xmltodict: reference/interop/xmltodict.md
-      - Utilities:
-        - FHIR Helpers: reference/utilities/fhir_helpers.md
-        - Terminology: reference/utilities/terminology.md
-        - Agent Tools: reference/utilities/tools.md
-        - Sandbox: reference/utilities/sandbox.md
-        - Data Generator: reference/utilities/data_generator.md
   - API Reference:
       - api/index.md
       - api/pipeline.md
@@ -160,6 +167,32 @@ extra_javascript:
 
 plugins:
   - blog
+  - llmstxt:
+      markdown_description: >-
+        HealthChain is an open-source Python SDK for building healthcare AI
+        applications — type-safe FHIR resources with validation, agent tools
+        served over MCP and LangChain, real-time EHR connectivity (FHIR APIs,
+        CDS Hooks, SOAP/CDA), and production deployment tooling.
+      full_output: llms-full.txt
+      sections:
+        Getting started:
+          - installation.md: Install HealthChain and its optional extras
+          - quickstart.md: Build your first gateway and agent tools, then test them with the sandbox
+          - cli.md: The healthchain CLI (new, serve, mcp)
+        Cookbook:
+          - cookbook/index.md
+          - cookbook/setup_fhir_sandboxes.md
+          - cookbook/fhir_qa.md
+          - cookbook/multi_ehr_aggregation.md
+          - cookbook/research_extract_fhir_api.md
+          - cookbook/clinical_coding.md
+          - cookbook/discharge_summarizer.md
+          - cookbook/ml_model_deployment.md
+        Reference:
+          - reference/*.md
+          - security.md: Security and compliance configuration
+        API:
+          - api/*.md
   - mkdocstrings:
       default_handler: python
       handlers:

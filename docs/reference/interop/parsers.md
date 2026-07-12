@@ -1,6 +1,6 @@
 # Parsers
 
-Parsers are responsible for extracting structured data from various healthcare document formats. The module includes built-in parsers for common formats like CDA and HL7v2.
+Parsers are responsible for extracting structured data from healthcare document formats. The module includes a built-in parser for CDA documents.
 
 The interop/CDA layer requires the `cda` extra: `pip install healthchain[cda]`.
 
@@ -9,7 +9,6 @@ The interop/CDA layer requires the `cda` extra: `pip install healthchain[cda]`.
 | Parser | Description |
 |--------|-------------|
 | `CDAParser` | Parses CDA XML documents into structured data |
-| `HL7v2Parser` | Parses HL7v2 messages into structured data |
 
 ## CDA Parser
 
@@ -24,7 +23,7 @@ The input data should be in the format `{<section_key>}: {<section_entries>}`.
 If the CDA document contains a section that has no matching entry in the configured
 sections (e.g. an allergies section, since the bundled configs only cover problems,
 medications, and notes), the parser logs a warning naming the section's title and code
-and skips it — it does not silently drop it.
+and skips it.
 
 ([Full Documentation on Configuration](./configuration.md))
 

@@ -52,6 +52,8 @@ Edit `app.py` to add your model, and `healthchain.yaml` to configure deployment 
 
 See the [CLI reference](https://healthchainai.github.io/HealthChain/cli/) for all commands.
 
+Building with an AI assistant? Point it at [llms.txt](https://healthchainai.github.io/HealthChain/llms.txt) for a map of the current API docs.
+
 ## Core Features
 
 The quickest way for AI developers and researchers to ship healthcare AI — everything you need out of the box, built to scale with you.
@@ -126,7 +128,8 @@ Every serious healthcare AI project builds the same integration infrastructure f
 HealthChain handles that complexity so you can focus on what actually matters: the model and the patient.
 
 - **Optimized for real-time** - Connect to live FHIR APIs and integration points instead of stale data exports
-- **Validation built in** - Type-safe FHIR resources and validation reports that catch broken data before it ships
+- **Validation built in** - Type-safe FHIR resources and validation reports that catch broken data before it ships — including spec-invalid clinical codes that type checks alone let through
+- **No invented facts** - Helpers never add clinical claims you didn't pass: no auto-generated timestamps, no guessed statuses — what enters the record is exactly what your model produced
 - **Bring any model or agent** - LLMs, agents, or classical ML — and output validated FHIR
 - **Works with your existing stack** - Integrates with FastAPI, MCP, and LangChain
 - **Production-ready foundations** - Dockerized deployment, configurable security, and an architecture built for NHS and HIPAA environments
@@ -201,8 +204,8 @@ healthchain mcp --bundle patient_bundle.json
 
 ## 🛣️ What we're building towards
 
-- [ ] 🔒 **Production security and compliance** — API authentication, audit logging, and configurable security for NHS/HIPAA deployments
-- [ ] 📋 **Governance as config** — clinical safety, data access agreements, and compliance standards as a first-class deployment artifact in `healthchain.yaml`
+- [x] 🔒 **Security foundations** — API-key authentication, audit logging, and TLS, configured via `healthchain.yaml` and enforced by the gateway middleware
+- [ ] 📋 **Governance as config** — clinical safety, data access agreements, and compliance standards for NHS/HIPAA deployments as a first-class deployment artifact in `healthchain.yaml`
 - [ ] 🔌 **Deeper EHR connectivity** — more FHIR sources, live data patterns, and real-world integration examples from pilot deployments
 - [ ] 📊 **Observability** — deployment telemetry and audit trails for healthcare systems
 - [x] 🤖 **A toolkit for clinical AI agents** — typed FHIR tools with validation and terminology built in, served over MCP and LangChain
