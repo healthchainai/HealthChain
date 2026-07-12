@@ -127,7 +127,7 @@ def test_llmconfig_defaults():
     """LLMConfig has sensible defaults."""
     config = LLMConfig()
     assert config.provider == "anthropic"
-    assert config.model == "claude-opus-4-6"
+    assert config.model == "claude-opus-4-8"
     assert config.max_tokens == 512
 
 

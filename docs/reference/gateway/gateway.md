@@ -1,6 +1,6 @@
 # Gateway
 
-The HealthChain Gateway module provides a secure integration layer for connecting your NLP/ML pipelines with multiple healthcare systems.
+The HealthChain Gateway module provides a secure integration layer for connecting your models and agents with multiple healthcare systems.
 
 It provides a unified interface for connecting to FHIR servers, CDS Hooks, and SOAP/CDA services and is designed to be used in conjunction with the [HealthChainAPI](api.md) to create a complete healthcare integration platform.
 

@@ -4,7 +4,6 @@ The HealthChain Interop Engine provides a robust and customizable framework for 
 
 - FHIR
 - CDA
-- HL7v2 (Coming soon)
 
 The interop/CDA layer requires the `cda` extra: `pip install healthchain[cda]`.
 
@@ -25,9 +24,8 @@ The interoperability module is built around a central `InteropEngine` that coord
           │                 │                 │
 ┌─────────▼─────────┐ ┌─────▼─────┐ ┌─────────▼─────────┐
 │   - CDA Parser    │ │ Registry  │ │   - CDA Generator │
-│   - HL7v2 Parser  │ │ Renderer  │ │  - FHIR Generator │
-└───────────────────┘ └───────────┘ │ - HL7v2 Generator │
-                                    └───────────────────┘
+└───────────────────┘ │ Renderer  │ │  - FHIR Generator │
+                      └───────────┘ └───────────────────┘
 ```
 
 ## Key Components
@@ -93,7 +91,7 @@ The interoperability module is designed with extensibility at its core. You can 
 
 ### Custom Parsers
 
-Parsers convert source formats (CDA or HL7v2) into mapped dictionaries that can be processed by generators:
+Parsers convert source formats (CDA) into mapped dictionaries that can be processed by generators:
 
 ```python
 # Register a custom parser with the engine

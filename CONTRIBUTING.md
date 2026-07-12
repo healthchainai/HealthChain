@@ -94,6 +94,8 @@ Each cookbook has three parts:
 
 Use `healthchain seed medplum` to set up local test data — see the [sandbox docs](https://healthchainai.github.io/HealthChain/reference/utilities/sandbox/) and [CLI reference](https://healthchainai.github.io/HealthChain/cli/) for setup.
 
+If a merged cookbook contribution supports a grant or fellowship application, maintainers will provide a signed support letter — email the maintainer in [MAINTAINERS.md](MAINTAINERS.md) with the subject `[Cookbook Contributor] Support Request`, the grant name, and the deadline (allow 5 working days).
+
 ## 💻 Writing code
 
 Check [`help wanted`](https://github.com/healthchainai/HealthChain/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) for issues open for external contribution. Only issues with this label are actively looking for contributors — comment before starting.

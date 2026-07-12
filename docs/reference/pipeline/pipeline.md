@@ -2,7 +2,7 @@
 
 HealthChain pipelines help you quickly build data processing workflows that integrate seamlessly with EHR systems. They support healthcare formats like [FHIR](https://build.fhir.org/) out of the box, so you can focus on your AI logic, not integration hassles.
 
-Pipelines are lightweight composition primitives: create a `Pipeline`, add steps with `add_node`, and run your data through end-to-end. HealthChain doesn't ship prebuilt pipeline classes or NLP wrappers — load models with the library you already use (spaCy, HuggingFace Transformers, LangChain) and wrap them in nodes. For complete worked examples of common clinical tasks (medical coding, discharge summarization, ML risk scoring), start from a [cookbook recipe](../../cookbook/clinical_coding.md).
+Pipelines are lightweight composition primitives: create a `Pipeline`, add steps with `add_node`, and run your data through end-to-end. Load models with the library you already use (spaCy, HuggingFace Transformers, LangChain) and wrap them in nodes. For complete worked examples of common clinical tasks (medical coding, discharge summarization, ML risk scoring), start from a [cookbook recipe](../../cookbook/clinical_coding.md).
 
 ## Building a Pipeline 🕺
 
@@ -74,7 +74,7 @@ pipeline.add_node(extract_conditions)
 
 #### Components
 
-Components are reusable, stateful classes that encapsulate specific processing logic for your pipeline. HealthChain doesn't ship prebuilt components — bring your own NLP or ML model and wrap it in a node, exactly like the inline function above. Reach for a component instead of a plain function when a step needs to hold onto state across calls (a loaded model, a client connection).
+Components are reusable, stateful classes that encapsulate specific processing logic for your pipeline. Reach for a component instead of a plain function when a step needs to hold onto state across calls (a loaded model, a client connection).
 
 See the [Components](./components/components.md) page for the base component protocol, and [Custom Components](#custom-components) below for a worked example.
 

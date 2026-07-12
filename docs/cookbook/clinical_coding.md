@@ -131,7 +131,10 @@ def extract_problems(doc: Document) -> Document:
 ```
 
 !!! note
-    The pipeline owns nothing model-specific — spaCy runs inside your node, and HealthChain's job starts where the model output needs to become FHIR. `update_problem_list` converts your linked entities to `problem-list-item` [Condition](https://www.hl7.org/fhir/condition.html) resources, skipping any entity without a code. `patient_ref` is required: these Conditions are written against a real patient record, so the pipeline never guesses it.
+    spaCy runs inside your node — HealthChain's job starts where the model output needs to become FHIR. `update_problem_list` converts your linked entities to `problem-list-item` [Condition](https://www.hl7.org/fhir/condition.html) resources, skipping any entity without a code. `patient_ref` is required: these Conditions are written against a real patient record, so the pipeline never guesses it.
+
+!!! tip
+    The dictionary is pipeline-time entity linking: a deterministic mention → code mapping, standing in for a real linker (e.g. scispacy's `UmlsEntityLinker`). Its agentic counterpart is the [terminology module](../reference/utilities/terminology.md) — the same lookup job exposed as a typed tool behind the `TerminologyLookup` protocol, so an LLM uses codes returned by a lookup instead of generating them.
 
 
 ## Set up FHIR Gateway

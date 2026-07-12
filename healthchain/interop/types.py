@@ -8,7 +8,6 @@ from enum import Enum
 class FormatType(Enum):
     """Enum for supported healthcare data formats."""
 
-    HL7V2 = "hl7v2"
     CDA = "cda"
     FHIR = "fhir"
 

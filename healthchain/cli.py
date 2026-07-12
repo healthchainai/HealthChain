@@ -288,7 +288,7 @@ site:
 # LLM provider — uncomment and wire up with LangChain's init_chat_model in app.py to enable
 # llm:
 #   provider: anthropic     # anthropic | openai | google | huggingface
-#   model: claude-opus-4-6
+#   model: claude-opus-4-8
 #   max_tokens: 512
 """
 

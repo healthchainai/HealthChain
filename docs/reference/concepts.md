@@ -1,10 +1,13 @@
 # Core Concepts
 
-HealthChain has two core components and one optional module:
+HealthChain's main building blocks:
 
 - **Gateway:** Connect to multiple FHIR sources and healthcare systems with a single API.
-- **Pipelines:** Build data processing pipelines for healthcare NLP and ML tasks with automatic FHIR output.
-- **InteropEngine** *(optional)*: Convert between healthcare data formats like [FHIR](https://www.hl7.org/fhir/) and [HL7 CDA](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=7) for legacy system bridging.
+- **FHIR helpers:** Create, validate, and code [FHIR](https://www.hl7.org/fhir/) resources with type safety and minimal boilerplate.
+- **Agent tools:** Serve typed, validated FHIR tools to Claude over MCP, or to LangChain agents.
+- **Sandbox:** Test your service against realistic EHR request flows — protocol-shaped requests in, validated responses out, no real EHR required.
+
+Under the hood, **Pipelines** and the **Document** container compose processing steps around your own models inside protocol flows, and the optional **InteropEngine** (`pip install "healthchain[cda]"`) converts between FHIR and [HL7 CDA](https://www.hl7.org/implement/standards/product_brief.cfm?product_id=7) for legacy system bridging.
 
 
 ## Gateway
@@ -40,15 +43,131 @@ app.register_gateway(fhir)
 # Available at: GET /fhir/transform/Patient/123?source=epic
 ```
 
-## Pipeline
+## FHIR & Validation
 
-HealthChain [**Pipelines**](./pipeline/pipeline.md) provide a flexible way to build and manage processing pipelines for NLP and ML tasks that can easily integrate with electronic health record (EHR) systems.
+Use [**FHIR helpers**](./utilities/fhir_helpers.md) to create, read, and validate FHIR resources with minimal boilerplate — the strict schema is what lets you catch broken data before it reaches a live system. On top of the underlying Pydantic models the helpers add three things: **flat constructors** (scalars in, correctly nested resources out, the right terminology systems in the right places), **no invented facts** (no auto-timestamps or guessed statuses — output never silently gains clinical claims), and **semantic validation** (required-binding checks that catch spec-invalid codes plain type validation lets through).
+
+[(Full Documentation on FHIR Helpers)](./utilities/fhir_helpers.md)
+
+```python
+from healthchain.fhir import create_condition, validate_resource
+
+condition = create_condition(
+    code="38341003",
+    display="Hypertension",
+    system="http://snomed.info/sct",
+    subject="Patient/Foo",
+    clinical_status="active",
+)
+
+# Validation as data: a report you can act on, never an exception
+report = validate_resource(condition)
+print(report.valid, [issue.diagnostics for issue in report.issues])
+```
+
+The [**Terminology**](./utilities/terminology.md) seam adds code lookup (`lookup_code("metoprolol")`) with a bundled demo catalog that swaps for your terminology server in production.
+
+## Agent Tools
+
+[**FHIRToolkit**](./utilities/tools.md) packages the build/validate/read/lookup surface as typed agent tools — flat schemas a model can fill reliably, with errors returned as values an agent loop can read and correct.
+
+[(Full Documentation on Agent Tools)](./utilities/tools.md)
+
+```python
+from healthchain.tools import FHIRToolkit
+
+kit = FHIRToolkit(bundle="patient_bundle.json")
+
+kit.as_mcp().run()          # serve to Claude or any MCP client
+tools = kit.as_langchain()  # or drop into a LangChain agent
+```
+
+## Sandbox
+
+The [**SandboxClient**](./utilities/sandbox.md) plays the role of the EHR: it fires realistic, protocol-shaped requests (CDS Hooks, SOAP/CDA) at your service and lets you inspect what comes back — a closed verify loop that needs no real EHR, whether you wrote the integration yourself or an agent built it for you. Load test datasets, send requests, and validate responses in a few lines of code.
+
+[(Full Documentation on Sandbox)](./utilities/sandbox.md)
+
+### Workflows
+
+A [**workflow**](./utilities/sandbox.md#workflow-protocol-compatibility) represents a specific event in an EHR system that triggers your service (e.g., `patient-view` when opening a patient chart, `encounter-discharge` when discharging a patient).
+
+Workflows determine the request structure, required FHIR resources, and validation rules. Different workflows are compatible with different protocols:
+
+| Workflow Type                      | Protocol   | Example Workflows                                      |
+|-------------------------------------|------------|--------------------------------------------------------|
+| **CDS Hooks**                      | REST       | `patient-view`, `order-select`, `order-sign`, `encounter-discharge` |
+| **Clinical Documentation**          | SOAP       | `sign-note-inpatient`, `sign-note-outpatient`          |
+
+
+### Available Dataset Loaders
+
+[**Dataset Loaders**](./utilities/sandbox.md#dataset-registry) are shortcuts for loading common clinical test datasets from file. Currently available:
+
+| Dataset Key        | Description                                 | FHIR Version | Source                                                                                  | Download Link                                                                                  |
+|--------------------|---------------------------------------------|--------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| `mimic-on-fhir`    | **MIMIC-IV on FHIR Demo Dataset**        | R4           | [PhysioNet Project](https://physionet.org/content/mimic-iv-fhir-demo/2.1.0/)                  | [Download ZIP](https://physionet.org/content/mimic-iv-fhir-demo/get-zip/2.1.0/) (49.5 MB)      |
+| `synthea-patient`  | **Synthea FHIR Patient Records**    | R4           | [Synthea Downloads](https://synthea.mitre.org/downloads)                                  | [Download ZIP](https://arc.net/l/quote/hoquexhy) (100 Sample, 36 MB)                           |
+
+
+```python
+from healthchain.sandbox import list_available_datasets
+
+# See all registered datasets with descriptions
+datasets = list_available_datasets()
+print(datasets)
+```
+
+### Basic Usage
+
+```python
+from healthchain.sandbox import SandboxClient
+
+# Initialize client with your service URL and workflow
+client = SandboxClient(
+    url="http://localhost:8000/cds/encounter-discharge",
+    workflow="encounter-discharge"
+)
+
+# Load test data from a registered dataset
+client.load_from_registry(
+    "synthea-patient",
+    data_dir="./data/synthea",
+    resource_types=["Condition", "DocumentReference"],
+    sample_size=3
+)
+
+# Optionally inspect before sending
+client.preview_requests()  # See what will be sent
+client.get_status()        # Check client state
+
+# Send requests to your service
+responses = client.send_requests()
+```
+
+For clinical documentation workflows using SOAP/CDA:
+
+```python
+# Use context manager for automatic result saving
+with SandboxClient(
+    url="http://localhost:8000/notereader/ProcessDocument",
+    workflow="sign-note-inpatient",
+    protocol="soap"
+) as client:
+    client.load_from_path("./cookbook/data/notereader_cda.xml")
+    responses = client.send_requests()
+    # Results automatically saved to ./output/ on success
+```
+
+## Pipeline & I/O
+
+[**Pipelines**](./pipeline/pipeline.md) are the supporting primitive behind protocol flows: they compose processing steps around your own models, and gateway handlers (CDS Hooks, NoteReader) pass each request through them as a [**Document**](./io/containers/containers.md).
 
 You can build pipelines with three different approaches:
 
 ### 1. Quick Inline Functions
 
-For quick experiments, create a `Pipeline` and add your processing functions. Each step receives and returns a [**Document**](./io/containers/containers.md); raw input (text, a FHIR Bundle, or a list of resources) is wrapped into a `Document` automatically.
+For quick experiments, create a `Pipeline` and add your processing functions. Each step receives and returns a **Document**; raw input (text, a FHIR Bundle, or a list of resources) is wrapped into a `Document` automatically.
 
 Containers make your pipeline FHIR-native by loading and transforming your data (free text, EHR resources, etc.) into structured FHIR-ready formats. Just add your processing functions with `@add_node`, compile with `.build()`, and your pipeline is ready to process FHIR data end-to-end.
 
@@ -137,9 +256,9 @@ For complete, runnable examples of common clinical tasks — medical coding, dis
 
 [(Full Documentation on Pipelines)](./pipeline/pipeline.md)
 
-## Interoperability
+## Interoperability (CDA)
 
-The HealthChain Interoperability module provides tools for converting between healthcare data formats, including FHIR and CDA.
+The optional Interoperability module converts between FHIR and CDA for legacy system bridging. It requires the `cda` extra: `pip install "healthchain[cda]"`.
 
 [(Full Documentation on Interoperability Engine)](./interop/interop.md)
 
@@ -158,102 +277,4 @@ fhir_resources = engine.to_fhir(cda_xml, src_format=FormatType.CDA)
 
 # Convert FHIR resources back to CDA
 cda_document = engine.from_fhir(fhir_resources, dest_format=FormatType.CDA)
-```
-
-
-## Utilities
-
-### Sandbox Client
-
-Use [**SandboxClient**](./utilities/sandbox.md) to quickly test your app against real-world EHR scenarios like CDS Hooks or Clinical Documentation Improvement (CDI) workflows. Load test datasets, send requests to your service, and validate responses in a few lines of code.
-
-[(Full Documentation on Sandbox)](./utilities/sandbox.md)
-
-#### Workflows
-
-A [**workflow**](./utilities/sandbox.md#workflow-protocol-compatibility) represents a specific event in an EHR system that triggers your service (e.g., `patient-view` when opening a patient chart, `encounter-discharge` when discharging a patient).
-
-Workflows determine the request structure, required FHIR resources, and validation rules. Different workflows are compatible with different protocols:
-
-| Workflow Type                      | Protocol   | Example Workflows                                      |
-|-------------------------------------|------------|--------------------------------------------------------|
-| **CDS Hooks**                      | REST       | `patient-view`, `order-select`, `order-sign`, `encounter-discharge` |
-| **Clinical Documentation**          | SOAP       | `sign-note-inpatient`, `sign-note-outpatient`          |
-
-
-#### Available Dataset Loaders
-
-[**Dataset Loaders**](./utilities/sandbox.md#dataset-registry) are shortcuts for loading common clinical test datasets from file. Currently available:
-
-| Dataset Key        | Description                                 | FHIR Version | Source                                                                                  | Download Link                                                                                  |
-|--------------------|---------------------------------------------|--------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| `mimic-on-fhir`    | **MIMIC-IV on FHIR Demo Dataset**        | R4           | [PhysioNet Project](https://physionet.org/content/mimic-iv-fhir-demo/2.1.0/)                  | [Download ZIP](https://physionet.org/content/mimic-iv-fhir-demo/get-zip/2.1.0/) (49.5 MB)      |
-| `synthea-patient`  | **Synthea FHIR Patient Records**    | R4           | [Synthea Downloads](https://synthea.mitre.org/downloads)                                  | [Download ZIP](https://arc.net/l/quote/hoquexhy) (100 Sample, 36 MB)                           |
-
-
-```python
-from healthchain.sandbox import list_available_datasets
-
-# See all registered datasets with descriptions
-datasets = list_available_datasets()
-print(datasets)
-```
-
-#### Basic Usage
-
-```python
-from healthchain.sandbox import SandboxClient
-
-# Initialize client with your service URL and workflow
-client = SandboxClient(
-    url="http://localhost:8000/cds/encounter-discharge",
-    workflow="encounter-discharge"
-)
-
-# Load test data from a registered dataset
-client.load_from_registry(
-    "synthea-patient",
-    data_dir="./data/synthea",
-    resource_types=["Condition", "DocumentReference"],
-    sample_size=3
-)
-
-# Optionally inspect before sending
-client.preview_requests()  # See what will be sent
-client.get_status()        # Check client state
-
-# Send requests to your service
-responses = client.send_requests()
-```
-
-For clinical documentation workflows using SOAP/CDA:
-
-```python
-# Use context manager for automatic result saving
-with SandboxClient(
-    url="http://localhost:8000/notereader/ProcessDocument",
-    workflow="sign-note-inpatient",
-    protocol="soap"
-) as client:
-    client.load_from_path("./cookbook/data/notereader_cda.xml")
-    responses = client.send_requests()
-    # Results automatically saved to ./output/ on success
-```
-
-### FHIR Helpers
-
-Use `healthchain.fhir` helpers to quickly create and manipulate FHIR resources (like `Condition`, `Observation`, etc.) in your code, ensuring they're standards-compliant with minimal boilerplate.
-
-[(Full Documentation on FHIR Helpers)](./utilities/fhir_helpers.md)
-
-```python
-from healthchain.fhir import create_condition
-
-condition = create_condition(
-    code="38341003",
-    display="Hypertension",
-    system="http://snomed.info/sct",
-    subject="Patient/Foo",
-    clinical_status="active"
-)
 ```

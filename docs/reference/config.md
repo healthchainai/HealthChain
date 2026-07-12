@@ -34,7 +34,7 @@ site:
 # LLM provider for LangChain-based pipelines
 # llm:
 #   provider: anthropic
-#   model: claude-opus-4-6
+#   model: claude-opus-4-8
 #   max_tokens: 512
 ```
 
@@ -119,14 +119,14 @@ LLM provider settings for LangChain-based pipelines. API key is read from the st
 ```yaml
 llm:
   provider: anthropic
-  model: claude-opus-4-6
+  model: claude-opus-4-8
   max_tokens: 512
 ```
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `provider` | string | `anthropic` | LLM provider — `anthropic`, `openai`, or `google` |
-| `model` | string | `claude-opus-4-6` | Model ID passed to your LLM framework |
+| `model` | string | `claude-opus-4-8` | Model ID passed to your LLM framework |
 | `max_tokens` | int | `512` | Maximum tokens for model response |
 
 `llm` is validated config, not a model factory — instantiate the model with your framework of choice, e.g. LangChain's [`init_chat_model`](https://python.langchain.com/docs/how_to/chat_models_universal_init/):

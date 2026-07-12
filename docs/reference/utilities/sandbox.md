@@ -1,6 +1,8 @@
 # Sandbox Client
 
-The sandbox client provides a simplified interface for testing and validating your applications in realistic healthcare contexts. Use `app.sandbox()` to test a `HealthChainAPI` app you've built, or `SandboxClient` directly to connect to any already-running service.
+The sandbox client provides a simplified interface for testing and validating your applications in realistic healthcare contexts. It plays the role of the EHR: protocol-shaped requests (CDS Hooks, SOAP/CDA) go in, your service's responses come back out, and you can verify the whole loop before anything touches a real system — equally useful when an agent built the integration and needs to check its own work.
+
+Use `app.sandbox()` to test a `HealthChainAPI` app you've built, or `SandboxClient` directly to connect to any already-running service.
 
 !!! note "Installation"
     The sandbox client ships with the core install. Methods that generate synthetic data (`load_free_text()`, `load_synthetic()`) require the `sandbox` extra: `pip install "healthchain[sandbox]"`
