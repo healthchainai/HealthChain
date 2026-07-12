@@ -43,7 +43,7 @@ class InteropEngine:
     """Generic interoperability engine for converting between healthcare formats
 
     The InteropEngine provides capabilities for converting between different
-    healthcare data format standards, such as HL7 FHIR, CDA, and HL7v2.
+    healthcare data format standards, such as HL7 FHIR and CDA.
 
     The engine uses a template-based approach for transformations, with templates
     stored in the configured template directory. Transformations are handled by
@@ -132,11 +132,6 @@ class InteropEngine:
         """Lazily load the CDA parser"""
         return self._get_parser(FormatType.CDA)
 
-    @cached_property
-    def hl7v2_parser(self):
-        """Lazily load the HL7v2 parser"""
-        return self._get_parser(FormatType.HL7V2)
-
     # Lazy-loaded generators
     @cached_property
     def cda_generator(self):
@@ -148,16 +143,11 @@ class InteropEngine:
         """Lazily load the FHIR generator"""
         return self._get_generator(FormatType.FHIR)
 
-    @cached_property
-    def hl7v2_generator(self):
-        """Lazily load the HL7v2 generator"""
-        return self._get_generator(FormatType.HL7V2)
-
     def _get_parser(self, format_type: FormatType):
         """Get or create a parser for the specified format
 
         Args:
-            format_type: The format type to get a parser for (CDA or HL7v2)
+            format_type: The format type to get a parser for (CDA)
 
         Returns:
             The parser instance for the specified format
@@ -169,8 +159,6 @@ class InteropEngine:
             if format_type == FormatType.CDA:
                 parser = CDAParser(self.config)
                 self._parsers[format_type] = parser
-            elif format_type == FormatType.HL7V2:
-                raise NotImplementedError("HL7v2 parser not implemented")
             else:
                 raise ValueError(f"Unsupported parser format: {format_type}")
 
@@ -180,7 +168,7 @@ class InteropEngine:
         """Get or create a generator for the specified format
 
         Args:
-            format_type: The format type to get a generator for (CDA, HL7v2, or FHIR)
+            format_type: The format type to get a generator for (CDA or FHIR)
 
         Returns:
             The generator instance for the specified format
@@ -192,8 +180,6 @@ class InteropEngine:
             if format_type == FormatType.CDA:
                 generator = CDAGenerator(self.config, self.template_registry)
                 self._generators[format_type] = generator
-            elif format_type == FormatType.HL7V2:
-                raise NotImplementedError("HL7v2 generator not implemented")
             elif format_type == FormatType.FHIR:
                 generator = FHIRGenerator(self.config, self.template_registry)
                 self._generators[format_type] = generator
@@ -208,7 +194,7 @@ class InteropEngine:
         """Register a custom parser for a format type. This will replace the default parser for the format type.
 
         Args:
-            format_type: The format type (CDA, HL7v2) to register the parser for
+            format_type: The format type (CDA) to register the parser for
             parser_instance: The parser instance that implements the parsing logic
 
         Returns:
@@ -226,7 +212,7 @@ class InteropEngine:
         """Register a custom generator for a format type. This will replace the default generator for the format type.
 
         Args:
-            format_type: The format type (CDA, HL7v2, FHIR) to register the generator for
+            format_type: The format type (CDA, FHIR) to register the generator for
             generator_instance: The generator instance that implements the generation logic
 
         Returns:
@@ -287,8 +273,8 @@ class InteropEngine:
         """Convert source data to FHIR resources
 
         Args:
-            src_data: Input data as string (CDA XML or HL7v2 message)
-            src_format: Source format type, either as string ("cda", "hl7v2")
+            src_data: Input data as string (CDA XML)
+            src_format: Source format type, either as string ("cda")
                          or FormatType enum
 
         Returns:
@@ -305,8 +291,6 @@ class InteropEngine:
 
         if src_format == FormatType.CDA:
             return self._cda_to_fhir(src_data)
-        elif src_format == FormatType.HL7V2:
-            return self._hl7v2_to_fhir(src_data)
         else:
             raise ValueError(f"Unsupported format: {src_format}")
 
@@ -320,13 +304,13 @@ class InteropEngine:
 
         Args:
             resources: List of FHIR resources to convert or a FHIR Bundle
-            dest_format: Destination format type, either as string ("cda", "hl7v2")
+            dest_format: Destination format type, either as string ("cda")
                         or FormatType enum
             **kwargs: Additional arguments to pass to generator.
                      For CDA: document_type (str) - Type of CDA document (e.g. "ccd", "discharge")
 
         Returns:
-            str: Converted data as string (CDA XML or HL7v2 message)
+            str: Converted data as string (CDA XML)
 
         Raises:
             ValueError: If dest_format is not supported
@@ -338,9 +322,7 @@ class InteropEngine:
         dest_format = validate_format(dest_format)
         resources = normalize_resource_list(resources)
 
-        if dest_format == FormatType.HL7V2:
-            return self._fhir_to_hl7v2(resources, **kwargs)
-        elif dest_format == FormatType.CDA:
+        if dest_format == FormatType.CDA:
             return self._fhir_to_cda(resources, **kwargs)
         else:
             raise ValueError(f"Unsupported format: {dest_format}")
@@ -406,33 +388,3 @@ class InteropEngine:
             )
 
         return cda_generator.transform(resources, document_type=document_type)
-
-    def _hl7v2_to_fhir(self, source_data: str) -> List[Resource]:
-        """Convert HL7v2 to FHIR resources"""
-        parser = self.hl7v2_parser
-        generator = self.fhir_generator
-
-        # Parse HL7v2 message using the parser
-        message_entries = parser.from_string(source_data)
-
-        # Process each message entry and convert to FHIR resources
-        resources = []
-        for message_key, entries in message_entries.items():
-            resource_entries = generator.transform(
-                entries, src_format=FormatType.HL7V2, message_key=message_key
-            )
-            resources.extend(resource_entries)
-
-        return resources
-
-    def _fhir_to_hl7v2(self, resources: List[Resource]) -> str:
-        """Convert FHIR resources to HL7v2"""
-        generator = self.hl7v2_generator
-
-        # Process each resource and convert to HL7v2 message
-        messages = []
-        for resource in resources:
-            message = generator.transform(resource)
-            messages.append(message)
-
-        return messages

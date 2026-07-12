@@ -472,8 +472,9 @@ class ConfigManager:
         return default
 
     def validate(self) -> bool:
-        """Validate that all required configurations are present"""
-        # TODO: Implement validation
+        """Validation hook called by load(). The base ConfigManager performs
+        no checks; subclasses (e.g. InteropConfigManager) override this with
+        real validation."""
         return True
 
     def set_validation_level(self, level: str) -> "ConfigManager":

@@ -8,6 +8,9 @@ This is the foundational pattern for patient-facing AI assistants — hospital p
 
 Check out the full working example [here](https://github.com/healthchainai/HealthChain/tree/main/cookbook/fhir_context_llm_qa.py)!
 
+![Grounded Q&A flow: a patient question hits the /qa endpoint, live FHIR resources are fetched and formatted into clinical context by a pipeline, and the LLM answers anchored to the record](../assets/images/cards/hc-flow-fhir-qa-light.svg#only-light)
+![Grounded Q&A flow: a patient question hits the /qa endpoint, live FHIR resources are fetched and formatted into clinical context by a pipeline, and the LLM answers anchored to the record](../assets/images/cards/hc-flow-fhir-qa-dark.svg#only-dark)
+
 ## Setup
 
 ```bash
@@ -217,7 +220,7 @@ Then run it:
 from langchain_anthropic import ChatAnthropic
 
 if __name__ == "__main__":
-    llm = ChatAnthropic(model="claude-opus-4-6", max_tokens=512)
+    llm = ChatAnthropic(model="claude-opus-4-8", max_tokens=512)
     app = create_app(llm)
     app.run(port=8888)
 ```

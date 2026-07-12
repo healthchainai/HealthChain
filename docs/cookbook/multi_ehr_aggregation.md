@@ -6,7 +6,8 @@ This example shows you how to aggregate patient data from multiple FHIR sources 
 
 Check out the full working example [here](https://github.com/healthchainai/HealthChain/tree/main/cookbook/multi_ehr_data_aggregation.py)!
 
-![](../assets/images/hc-use-cases-genai-aggregate.png) *Illustrative Architecture - actual implementation may vary.*
+![Multi-EHR aggregation flow: Epic, Cerner and other live FHIR sources flow through FHIRGateway into one unified patient record consumed by your model or agent](../assets/images/cards/hc-flow-aggregation-light.svg#only-light)
+![Multi-EHR aggregation flow: Epic, Cerner and other live FHIR sources flow through FHIRGateway into one unified patient record consumed by your model or agent](../assets/images/cards/hc-flow-aggregation-dark.svg#only-dark)
 
 ## Setup
 

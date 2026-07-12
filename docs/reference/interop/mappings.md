@@ -1,6 +1,6 @@
 # Mappings
 
-Mapping tables are used to translate between different healthcare terminology systems, code sets, and formats. These mappings are essential for semantic interoperability between CDA, HL7v2, and FHIR formats where the same concept may be represented differently.
+Mapping tables are used to translate between different healthcare terminology systems, code sets, and formats. These mappings are essential for semantic interoperability between CDA and FHIR, where the same concept may be represented differently.
 
 The interop/CDA layer requires the `cda` extra: `pip install healthchain[cda]`.
 
@@ -22,8 +22,6 @@ configs/mappings/
 ├── cda_default/
 │   ├── systems.yaml
 │   └── status_codes.yaml
-├── hl7v2_fhir/
-│   └── ...
 └── README.md
 ```
 

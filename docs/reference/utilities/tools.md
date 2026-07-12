@@ -2,6 +2,9 @@
 
 `healthchain.tools` packages the FHIR build/validate/read/lookup surface as **agent tools**: flat scalar schemas a model can fill reliably, JSON-safe returns, and errors as values a model can read and correct — a raised exception kills an agent loop; `{"ok": false, "issues": [...]}` is something it can fix.
 
+![FHIRToolkit exposes typed FHIR tools to Claude over MCP and to LangChain agents via as_langchain, with tool calls returning typed validated results](../../assets/images/cards/hc-flow-agent-tools-light.svg#only-light)
+![FHIRToolkit exposes typed FHIR tools to Claude over MCP and to LangChain agents via as_langchain, with tool calls returning typed validated results](../../assets/images/cards/hc-flow-agent-tools-dark.svg#only-dark)
+
 ## Quick Start
 
 ```python

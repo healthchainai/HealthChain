@@ -17,9 +17,6 @@ fhir_resources = engine.to_fhir(cda_xml, src_format=FormatType.CDA)
 
 # Convert FHIR resources to CDA XML
 cda_xml = engine.from_fhir(fhir_resources, dest_format=FormatType.CDA)
-
-# Convert HL7v2 message to FHIR resources
-fhir_resources = engine.to_fhir(hl7v2_message, src_format=FormatType.HL7V2)
 ```
 
 ## Creating an Engine
@@ -66,9 +63,6 @@ All conversions convert to and from FHIR.
 ```python
 # From CDA
 fhir_resources = engine.to_fhir(cda_xml, src_format=FormatType.CDA)
-
-# From HL7v2
-fhir_resources = engine.to_fhir(hl7v2_message, src_format=FormatType.HL7V2)
 ```
 
 ### Converting from FHIR
@@ -76,9 +70,6 @@ fhir_resources = engine.to_fhir(hl7v2_message, src_format=FormatType.HL7V2)
 ```python
 # To CDA
 cda_xml = engine.from_fhir(fhir_resources, dest_format=FormatType.CDA)
-
-# To HL7v2
-hl7v2_message = engine.from_fhir(fhir_resources, dest_format=FormatType.HL7V2)
 ```
 
 ## Accessing Configuration

@@ -20,4 +20,4 @@ The core install is deliberately lean — type-safe FHIR, gateways, the agent to
 pip install "healthchain[cda,mcp]"   # combine as needed
 ```
 
-HealthChain doesn't bundle model frameworks — bring your own and use them directly in pipeline nodes. Each [cookbook](cookbook/index.md) states the exact install line it needs, including any model-specific dependencies (e.g. `torch`).
+Bring your own model framework and use it directly in pipeline nodes. Each [cookbook](cookbook/index.md) states the exact install line it needs, including any model-specific dependencies (e.g. `torch`).
