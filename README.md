@@ -2,7 +2,10 @@
 
 <div align="center" style="margin-bottom: 1em;">
 
-<img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/brand/hero/readme-hero-transparent.png" alt="HealthChain" width="700"></img>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/brand/lockup/lockup-horizontal-white.png">
+  <img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/brand/lockup/lockup-horizontal-black.png" alt="HealthChain" width="480">
+</picture>
 
 <!-- Project Badges -->
 
