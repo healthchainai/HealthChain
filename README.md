@@ -3,8 +3,8 @@
 <div align="center" style="margin-bottom: 1em;">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/brand/lockup/lockup-horizontal-white.png">
-  <img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/brand/lockup/lockup-horizontal-black.png" alt="HealthChain" width="480">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/brand/lockup/lockup-stacked-white.png">
+  <img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/brand/lockup/lockup-stacked-black.png" alt="HealthChain" width="400">
 </picture>
 
 <!-- Project Badges -->
