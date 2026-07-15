@@ -44,16 +44,15 @@ Hands-on, runnable recipes for building healthcare AI applications with HealthCh
   </div>
 </a>
 
-<a href="ml_model_deployment/" class="cookbook-card" data-tags="ml cdshooks fhir-gateway intermediate zero-setup">
+<a href="ml_model_deployment/" class="cookbook-card" data-tags="ml fhir-gateway intermediate zero-setup">
   <div class="cookbook-card-icon">🔬</div>
-  <div class="cookbook-card-title">Deploy ML Models: Real-Time Alerts & Batch Screening</div>
+  <div class="cookbook-card-title">Deploy ML Models: Predictions to FHIR RiskAssessments</div>
   <div class="cookbook-card-description">
-    Deploy the same ML model two ways: CDS Hooks for point-of-care sepsis alerts, and FHIR Gateway for population-level batch screening with RiskAssessment resources.
+    Turn the risk scores your model already produces — XGBoost, scikit-learn, anything — into spec-valid FHIR RiskAssessment resources, then write them back to a live FHIR server through FHIRGateway.
   </div>
   <div class="cookbook-tags">
     <span class="tag tag-intermediate">Intermediate</span>
     <span class="tag tag-ml">ML Research</span>
-    <span class="tag tag-cdshooks">CDS Hooks</span>
     <span class="tag tag-fhirgateway">FHIR Gateway</span>
     <span class="tag tag-zerosetup">Zero Setup</span>
   </div>
