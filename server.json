@@ -27,7 +27,7 @@
           "name": "--bundle",
           "valueHint": "patient_bundle.json",
           "description": "Path to the FHIR bundle the toolkit operates on",
-          "isRequired": true
+          "isRequired": false
         }
       ]
     }
