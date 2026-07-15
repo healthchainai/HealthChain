@@ -1,0 +1,35 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.healthchainai/healthchain",
+  "description": "Typed, validated FHIR tools for healthcare AI agents — build, read, validate, and code FHIR resources from a patient bundle, with terminology lookup and machine-readable validation reports built for fix-and-retry.",
+  "repository": {
+    "url": "https://github.com/healthchainai/HealthChain",
+    "source": "github"
+  },
+  "version": "0.16.1",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "healthchain",
+      "version": "0.16.1",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "mcp",
+          "description": "Serve FHIRToolkit over MCP (stdio)"
+        },
+        {
+          "type": "named",
+          "name": "--bundle",
+          "valueHint": "patient_bundle.json",
+          "description": "Path to the FHIR bundle the toolkit operates on",
+          "isRequired": true
+        }
+      ]
+    }
+  ]
+}

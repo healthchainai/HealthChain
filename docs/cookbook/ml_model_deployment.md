@@ -6,8 +6,6 @@ You have a model that outputs risk scores. To make those scores useful inside an
 
 Check out the full working example [here](https://github.com/healthchainai/HealthChain/tree/main/cookbook/ml_risk_to_fhir.py)!
 
-![](../assets/images/hc-use-cases-ml-deployment.png)
-
 ## Quick Start
 
 The example runs offline with a pre-baked predictions dict — no model file, no server, no setup:

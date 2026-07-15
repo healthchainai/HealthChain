@@ -1,6 +1,8 @@
+<!-- mcp-name: io.github.healthchainai/healthchain -->
+
 <div align="center" style="margin-bottom: 1em;">
 
-<img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/brand/hero/readme-hero-transparent.png" alt="HealthChain — Build, test & deploy AI in real healthcare systems" width="700"></img>
+<img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/brand/hero/readme-hero-transparent.png" alt="HealthChain" width="700"></img>
 
 <!-- Project Badges -->
 
@@ -23,7 +25,7 @@
 
 <div align="center">
 
-The model is the easy part — the integration that blocks it from ever reaching production is the hard part. HealthChain handles it, giving your models and agents tools they can trust: **type-safe FHIR resources**, **real-time EHR connectivity**, and **production-ready deployment**. So what you build holds up outside the demo.
+Agents read clinical data fine — writing it back correctly is the hard part, and generic agent frameworks don't check it. HealthChain gives any model or agent typed, validated FHIR tools they can trust: the right code from the right system, on the right patient, with a valid status. Plus real-time EHR connectivity and production deployment — so what you build holds up outside the demo.
 
 </div>
 
@@ -123,7 +125,7 @@ The quickest way for AI developers and researchers to ship healthcare AI — eve
 
 ## Why HealthChain?
 
-Every serious healthcare AI project builds the same integration infrastructure from scratch. Whether you're deploying a logistic regression, a 70B-parameter model, or an agentic workflow, the wall between a trained model and a live clinical system is the same: real FHIR APIs, multi-site deployments, auditable governance. No off-the-shelf solution exists, and engineers who understand both AI and healthcare protocols are scarce and hard to retain.
+Every serious healthcare AI project builds the same integration infrastructure from scratch. Whether you're deploying a logistic regression, a 70B-parameter model, or an agentic workflow, the wall between a trained model and a live clinical system is the same: real FHIR APIs, validated writes, multi-site deployments, auditable governance. No off-the-shelf solution exists, and engineers who understand both AI and healthcare protocols are scarce and hard to retain.
 
 HealthChain handles that complexity so you can focus on what actually matters: the model and the patient.
 
@@ -224,6 +226,8 @@ HealthChain is built by and for the next generation of healthcare developers —
 ## 🤗 Acknowledgements
 
 This project builds on [fhir.resources](https://github.com/nazrulworld/fhir.resources) and [CDS Hooks](https://cds-hooks.org/) standards developed by [HL7](https://www.hl7.org/) and [Boston Children's Hospital](https://www.childrenshospital.org/).
+
+See also [groundeval](https://github.com/healthchainai/groundeval) — the open-source eval harness for healthcare AI agents.
 
 ---
 
