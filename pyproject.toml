@@ -57,7 +57,7 @@ cda = ["python-liquid>=2.2.1,<3", "xmltodict>=0.13.0,<0.14"]
 sandbox = ["faker>=25.1.0,<26"]
 examples = [
     "spacy>=3.0.0,<4.0.0",
-    "transformers>=4.40,<5",
+    "transformers>=4.40,<6",
     "numpy<2.0.0",
 ]
 
