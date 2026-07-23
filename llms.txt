@@ -1,0 +1,70 @@
+# HealthChain
+
+> An open-source Python SDK for healthcare AI — typed, validated FHIR tools your models and agents can trust, plus real-time EHR connectivity and production deployment.
+
+HealthChain is an open-source Python SDK for building healthcare AI applications — type-safe FHIR resources with validation, agent tools served over MCP and LangChain, real-time EHR connectivity (FHIR APIs, CDS Hooks, SOAP/CDA), and production deployment tooling.
+
+## Getting started
+
+- [Installation](https://healthchainai.github.io/HealthChain/installation/index.md): Install HealthChain and its optional extras
+- [Quickstart](https://healthchainai.github.io/HealthChain/quickstart/index.md): Build your first gateway and agent tools, then test them with the sandbox
+- [CLI](https://healthchainai.github.io/HealthChain/cli/index.md): The healthchain CLI (new, serve, mcp)
+
+## Cookbook
+
+- [Cookbook](https://healthchainai.github.io/HealthChain/cookbook/index.md)
+- [Connecting to FHIR Sandboxes](https://healthchainai.github.io/HealthChain/cookbook/setup_fhir_sandboxes/index.md)
+- [FHIR-Grounded Patient Q&A](https://healthchainai.github.io/HealthChain/cookbook/fhir_qa/index.md)
+- [Multi-Source Data Integration](https://healthchainai.github.io/HealthChain/cookbook/multi_ehr_aggregation/index.md)
+- [Research Extract to FHIR API](https://healthchainai.github.io/HealthChain/cookbook/research_extract_fhir_api/index.md)
+- [Automated Clinical Coding](https://healthchainai.github.io/HealthChain/cookbook/clinical_coding/index.md)
+- [Discharge Summarizer](https://healthchainai.github.io/HealthChain/cookbook/discharge_summarizer/index.md)
+- [ML Model Deployment](https://healthchainai.github.io/HealthChain/cookbook/ml_model_deployment/index.md)
+
+## Reference
+
+- [Welcome](https://healthchainai.github.io/HealthChain/reference/index.md)
+- [Core Concepts](https://healthchainai.github.io/HealthChain/reference/concepts/index.md)
+- [Configuration](https://healthchainai.github.io/HealthChain/reference/config/index.md)
+- [HealthChainAPI](https://healthchainai.github.io/HealthChain/reference/gateway/api/index.md)
+- [CDS Hooks](https://healthchainai.github.io/HealthChain/reference/gateway/cdshooks/index.md)
+- [Events](https://healthchainai.github.io/HealthChain/reference/gateway/events/index.md)
+- [FHIR Gateway](https://healthchainai.github.io/HealthChain/reference/gateway/fhir_gateway/index.md)
+- [Overview](https://healthchainai.github.io/HealthChain/reference/gateway/gateway/index.md)
+- [SOAP/CDA](https://healthchainai.github.io/HealthChain/reference/gateway/soap_cda/index.md)
+- [Configuration](https://healthchainai.github.io/HealthChain/reference/interop/configuration/index.md)
+- [Engine](https://healthchainai.github.io/HealthChain/reference/interop/engine/index.md)
+- [Generators](https://healthchainai.github.io/HealthChain/reference/interop/generators/index.md)
+- [Overview](https://healthchainai.github.io/HealthChain/reference/interop/interop/index.md)
+- [Mappings](https://healthchainai.github.io/HealthChain/reference/interop/mappings/index.md)
+- [Parsers](https://healthchainai.github.io/HealthChain/reference/interop/parsers/index.md)
+- [Templates](https://healthchainai.github.io/HealthChain/reference/interop/templates/index.md)
+- [Working with xmltodict](https://healthchainai.github.io/HealthChain/reference/interop/xmltodict/index.md)
+- [Overview](https://healthchainai.github.io/HealthChain/reference/io/adapters/adapters/index.md)
+- [CDA Adapter](https://healthchainai.github.io/HealthChain/reference/io/adapters/cdaadapter/index.md)
+- [CDS FHIR Adapter](https://healthchainai.github.io/HealthChain/reference/io/adapters/cdsfhiradapter/index.md)
+- [Overview](https://healthchainai.github.io/HealthChain/reference/io/containers/containers/index.md)
+- [Document](https://healthchainai.github.io/HealthChain/reference/io/containers/document/index.md)
+- [Pipeline](https://healthchainai.github.io/HealthChain/reference/pipeline/pipeline/index.md)
+- [Components](https://healthchainai.github.io/HealthChain/reference/pipeline/components/components/index.md)
+- [Test Data Generators](https://healthchainai.github.io/HealthChain/reference/utilities/data_generator/index.md)
+- [FHIR Helpers](https://healthchainai.github.io/HealthChain/reference/utilities/fhir_helpers/index.md)
+- [Sandbox Client](https://healthchainai.github.io/HealthChain/reference/utilities/sandbox/index.md)
+- [Terminology](https://healthchainai.github.io/HealthChain/reference/utilities/terminology/index.md)
+- [Agent Tools](https://healthchainai.github.io/HealthChain/reference/utilities/tools/index.md)
+- [Security & Compliance](https://healthchainai.github.io/HealthChain/security/index.md): Security and compliance configuration
+
+## API
+
+- [API Reference](https://healthchainai.github.io/HealthChain/api/index.md)
+- [Adapters](https://healthchainai.github.io/HealthChain/api/adapters/index.md)
+- [CDS Hooks](https://healthchainai.github.io/HealthChain/api/cds_hooks/index.md)
+- [Component](https://healthchainai.github.io/HealthChain/api/component/index.md)
+- [Containers](https://healthchainai.github.io/HealthChain/api/containers/index.md)
+- [FHIR Helpers](https://healthchainai.github.io/HealthChain/api/fhir_helpers/index.md)
+- [Interoperability Engine](https://healthchainai.github.io/HealthChain/api/interop/index.md)
+- [Pipeline](https://healthchainai.github.io/HealthChain/api/pipeline/index.md)
+- [Sandbox Client](https://healthchainai.github.io/HealthChain/api/sandbox/index.md)
+- [Terminology](https://healthchainai.github.io/HealthChain/api/terminology/index.md)
+- [Agent Tools](https://healthchainai.github.io/HealthChain/api/tools/index.md)
+
