@@ -128,6 +128,9 @@ def _print_startup_banner(
     auth = config.security.auth if config else "none"
     tls = config.security.tls.enabled if config else False
     audit_log = config.compliance.audit_log if config else None
+    governance = config.governance if config else None
+    standards = ", ".join(governance.standards) if governance else ""
+    clinical_safety_officer = governance.clinical_safety_officer if governance else ""
     # Check registered gateways first, then fall back to env var presence
     fhir_configured = any(
         hasattr(gw, "connection_manager")
@@ -145,6 +148,10 @@ def _print_startup_banner(
     ]
     if site:
         status.append(_status_row("site:       ", site))
+    if standards:
+        status.append(_status_row("standards:  ", standards))
+    if clinical_safety_officer:
+        status.append(_status_row("CSO:        ", clinical_safety_officer))
     status += [
         "",
         _status_row("auth:       ", _val_auth(auth)),

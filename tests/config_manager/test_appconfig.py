@@ -43,7 +43,42 @@ def test_appconfig_missing_fields_use_defaults(tmp_path):
     assert config.security.auth == "none"
     assert config.security.tls.enabled is False
     assert config.compliance.audit_log is None
+    assert config.governance.standards == []
+    assert config.governance.clinical_safety_officer == ""
+    assert config.governance.data_access_agreement == ""
+    assert config.governance.dpia_required is False
+    assert config.governance.notes == ""
     assert config.site.environment == "development"
+
+
+def test_appconfig_governance_parsed_as_declarative_metadata(tmp_path):
+    """AppConfig accepts configured governance context without policy validation."""
+    config_file = tmp_path / "healthchain.yaml"
+    config_file.write_text(
+        """
+governance:
+  standards:
+    - dcb0129
+    - dcb0160
+    - organisation-policy-v1
+  clinical_safety_officer: Dr Jane Smith
+  data_access_agreement: ./governance/daa.pdf
+  dpia_required: true
+  notes: Reviewed by the deployment board.
+"""
+    )
+
+    config = AppConfig.from_yaml(config_file)
+
+    assert config.governance.standards == [
+        "dcb0129",
+        "dcb0160",
+        "organisation-policy-v1",
+    ]
+    assert config.governance.clinical_safety_officer == "Dr Jane Smith"
+    assert config.governance.data_access_agreement == "./governance/daa.pdf"
+    assert config.governance.dpia_required is True
+    assert config.governance.notes == "Reviewed by the deployment board."
 
 
 def test_appconfig_invalid_auth_raises(tmp_path):

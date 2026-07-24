@@ -6,7 +6,8 @@ from fastapi import Depends, HTTPException
 from fastapi.testclient import TestClient
 from fastapi.exceptions import RequestValidationError
 
-from healthchain.gateway.api.app import HealthChainAPI
+from healthchain.config.appconfig import AppConfig, GovernanceConfig
+from healthchain.gateway.api.app import HealthChainAPI, _print_startup_banner
 from healthchain.gateway.api.dependencies import (
     get_event_dispatcher,
     get_gateway,
@@ -82,6 +83,51 @@ def test_app_creation(mock_dispatcher):
     app = HealthChainAPI(enable_events=True, event_dispatcher=mock_dispatcher)
     assert app.get_event_dispatcher() is mock_dispatcher
     assert app.enable_events is True
+
+
+def test_startup_banner_displays_configured_governance(capsys):
+    """Startup banner shows standards and CSO when they are configured."""
+    config = AppConfig(
+        governance=GovernanceConfig(
+            standards=["dcb0129", "dcb0160"],
+            clinical_safety_officer="Dr Jane Smith",
+            data_access_agreement="./governance/daa.pdf",
+            dpia_required=True,
+        )
+    )
+
+    _print_startup_banner(
+        title=config.name,
+        version=config.version,
+        gateways={},
+        services={},
+        docs_url="/docs",
+        config=config,
+    )
+
+    output = capsys.readouterr().out
+    assert "dcb0129, dcb0160" in output
+    assert "Dr Jane Smith" in output
+    assert "./governance/daa.pdf" not in output
+    assert "DPIA" not in output
+
+
+def test_startup_banner_is_silent_for_default_governance(capsys):
+    """Startup banner omits governance rows when no context is configured."""
+    config = AppConfig()
+
+    _print_startup_banner(
+        title=config.name,
+        version=config.version,
+        gateways={},
+        services={},
+        docs_url="/docs",
+        config=config,
+    )
+
+    output = capsys.readouterr().out
+    assert "standards:" not in output
+    assert "CSO:" not in output
 
 
 def test_lifespan_startup_shutdown():

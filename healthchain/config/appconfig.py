@@ -75,6 +75,16 @@ class ComplianceConfig(BaseModel):
     audit_log: Optional[str] = None
 
 
+class GovernanceConfig(BaseModel):
+    """Declarative governance context for a deployment."""
+
+    standards: List[str] = []
+    clinical_safety_officer: str = ""
+    data_access_agreement: str = ""
+    dpia_required: bool = False
+    notes: str = ""
+
+
 class SiteConfig(BaseModel):
     name: str = ""
     environment: str = "development"
@@ -96,6 +106,7 @@ class AppConfig(BaseModel):
     service: ServiceConfig = ServiceConfig()
     security: SecurityConfig = SecurityConfig()
     compliance: ComplianceConfig = ComplianceConfig()
+    governance: GovernanceConfig = GovernanceConfig()
     site: SiteConfig = SiteConfig()
     sources: Dict[str, SourceConfig] = {}
     llm: Optional[LLMConfig] = None

@@ -278,6 +278,16 @@ security:
 compliance:
   audit_log: ./logs/audit.jsonl
 
+# Governance context — declarative metadata only; no compliance enforcement
+# governance:
+#   standards:             # open identifiers, e.g. dcb0129, dcb0160, hipaa
+#     - dcb0129
+#     - dcb0160
+#   clinical_safety_officer: ""
+#   data_access_agreement: ""  # path or URL to the signed agreement
+#   dpia_required: false
+#   notes: ""
+
 # Site / deployment metadata
 site:
   name: ""
@@ -615,6 +625,34 @@ def status():
         print(f"{_key('audit log   ')}{_BOLD}{config.compliance.audit_log}{_RST}")
     else:
         print(f"{_key('audit log   ')}{_DIM}disabled{_RST}")
+
+    governance = config.governance
+    if (
+        governance.standards
+        or governance.clinical_safety_officer
+        or governance.data_access_agreement
+        or governance.dpia_required
+    ):
+        print(_section("Governance"))
+        if governance.standards:
+            print(f"{_key('standards   ')}{', '.join(governance.standards)}")
+        if governance.clinical_safety_officer:
+            print(
+                f"{_key('CSO         ')}"
+                f"{_BOLD}{governance.clinical_safety_officer}{_RST}"
+            )
+        daa_val = (
+            _val_on("configured")
+            if governance.data_access_agreement
+            else f"{_DIM}not configured{_RST}"
+        )
+        print(f"{_key('data access ')}{daa_val}")
+        dpia_val = (
+            f"{_AMBER}required{_RST}"
+            if governance.dpia_required
+            else f"{_DIM}not required{_RST}"
+        )
+        print(f"{_key('DPIA        ')}{dpia_val}")
 
     if config.sources:
         print(_section("Sources"))
