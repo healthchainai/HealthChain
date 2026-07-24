@@ -191,6 +191,22 @@ def test_new_project_yaml_contains_project_name(tmp_path):
     assert "named-app" in yaml_content
 
 
+def test_new_project_yaml_contains_commented_governance_section(tmp_path):
+    """Generated config documents governance fields without enabling the block."""
+    project_dir = tmp_path / "governed-app"
+
+    with patch("builtins.print"):
+        new_project(str(project_dir), "default")
+
+    yaml_content = (project_dir / "healthchain.yaml").read_text()
+    assert "# governance:" in yaml_content
+    assert "#   standards:" in yaml_content
+    assert '#   clinical_safety_officer: ""' in yaml_content
+    assert '#   data_access_agreement: ""' in yaml_content
+    assert "#   dpia_required: false" in yaml_content
+    assert "\ngovernance:" not in yaml_content
+
+
 def test_new_project_rejects_existing_directory(tmp_path):
     """new_project prints an error and does not overwrite an existing directory."""
     project_dir = tmp_path / "existing-app"
@@ -227,6 +243,12 @@ def test_status_displays_config_fields(mock_load):
     mock_config.security.tls.enabled = False
     mock_config.security.allowed_origins = ["*"]
     mock_config.compliance.audit_log = "./logs/audit.jsonl"
+    mock_config.governance.standards = []
+    mock_config.governance.clinical_safety_officer = ""
+    mock_config.governance.data_access_agreement = ""
+    mock_config.governance.dpia_required = False
+    mock_config.sources = {}
+    mock_config.llm = None
     mock_load.return_value = mock_config
 
     with patch("builtins.print") as mock_print:
@@ -238,6 +260,41 @@ def test_status_displays_config_fields(mock_load):
     assert "production" in print_output
     assert "Test Hospital" in print_output
     assert "audit.jsonl" in print_output
+    assert "Governance" not in print_output
+
+
+@patch("healthchain.config.appconfig.AppConfig.load")
+def test_status_displays_configured_governance_fields(mock_load):
+    """status shows configured governance context without exposing agreement details."""
+    mock_config = MagicMock()
+    mock_config.name = "test-app"
+    mock_config.version = "1.0.0"
+    mock_config.service.type = "fhir-gateway"
+    mock_config.service.port = 8000
+    mock_config.site.environment = "production"
+    mock_config.site.name = ""
+    mock_config.security.auth = "none"
+    mock_config.security.tls.enabled = False
+    mock_config.security.allowed_origins = ["*"]
+    mock_config.compliance.audit_log = None
+    mock_config.governance.standards = ["dcb0129", "dcb0160"]
+    mock_config.governance.clinical_safety_officer = "Dr Jane Smith"
+    mock_config.governance.data_access_agreement = "./governance/daa.pdf"
+    mock_config.governance.dpia_required = True
+    mock_config.sources = {}
+    mock_config.llm = None
+    mock_load.return_value = mock_config
+
+    with patch("builtins.print") as mock_print:
+        status()
+
+    print_output = " ".join(str(call) for call in mock_print.call_args_list)
+    assert "Governance" in print_output
+    assert "dcb0129, dcb0160" in print_output
+    assert "Dr Jane Smith" in print_output
+    assert "configured" in print_output
+    assert "required" in print_output
+    assert "./governance/daa.pdf" not in print_output
 
 
 @pytest.mark.parametrize(

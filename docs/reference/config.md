@@ -22,6 +22,16 @@ security:
 compliance:
   audit_log: ./logs/audit.jsonl
 
+# Governance context is optional and purely declarative
+# governance:
+#   standards:
+#     - dcb0129
+#     - dcb0160
+#   clinical_safety_officer: ""
+#   data_access_agreement: ""
+#   dpia_required: false
+#   notes: ""
+
 site:
   name: ""
   environment: development
@@ -72,6 +82,39 @@ site:
 
 !!! note "Audit logging"
     When `audit_log` is set, every request is appended as a JSONL entry containing `timestamp`, `method`, `path`, `status_code`, `duration_ms`, `request_id`, and `user`. The log directory is created automatically if missing. When `api-key` auth is also enabled, `user` records the authenticated identity.
+
+---
+
+## `governance`
+
+Optional deployment governance metadata. This section records context only:
+HealthChain does not validate compliance claims, enforce policy, or expose these
+values through `/health` or other HTTP endpoints.
+
+```yaml
+governance:
+  standards:
+    - dcb0129
+    - dcb0160
+    - organisation-policy-v1
+  clinical_safety_officer: Dr Jane Smith
+  data_access_agreement: ./governance/daa.pdf
+  dpia_required: true
+  notes: Reviewed by the deployment board.
+```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `standards` | list of strings | `[]` | Applicable governance or compliance identifiers. Values are deliberately open and are not validated against a fixed set. |
+| `clinical_safety_officer` | string | `""` | Name or reference for the deployment's clinical safety officer |
+| `data_access_agreement` | path or URL | `""` | Location of the signed data access agreement |
+| `dpia_required` | bool | `false` | Whether a data protection impact assessment is required |
+| `notes` | string | `""` | Free-form deployment governance notes |
+
+When configured, `healthchain serve` shows the standards and clinical safety
+officer in its startup banner. `healthchain status` also reports whether a data
+access agreement is configured and whether a DPIA is required; it does not print
+the agreement path or URL.
 
 ---
 
