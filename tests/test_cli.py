@@ -247,6 +247,7 @@ def test_status_displays_config_fields(mock_load):
     mock_config.governance.clinical_safety_officer = ""
     mock_config.governance.data_access_agreement = ""
     mock_config.governance.dpia_required = False
+    mock_config.governance.notes = ""
     mock_config.sources = {}
     mock_config.llm = None
     mock_load.return_value = mock_config
@@ -281,6 +282,7 @@ def test_status_displays_configured_governance_fields(mock_load):
     mock_config.governance.clinical_safety_officer = "Dr Jane Smith"
     mock_config.governance.data_access_agreement = "./governance/daa.pdf"
     mock_config.governance.dpia_required = True
+    mock_config.governance.notes = "Reviewed by the deployment board."
     mock_config.sources = {}
     mock_config.llm = None
     mock_load.return_value = mock_config
@@ -295,6 +297,41 @@ def test_status_displays_configured_governance_fields(mock_load):
     assert "configured" in print_output
     assert "required" in print_output
     assert "./governance/daa.pdf" not in print_output
+    assert "notes" in print_output
+    assert "Reviewed by the deployment board." not in print_output
+
+
+@patch("healthchain.config.appconfig.AppConfig.load")
+def test_status_displays_notes_only_governance_as_configured(mock_load):
+    """status makes notes-only governance visible without printing free-form text."""
+    mock_config = MagicMock()
+    mock_config.name = "test-app"
+    mock_config.version = "1.0.0"
+    mock_config.service.type = "fhir-gateway"
+    mock_config.service.port = 8000
+    mock_config.site.environment = "production"
+    mock_config.site.name = ""
+    mock_config.security.auth = "none"
+    mock_config.security.tls.enabled = False
+    mock_config.security.allowed_origins = ["*"]
+    mock_config.compliance.audit_log = None
+    mock_config.governance.standards = []
+    mock_config.governance.clinical_safety_officer = ""
+    mock_config.governance.data_access_agreement = ""
+    mock_config.governance.dpia_required = False
+    mock_config.governance.notes = "Internal governance context"
+    mock_config.sources = {}
+    mock_config.llm = None
+    mock_load.return_value = mock_config
+
+    with patch("builtins.print") as mock_print:
+        status()
+
+    print_output = " ".join(str(call) for call in mock_print.call_args_list)
+    assert "Governance" in print_output
+    assert "notes" in print_output
+    assert "configured" in print_output
+    assert "Internal governance context" not in print_output
 
 
 @pytest.mark.parametrize(

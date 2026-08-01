@@ -632,6 +632,7 @@ def status():
         or governance.clinical_safety_officer
         or governance.data_access_agreement
         or governance.dpia_required
+        or governance.notes
     ):
         print(_section("Governance"))
         if governance.standards:
@@ -653,6 +654,8 @@ def status():
             else f"{_DIM}not required{_RST}"
         )
         print(f"{_key('DPIA        ')}{dpia_val}")
+        if governance.notes:
+            print(f"{_key('notes       ')}{_val_on('configured')}")
 
     if config.sources:
         print(_section("Sources"))
