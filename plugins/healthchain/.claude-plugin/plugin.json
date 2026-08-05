@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "healthchain",
+  "displayName": "HealthChain",
+  "version": "0.1.0",
+  "description": "Build healthcare AI services with HealthChain: FHIR gateways, validated FHIR resources, and typed agent tools",
+  "author": {
+    "name": "Jennifer Jiang-Kells",
+    "url": "https://github.com/healthchainai/HealthChain"
+  },
+  "homepage": "https://healthchainai.github.io/HealthChain/",
+  "repository": "https://github.com/healthchainai/HealthChain",
+  "license": "Apache-2.0",
+  "keywords": ["healthcare", "fhir", "ehr", "agents", "mcp"]
+}
