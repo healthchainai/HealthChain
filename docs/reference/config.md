@@ -113,8 +113,8 @@ governance:
 
 When configured, `healthchain serve` shows the standards and clinical safety
 officer in its startup banner. `healthchain status` also reports whether a data
-access agreement is configured and whether a DPIA is required; it does not print
-the agreement path or URL.
+access agreement is configured, whether a DPIA is required, and whether notes
+are present; it does not print the agreement path, URL, or the note text.
 
 ---
 
