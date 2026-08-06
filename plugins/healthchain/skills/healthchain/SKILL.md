@@ -44,3 +44,5 @@ What's not checked: profiles and invariants — that's a server's `$validate`. L
 ## Before writing code
 
 Check exact signatures — and removed 0.15 names — in `reference/api.md` before using the Gateway surface; it is not guessable from memory alone.
+
+- Deeper API docs: https://healthchainai.github.io/HealthChain/llms.txt
