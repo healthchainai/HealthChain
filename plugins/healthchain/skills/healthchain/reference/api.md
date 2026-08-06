@@ -91,7 +91,7 @@ from healthchain.fhir import load_bundle, get_resources, get_coded_entries, reso
 ```
 
 - `get_resources(bundle, resource_type)` / `set_resources` / `add_resource` / `create_bundle` / `get_resource_type`
-- `get_coded_entries(resources)` → `CodedEntry` objects with `.code`, `.display`, `.system`, `.status`, `.authored_on` (renamed from `.date` in 0.16), and `.codings` keeping every coding including text-only concepts
+- `get_coded_entries(bundle, resource_type, status=None)` → `CodedEntry` objects with `.code`, `.display`, `.system`, `.status`, `.authored_on` (renamed from `.date` in 0.16), and `.codings` keeping every coding including text-only concepts
 - `get_medications(bundle)` — the medication-shaped convenience over the same reader
 - `resolve_reference(bundle, reference)` — follows a `Reference` within a bundle
 - `create_resource_from_dict`, `convert_prefetch_to_fhir_objects`, `prefetch_to_bundle`, `read_content_attachment`

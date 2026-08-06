@@ -117,10 +117,10 @@ print(result["ok"], result["resource"]["resourceType"])
 ```bash
 pip install "healthchain[sandbox]"
 healthchain serve &
-healthchain sandbox run
+healthchain sandbox run --url http://localhost:8000/cds/cds-services/my-service
 ```
 
-`SandboxClient` plays the role of the EHR — it fires protocol-shaped requests (CDS Hooks, SOAP/CDA) at the running service, so the integration can be verified whether a human wrote it or an agent built it. `healthchain seed medplum ./data` loads demo FHIR into a test server first when the service needs data to read.
+`--url` is required and points at your own running service's real endpoint — the value above is the CLI's own example shape, not a fixed string to copy as-is. `SandboxClient` plays the role of the EHR — it fires protocol-shaped requests (CDS Hooks, SOAP/CDA) at the running service, so the integration can be verified whether a human wrote it or an agent built it. `healthchain seed medplum ./data` loads demo FHIR into a test server first when the service needs data to read.
 
 ## Reading an existing bundle
 
