@@ -21,3 +21,14 @@ pip install "healthchain[cda,mcp]"   # combine as needed
 ```
 
 Bring your own model framework and use it directly in pipeline nodes. Each [cookbook](cookbook/index.md) states the exact install line it needs, including any model-specific dependencies (e.g. `torch`).
+
+## Give your AI assistant the API
+
+Claude Code users can install the HealthChain plugin, which teaches Claude the current API, the CLI verbs, and the recipes:
+
+```
+/plugin marketplace add healthchainai/HealthChain
+/plugin install healthchain@healthchain
+```
+
+Any other assistant can read [llms.txt](https://healthchainai.github.io/HealthChain/llms.txt) for a map of the API docs.

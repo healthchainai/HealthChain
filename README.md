@@ -57,7 +57,14 @@ Edit `app.py` to add your model, and `healthchain.yaml` to configure deployment 
 
 See the [CLI reference](https://healthchainai.github.io/HealthChain/cli/) for all commands.
 
-Building with an AI assistant? Point it at [llms.txt](https://healthchainai.github.io/HealthChain/llms.txt) for a map of the current API docs.
+Building with an AI assistant? Install the Claude Code plugin so it knows the API:
+
+```
+/plugin marketplace add healthchainai/HealthChain
+/plugin install healthchain@healthchain
+```
+
+Or point any assistant at [llms.txt](https://healthchainai.github.io/HealthChain/llms.txt) for a map of the current API docs.
 
 ## Core Features
 
