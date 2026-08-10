@@ -24,12 +24,18 @@ healthchain serve
 The write path is the one that matters: a model produced something, and it has to enter the record correctly.
 
 ```python
-from healthchain.fhir import create_condition, validate_resource
+from healthchain.fhir import create_condition, create_patient, validate_resource
 
 model_output = {"text": "hypertension", "code": "38341003"}
 
+# The subject comes from your data — the request, a lookup, the bundle you loaded.
+# A Condition pointing at a patient that doesn't exist is valid FHIR and still wrong,
+# so resolve the real patient before you build anything that references one.
+patient = create_patient(identifier="MRN-12345")
+subject = f"Patient/{patient.id}"
+
 condition = create_condition(
-    subject="Patient/123",
+    subject=subject,
     code=model_output["code"],
     display=model_output["text"],
     system="http://snomed.info/sct",
