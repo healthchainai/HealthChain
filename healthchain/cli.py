@@ -303,15 +303,21 @@ site:
 """
 
 
-def new_project(name: str, template: str):
-    """Scaffold a new HealthChain project."""
-    project_dir = Path(name)
+def new_project(name: str, template: str) -> None:
+    """Scaffold a new HealthChain project.
 
-    if project_dir.exists():
-        print(f"Error: directory '{name}' already exists.")
-        return
+    `name` is a directory to create, or "." to scaffold into the current
+    directory — the common case when adding a service to an existing repo.
+    """
+    in_place = name in (".", "./")
+    project_dir = Path(".") if in_place else Path(name)
+    project_name = Path.cwd().name if in_place else name
 
-    project_dir.mkdir()
+    if not in_place:
+        if project_dir.exists():
+            print(f"Error: directory '{name}' already exists.")
+            return
+        project_dir.mkdir()
 
     _app_py = {
         "cds-hooks": _APP_PY_CDS_HOOKS,
@@ -325,23 +331,38 @@ def new_project(name: str, template: str):
     }
     service_type = template if template != "default" else "fhir-gateway"
 
-    (project_dir / "app.py").write_text(_app_py[template])
-    (project_dir / "healthchain.yaml").write_text(
-        _make_healthchain_yaml(name, service_type)
-    )
-    (project_dir / ".env.example").write_text(_env_example[template])
-    (project_dir / "requirements.txt").write_text(_REQUIREMENTS)
-    (project_dir / "Dockerfile").write_text(_DOCKERFILE)
-    (project_dir / ".dockerignore").write_text(_DOCKERIGNORE)
+    files = {
+        "app.py": _app_py[template],
+        "healthchain.yaml": _make_healthchain_yaml(project_name, service_type),
+        ".env.example": _env_example[template],
+        "requirements.txt": _REQUIREMENTS,
+        "Dockerfile": _DOCKERFILE,
+        ".dockerignore": _DOCKERIGNORE,
+    }
 
-    print(f"\n{_BOLD}{_GREEN}✚ Created project '{name}/'{_RST}")
-    print(f"  {_CYAN}{name}/app.py{_RST}")
-    print(f"  {_CYAN}{name}/healthchain.yaml{_RST}")
-    print(f"  {_CYAN}{name}/.env.example{_RST}")
-    print(f"  {_CYAN}{name}/requirements.txt{_RST}")
-    print(f"  {_CYAN}{name}/Dockerfile{_RST}")
+    # Scaffolding in place lands among files someone else wrote — refuse per
+    # file rather than overwriting any of them.
+    clashes = [filename for filename in files if (project_dir / filename).exists()]
+    if clashes:
+        verb = "already exists" if len(clashes) == 1 else "already exist"
+        print(f"Error: {', '.join(clashes)} {verb} here. Nothing was written.")
+        print("Move or remove them, or scaffold into a new directory instead.")
+        return
+
+    for filename, content in files.items():
+        (project_dir / filename).write_text(content)
+
+    prefix = "" if in_place else f"{name}/"
+    if in_place:
+        print(f"\n{_BOLD}{_GREEN}✚ Created project in '{project_name}/'{_RST}")
+    else:
+        print(f"\n{_BOLD}{_GREEN}✚ Created project '{name}/'{_RST}")
+    for filename in files:
+        if filename != ".dockerignore":
+            print(f"  {_CYAN}{prefix}{filename}{_RST}")
     print(f"\n{_BOLD}Next steps:{_RST}")
-    print(f"  {_BOLD}cd {name}{_RST}")
+    if not in_place:
+        print(f"  {_BOLD}cd {name}{_RST}")
     if template == "cds-hooks":
         print(
             f"  {_BOLD}healthchain serve{_RST}          {_DIM}# starts the CDS Hooks service{_RST}"
@@ -684,7 +705,11 @@ def main():
 
     # Subparser for the 'new' command
     new_parser = subparsers.add_parser("new", help="Scaffold a new HealthChain project")
-    new_parser.add_argument("name", type=str, help="Project name (creates a directory)")
+    new_parser.add_argument(
+        "name",
+        type=str,
+        help="Project name (creates a directory), or '.' to scaffold into the current directory",
+    )
     new_parser.add_argument(
         "--type",
         "-t",
