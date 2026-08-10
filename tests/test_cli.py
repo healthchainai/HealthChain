@@ -168,6 +168,21 @@ def test_new_project_fhir_gateway_template_generates_working_app(tmp_path):
     assert "merge_bundles" in app_py
 
 
+def test_new_project_fhir_gateway_template_configures_one_source(tmp_path):
+    """The starter service has one fully documented source, not a broken second one."""
+    project_dir = tmp_path / "my-fhir-app"
+
+    with patch("builtins.print"):
+        new_project(str(project_dir), "fhir-gateway")
+
+    config = (project_dir / "healthchain.yaml").read_text()
+    env_example = (project_dir / ".env.example").read_text()
+    assert "  epic:\n    env_prefix: EPIC" in config
+    assert "cerner:" not in config
+    assert "EPIC_TOKEN_URL" in env_example
+    assert "CERNER_" not in env_example
+
+
 def test_new_project_default_template_generates_stub(tmp_path):
     """new_project with default template generates a minimal stub app.py."""
     project_dir = tmp_path / "my-stub-app"

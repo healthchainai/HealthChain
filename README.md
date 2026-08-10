@@ -64,6 +64,13 @@ Building with an AI assistant? Install the Claude Code plugin so it knows the AP
 /plugin install healthchain@healthchain
 ```
 
+Codex users can install the same skill from the repository marketplace:
+
+```
+codex plugin marketplace add healthchainai/HealthChain
+codex plugin add healthchain@healthchain
+```
+
 Or point any assistant at [llms.txt](https://healthchainai.github.io/HealthChain/llms.txt) for a map of the current API docs.
 
 ## Core Features

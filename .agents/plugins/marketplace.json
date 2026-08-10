@@ -1,0 +1,20 @@
+{
+  "name": "healthchain",
+  "interface": {
+    "displayName": "Healthchain"
+  },
+  "plugins": [
+    {
+      "name": "healthchain",
+      "source": {
+        "source": "local",
+        "path": "./plugins/healthchain"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

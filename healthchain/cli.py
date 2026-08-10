@@ -104,17 +104,15 @@ _ENV_EXAMPLE_CDS_HOOKS = """\
 
 _ENV_EXAMPLE_FHIR_GATEWAY = """\
 # FHIR source credentials
-# Add one block per EHR source. Prefix matches the source name in add_source().
+# The scaffold configures one source. Add further source blocks and matching
+# `sources:` entries in healthchain.yaml when the service needs them.
 
 # Epic
 EPIC_BASE_URL=https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4
 EPIC_CLIENT_ID=
 EPIC_CLIENT_SECRET=
+EPIC_TOKEN_URL=
 # EPIC_CLIENT_SECRET_PATH=/path/to/epic_private_key.pem
-
-# Cerner
-CERNER_BASE_URL=https://fhir-open.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d
-# Cerner open sandbox requires no credentials
 
 # API key authentication (set security.auth: api-key in healthchain.yaml to enforce)
 # HEALTHCHAIN_API_KEY=your-key-here
@@ -242,9 +240,7 @@ def _make_healthchain_yaml(name: str, service_type: str) -> str:
 # FHIRGateway.from_config(config) in app.py wires these up automatically
 sources:
   epic:
-    env_prefix: EPIC    # reads EPIC_CLIENT_ID, EPIC_BASE_URL, EPIC_TOKEN_URL from .env
-  cerner:
-    env_prefix: CERNER  # reads CERNER_BASE_URL from .env (no auth for open sandbox)"""
+    env_prefix: EPIC    # reads EPIC_CLIENT_ID, EPIC_BASE_URL, EPIC_TOKEN_URL from .env"""
     else:
         sources_block = """\
 # FHIR data sources — declare sources here, credentials stay in .env

@@ -26,7 +26,7 @@ Either way the scaffold gives you `app.py` and `healthchain.yaml`. Writing `app.
 healthchain serve
 ```
 
-`healthchain status` shows what `healthchain.yaml` is configured to do — port, security, governance. Source credentials come from environment variables (`EPIC_CLIENT_ID`, `EPIC_CLIENT_SECRET`, and the Cerner equivalents for the two-source scaffold); `healthchain serve` fails fast with a config error if they're missing, which is the fastest way to find out what a source needs. See `reference/api.md` for the `FHIRGateway` surface `app.py` is built on.
+`healthchain status` shows what `healthchain.yaml` is configured to do — port, security, governance. The scaffold configures one Epic source, with credentials from `EPIC_CLIENT_ID`, `EPIC_CLIENT_SECRET`, `EPIC_TOKEN_URL`, and `EPIC_BASE_URL`; add sources in `healthchain.yaml` only when the service needs them. `healthchain serve` fails fast with a config error if the configured source's credentials are missing. See `reference/api.md` for the `FHIRGateway` surface `app.py` is built on.
 
 ## 2. Turn model output into a validated FHIR resource
 

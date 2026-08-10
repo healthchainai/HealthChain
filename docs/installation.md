@@ -31,4 +31,11 @@ Claude Code users can install the HealthChain plugin, which teaches Claude the c
 /plugin install healthchain@healthchain
 ```
 
+Codex users can install the same skill from the repository marketplace:
+
+```
+codex plugin marketplace add healthchainai/HealthChain
+codex plugin add healthchain@healthchain
+```
+
 Any other assistant can read [llms.txt](https://healthchainai.github.io/HealthChain/llms.txt) for a map of the API docs.
