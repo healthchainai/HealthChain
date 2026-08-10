@@ -1,5 +1,6 @@
 {
   "name": "healthchain",
+  "description": "Plugins for building healthcare AI services with HealthChain — FHIR gateways, validated FHIR resources, and typed agent tools",
   "owner": {
     "name": "dotimplement ai",
     "url": "https://dotimplement.ai"

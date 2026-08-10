@@ -65,11 +65,11 @@ condition = create_condition(
 
 `create_condition(subject, clinical_status="active", code=None, display=None, system="http://snomed.info/sct", onset=None, *, generate_id=True, warn=True)`
 
-Keyword-only escape hatches on every `create_*`: `generate_id=False` for deterministic output, `warn=False` to silence binding warnings.
+Keyword-only escape hatches on the resource-level `create_*` helpers: `generate_id=False` for deterministic output, `warn=False` to silence binding warnings. The element helpers take neither — passing either raises `TypeError`.
 
-Others: `create_patient`, `create_medication_statement` (status defaults to `"unknown"`), `create_allergy_intolerance`, `create_value_quantity_observation`, `create_document_reference`, `create_document_reference_content`, `create_risk_assessment_from_prediction`, `set_condition_category`, `add_provenance_metadata`, `add_coding_to_codeable_concept`.
+Others: `create_patient`, `create_medication_statement` (status defaults to `"unknown"`), `create_allergy_intolerance`, `create_value_quantity_observation`, `create_document_reference`, `create_risk_assessment_from_prediction`, `set_condition_category`, `add_provenance_metadata`, `add_coding_to_codeable_concept`.
 
-Element helpers: `create_single_codeable_concept`, `create_single_reaction`, `create_single_attachment`, `create_dosage`.
+Element helpers: `create_single_codeable_concept`, `create_single_reaction`, `create_single_attachment`, `create_dosage`, `create_document_reference_content`.
 
 ### Validate
 

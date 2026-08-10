@@ -27,7 +27,7 @@ Pick by what the task needs. Full signatures are in `reference/api.md`; end-to-e
 ```bash
 healthchain new my-app -t fhir-gateway   # scaffold (also: cds-hooks, default)
 healthchain serve                        # run app:app with uvicorn
-healthchain sandbox run                  # fire test requests at it
+healthchain sandbox run --url URL        # fire test requests at it (--url required)
 healthchain seed medplum ./data          # load demo FHIR into a test server
 healthchain mcp --bundle patient.json    # serve FHIR agent tools over stdio
 healthchain status                       # what healthchain.yaml is configured to do
