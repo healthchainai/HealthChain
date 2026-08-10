@@ -219,6 +219,54 @@ def test_new_project_rejects_existing_directory(tmp_path):
     assert "already exists" in print_output
 
 
+@pytest.mark.parametrize("here", [".", "./"])
+def test_new_project_scaffolds_into_current_directory(tmp_path, monkeypatch, here):
+    """`healthchain new .` writes into the current directory instead of creating one."""
+    monkeypatch.chdir(tmp_path)
+
+    with patch("builtins.print"):
+        new_project(here, "fhir-gateway")
+
+    for filename in (
+        "app.py",
+        "healthchain.yaml",
+        ".env.example",
+        "requirements.txt",
+        "Dockerfile",
+    ):
+        assert (tmp_path / filename).exists()
+    assert not [child for child in tmp_path.iterdir() if child.is_dir()]
+
+
+def test_new_project_in_place_names_config_after_current_directory(
+    tmp_path, monkeypatch
+):
+    """With no name to use, the project name comes from the directory."""
+    project_dir = tmp_path / "existing-repo"
+    project_dir.mkdir()
+    monkeypatch.chdir(project_dir)
+
+    with patch("builtins.print"):
+        new_project(".", "default")
+
+    assert "existing-repo" in (project_dir / "healthchain.yaml").read_text()
+
+
+def test_new_project_in_place_refuses_rather_than_overwriting(tmp_path, monkeypatch):
+    """A collision leaves the existing file untouched and writes nothing else."""
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "app.py").write_text("MY CODE")
+
+    with patch("builtins.print") as mock_print:
+        new_project(".", "fhir-gateway")
+
+    print_output = " ".join(str(call) for call in mock_print.call_args_list)
+    assert "app.py" in print_output and "already exists" in print_output
+    assert (tmp_path / "app.py").read_text() == "MY CODE"
+    assert not (tmp_path / "healthchain.yaml").exists()
+    assert not (tmp_path / "Dockerfile").exists()
+
+
 @patch("healthchain.config.appconfig.AppConfig.load", return_value=None)
 def test_status_with_no_config_prints_helpful_message(mock_load):
     """status prints a helpful message when healthchain.yaml is not found."""
