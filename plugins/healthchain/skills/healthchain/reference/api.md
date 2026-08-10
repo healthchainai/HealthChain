@@ -65,7 +65,7 @@ condition = create_condition(
 
 `create_condition(subject, clinical_status="active", code=None, display=None, system="http://snomed.info/sct", onset=None, *, generate_id=True, warn=True)`
 
-Keyword-only escape hatches on the resource-level `create_*` helpers: `generate_id=False` for deterministic output, `warn=False` to silence binding warnings. The element helpers take neither — passing either raises `TypeError`.
+Keyword-only escape hatches on the resource-level `create_*` helpers: `generate_id=False` for deterministic output, `warn=False` to silence binding warnings. The element helpers accept neither. Most raise `TypeError` if you pass them, but `create_document_reference_content` takes `**kwargs` and silently copies whatever it gets into the dict it returns — passing `generate_id` there yields a content dict with a stray `"generate_id"` key rather than an error.
 
 Others: `create_patient`, `create_medication_statement` (status defaults to `"unknown"`), `create_allergy_intolerance`, `create_value_quantity_observation`, `create_document_reference`, `create_risk_assessment_from_prediction`, `set_condition_category`, `add_provenance_metadata`, `add_coding_to_codeable_concept`.
 
@@ -132,7 +132,7 @@ Zero-code path: `healthchain mcp --bundle patient_bundle.json`.
 
 ## 4. Sandbox — `healthchain.sandbox` (needs `healthchain[sandbox]`)
 
-`SandboxClient` fires protocol-shaped test requests at a running service — CDS Hooks or SOAP/CDA — so the service can be proven end to end with no real EHR. `DatasetLoader` and `DatasetRegistry` load common test datasets (MIMIC-IV on FHIR, Synthea). CLI equivalents: `healthchain sandbox run`, `healthchain seed medplum <path>`.
+`SandboxClient` fires protocol-shaped test requests at a running service — CDS Hooks or SOAP/CDA — so the service can be proven end to end with no real EHR. `DatasetLoader` and `DatasetRegistry` load common test datasets (MIMIC-IV on FHIR, Synthea). CLI equivalents: `healthchain sandbox run --url <url>`, `healthchain seed medplum <path>`.
 
 ## Terminology — `healthchain.terminology`
 
