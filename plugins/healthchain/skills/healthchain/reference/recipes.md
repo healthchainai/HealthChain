@@ -4,13 +4,22 @@ Four end-to-end paths, one per building block. Each is a starting point to adapt
 
 ## 1. Stand up a FHIR gateway service
 
+Starting from nothing:
+
 <!-- pytest.mark.skip -->
 ```bash
 healthchain new my-app -t fhir-gateway
 cd my-app
 ```
 
-The scaffold gives you `app.py` and `healthchain.yaml`. Edit `app.py` to add your sources and endpoints, then:
+Adding a service to a directory that already exists — a repo the user already chose — pass `.` instead, which scaffolds in place and refuses rather than overwriting anything already there:
+
+<!-- pytest.mark.skip -->
+```bash
+healthchain new . -t fhir-gateway
+```
+
+Either way the scaffold gives you `app.py` and `healthchain.yaml`. Writing `app.py` by hand instead skips `healthchain.yaml`, and with it `healthchain serve`, `healthchain status`, and the governance config. Edit `app.py` to add your sources and endpoints, then:
 
 <!-- pytest.mark.skip -->
 ```bash

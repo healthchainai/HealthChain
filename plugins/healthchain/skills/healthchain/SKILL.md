@@ -33,7 +33,7 @@ healthchain mcp --bundle patient.json    # serve FHIR agent tools over stdio
 healthchain status                       # what healthchain.yaml is configured to do
 ```
 
-`healthchain.yaml` is the deployment artifact — port, security, governance config.
+Starting from nothing, `healthchain new my-app` creates the directory. Already inside a project the user chose? `healthchain new .` scaffolds into the current directory instead, and refuses rather than overwriting anything already there. Either way you get `healthchain.yaml`, which is the deployment artifact — port, security, governance config. Hand-writing `app.py` skips it.
 
 ## Why the helpers instead of raw Pydantic
 
