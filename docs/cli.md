@@ -10,14 +10,20 @@ healthchain --help
 
 ## `healthchain new`
 
-Scaffold a new project directory.
+Scaffold a new project directory, or scaffold into the one you're already in.
 
 ```bash
 healthchain new my-app                        # empty stub
 healthchain new my-app --type fhir-gateway    # working FHIR Gateway service
 healthchain new my-app --type cds-hooks       # working CDS Hooks service
 healthchain new my-app -t fhir-gateway        # shorthand
+healthchain new . -t fhir-gateway             # scaffold into the current directory
 ```
+
+Pass `.` when you're adding a service to a repo that already exists. It writes the
+same files into the current directory and takes the project name from the directory
+name. If any of those files are already there it refuses and writes nothing — it will
+not overwrite your work.
 
 **`--type` / `-t`** options:
 

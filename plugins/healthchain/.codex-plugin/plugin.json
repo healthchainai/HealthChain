@@ -1,0 +1,23 @@
+{
+  "name": "healthchain",
+  "version": "0.1.0",
+  "description": "Build healthcare AI services with HealthChain: FHIR gateways, validated FHIR resources, and typed agent tools",
+  "author": {
+    "name": "Jennifer Jiang-Kells",
+    "url": "https://github.com/healthchainai/HealthChain"
+  },
+  "homepage": "https://healthchainai.github.io/HealthChain/",
+  "repository": "https://github.com/healthchainai/HealthChain",
+  "license": "Apache-2.0",
+  "keywords": ["healthcare", "fhir", "ehr", "agents", "mcp"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "HealthChain",
+    "shortDescription": "Build FHIR services with HealthChain.",
+    "longDescription": "Build and test healthcare AI services with current HealthChain APIs, CLI recipes, FHIR validation, and typed agent tools.",
+    "developerName": "HealthChain",
+    "category": "Healthcare",
+    "capabilities": ["Write"],
+    "defaultPrompt": "Build a validated FHIR service with HealthChain."
+  }
+}
