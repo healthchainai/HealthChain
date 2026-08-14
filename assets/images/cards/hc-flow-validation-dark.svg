@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" role="img" aria-label="Validation loop: raw LLM output becomes a typed FHIR resource, validate_resource either returns a report of errors to fix or production-ready FHIR">
+  <rect x="0" y="0" width="880" height="560" rx="16" fill="#2b2532"/>
+  <text x="34" y="52" font-size="19" letter-spacing="2" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">ANY MODEL OUTPUT</text>
+  <text x="560" y="52" font-size="19" letter-spacing="2" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#e59875">TRUSTED FHIR</text>
+
+  <rect x="34" y="110" width="226" height="76" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.75"/>
+  <text x="54" y="142" font-size="19" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">LLM output</text>
+  <text x="54" y="170" font-size="16" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">raw dict · untrusted</text>
+
+  <path d="M260 148 L310 148" stroke="#a89fb0" stroke-width="1.75" fill="none" marker-end="url(#db1)"/>
+
+  <rect x="314" y="104" width="240" height="88" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.75"/>
+  <text x="336" y="138" font-size="19" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">typed resource</text>
+  <text x="336" y="168" font-size="16" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">Condition · Pydantic</text>
+
+  <path d="M554 148 L602 148" stroke="#a89fb0" stroke-width="1.75" fill="none" marker-end="url(#db1)"/>
+
+  <rect x="606" y="96" width="242" height="104" rx="10" fill="#3d2f28" stroke="#e59875" stroke-width="2.5"/>
+  <text x="624" y="140" font-size="18" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#e59875">validate_resource()</text>
+  <text x="624" y="174" font-size="16" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">schema + bindings</text>
+  <rect x="822" y="106" width="10" height="10" fill="#e59875"/>
+  <rect x="810" y="118" width="10" height="10" fill="#f0b49a"/>
+
+  <path d="M660 200 C620 260 560 292 474 306" stroke="#a89fb0" stroke-width="1.75" stroke-dasharray="6 6" fill="none" marker-end="url(#db1)"/>
+  <rect x="180" y="280" width="290" height="118" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.75"/>
+  <text x="202" y="316" font-size="18" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0b49a">ValidationReport ✗</text>
+  <text x="202" y="348" font-size="16" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">missing: clinicalStatus</text>
+  <text x="202" y="376" font-size="16" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">bad code: SNOMED ↯</text>
+  <path d="M320 280 C320 230 360 205 400 196" stroke="#a89fb0" stroke-width="1.75" stroke-dasharray="6 6" fill="none" marker-end="url(#db1)"/>
+  <text x="228" y="246" font-size="16" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#e59875">fix &amp; retry</text>
+
+  <path d="M760 200 L760 292" stroke="#e59875" stroke-width="3" fill="none" marker-end="url(#db2)"/>
+  <rect x="600" y="296" width="248" height="82" rx="10" fill="#3d2f28" stroke="#e59875" stroke-width="2.5"/>
+  <text x="624" y="330" font-size="19" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">valid FHIR ✓</text>
+  <text x="624" y="360" font-size="16" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">safe to ship</text>
+
+  <rect x="34" y="452" width="814" height="62" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.75"/>
+  <text x="58" y="490" font-size="17" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace"><tspan font-weight="700" fill="#e59875">+ terminology</tspan><tspan fill="#a89fb0">  lookup_code("metoprolol") → RxNorm 866427 · SNOMED · LOINC</tspan></text>
+
+  <defs>
+    <marker id="db1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#a89fb0"/>
+    </marker>
+    <marker id="db2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#e59875"/>
+    </marker>
+  </defs>
+</svg>

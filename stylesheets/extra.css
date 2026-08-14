@@ -1,0 +1,548 @@
+/* Import Source Code Pro from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+/* Jersey 25 — display face for the HealthChain wordmark in the header */
+@import url('https://fonts.googleapis.com/css2?family=Jersey+25&display=swap');
+
+/* ============================================
+   Light Mode (Default)
+   ============================================ */
+:root {
+  --md-text-font-family: "Roboto";
+  --md-code-font: "Source Code Pro", monospace;
+  --hc-heading-color: #37352f;
+  /* Warm neutral surfaces (replacing cool Nord grays) */
+  --hc-inline-code-bg: #f3f1ee;
+  --hc-inline-code-color: #4a4540;
+  --hc-code-shadow: #e9e4de;
+  --hc-nav-active-bg: #f3f1ee;
+  --hc-link-color: #723524;
+  --hc-link-hover-color: #9a5238;
+  /* Brand accent (russet) — aligned with dotimplement.ai. Used for links and
+     buttons. Applied sparingly; heading rules and table borders use the softer
+     tint below to keep heading furniture calm. */
+  --hc-accent: #723524;
+  --hc-accent-strong: #5c2a1d;
+  /* Muted, desaturated russet for borders/rules so accents read as quiet
+     structure rather than loud emphasis. */
+  --hc-accent-soft: #ddc9c0;
+}
+
+/* Material defines --md-default-* and --md-code-* under the active scheme
+   selector, which outranks :root. So light-mode overrides of those must use the
+   same selector to take effect. (Custom --hc-* vars above are fine in :root —
+   we consume them directly in rules.) */
+[data-md-color-scheme="default"] {
+  /* Warm off-white page background and warm near-black body text for a calmer,
+     Notion-like reading surface (instead of stark white + cool gray). */
+  --md-default-bg-color: #fdfcfb;
+  --md-default-fg-color: #37352f;
+  --md-default-fg-color--light: rgba(55, 53, 47, 0.7);
+  --md-default-fg-color--lighter: rgba(55, 53, 47, 0.4);
+  --md-default-fg-color--lightest: rgba(55, 53, 47, 0.12);
+
+  /* Material's accent (hover borders, search highlight, active states) tied to
+     the brand accent so it reads warm instead of the old default blue. */
+  --md-accent-fg-color: var(--hc-accent);
+
+  /* Warm cream header (faint russet undertone) so the top bar matches the
+     page warmth instead of reading as stark white. Dark text on top. */
+  --md-primary-fg-color: #f4ede8;
+  --md-primary-bg-color: #37352f;
+  --md-primary-bg-color--light: rgba(55, 53, 47, 0.7);
+
+  /* Always-dark code blocks in light page mode (Outlines/Notion style).
+     Nord palette — a cool blue-charcoal that floats cleanly on white, unlike
+     warm gruvbox which only reads well on a warm dark page. Dark page mode
+     keeps gruvbox (see the slate block below). */
+  --md-code-bg-color: #2e3440;
+  --md-code-fg-color: #d8dee9;
+  --md-code-hl-color: rgba(143, 188, 187, 0.18);
+  --md-code-hl-number-color: #b48ead;
+  --md-code-hl-special-color: #ebcb8b;
+  --md-code-hl-function-color: #88c0d0;
+  --md-code-hl-constant-color: #b48ead;
+  --md-code-hl-keyword-color: #81a1c1;
+  --md-code-hl-string-color: #a3be8c;
+  --md-code-hl-name-color: #d8dee9;
+  --md-code-hl-operator-color: #81a1c1;
+  --md-code-hl-punctuation-color: #eceff4;
+  --md-code-hl-comment-color: #616e88;
+  --md-code-hl-generic-color: #d8dee9;
+  --md-code-hl-variable-color: #88c0d0;
+}
+
+/* ============================================
+   Dark Mode (Slate)
+   ============================================ */
+[data-md-color-scheme="slate"] {
+  /* Warm near-black surface (instead of cool neutral) to match the light theme */
+  --md-default-bg-color: #1c1b1a;
+  --md-default-fg-color: #ededeb;
+  --md-default-fg-color--light: #cbc8c3;
+  --md-default-fg-color--lighter: #9b9890;
+  --md-default-fg-color--lightest: #4d4a44;
+  --hc-heading-color: #f5f4f2;
+  --hc-inline-code-bg: #2f2d2a;
+  --hc-inline-code-color: #e6e3dd;
+  --hc-code-shadow: transparent;
+  --hc-nav-active-bg: #2f2d2a;
+  --hc-link-color: #bd6b46;
+  --hc-link-hover-color: #d68b66;
+  /* Russet lifted for contrast on dark backgrounds (grounded terracotta) */
+  --hc-accent: #bd6b46;
+  --hc-accent-strong: #a35a39;
+  /* Muted accent for borders/rules in dark mode */
+  --hc-accent-soft: #5e4035;
+  /* Material's accent tied to the brand accent (see light scheme note) */
+  --md-accent-fg-color: var(--hc-accent);
+
+  /* Warm near-black header (slightly lifted from the page) with light text */
+  --md-primary-fg-color: #221e1b;
+  --md-primary-bg-color: #ededeb;
+  --md-primary-bg-color--light: rgba(237, 237, 235, 0.7);
+  /* Code blocks: gruvbox-dark in dark mode (light mode uses Material's neutral defaults) */
+  --md-code-bg-color: #282828;
+  --md-code-fg-color: #ebdbb2;
+  --md-code-hl-color: rgba(250, 189, 47, 0.18);
+  --md-code-hl-number-color: #d3869b;
+  --md-code-hl-special-color: #fe8019;
+  --md-code-hl-function-color: #b8bb26;
+  --md-code-hl-constant-color: #d3869b;
+  --md-code-hl-keyword-color: #fb4934;
+  --md-code-hl-string-color: #b8bb26;
+  --md-code-hl-name-color: #ebdbb2;
+  --md-code-hl-operator-color: #fe8019;
+  --md-code-hl-punctuation-color: #ebdbb2;
+  --md-code-hl-comment-color: #928374;
+  --md-code-hl-generic-color: #ebdbb2;
+  --md-code-hl-variable-color: #83a598;
+}
+
+/* ============================================
+   General Styles
+   ============================================ */
+.index-pre-code {
+  max-width: 700px;
+  left: 50%;
+}
+
+.index-pre-code pre>code {
+  text-align: left;
+}
+
+/* Code block as a soft floating card (Outlines/Notion style) */
+.md-typeset pre>code {
+  border-radius: 6px;
+  border: none;
+  padding: 0.9rem 1.15rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Dark page mode: the block barely separates from the page, so drop the
+   drop-shadow and lean on the gruvbox fill instead. */
+[data-md-color-scheme="slate"] .md-typeset pre>code {
+  box-shadow: none;
+}
+
+/* Keep the copy button legible on the dark block in both page modes */
+.md-typeset .md-clipboard {
+  color: rgba(216, 222, 233, 0.55);
+}
+
+.md-typeset .md-clipboard:hover {
+  color: #eceff4;
+}
+
+/* Nord-tinted scrollbars on code blocks */
+.md-typeset pre {
+  scrollbar-width: thin;
+  scrollbar-color: #4c566a transparent;
+}
+
+.md-typeset pre::-webkit-scrollbar {
+  height: 0.4rem;
+  width: 0.4rem;
+}
+
+.md-typeset pre::-webkit-scrollbar-thumb {
+  background-color: #4c566a;
+  border-radius: 0.2rem;
+}
+
+/* Guard: keep inline code light/warm so the dark-block fg color above can't
+   bleed into inline `code` spans that lack a more specific rule. */
+.md-typeset :not(pre) > code {
+  background-color: var(--hc-inline-code-bg);
+  color: var(--hc-inline-code-color);
+  border-radius: 3px;
+  padding: 0.15em 0.4em;
+  font-weight: 500;
+}
+
+.md-typeset p > code,
+.md-typeset strong > code,
+.md-typeset td > code,
+.md-typeset li > code {
+  background: var(--hc-inline-code-bg);
+  color: var(--hc-inline-code-color);
+  font-weight: 500;
+}
+
+.md-content p > code {
+  background: var(--hc-inline-code-bg);
+  color: var(--hc-inline-code-color);
+  font-weight: 500;
+}
+
+.md-typeset code {
+  font-weight: 500;
+}
+
+.md-typeset pre {
+  margin-left: .5rem;
+  margin-right: .5rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+h1.title {
+  color: #FFFFFF;
+  margin: 0px 0px 5px;
+}
+
+h2.subtitle {
+  margin: 5px 0px 25px;
+}
+
+.md-typeset {
+  line-height: 1.7;
+  font-weight: 400;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  font-weight: bold;
+  color: var(--hc-heading-color);
+}
+
+.md-nav__link--active {
+  background-color: var(--hc-nav-active-bg);
+}
+
+code {
+  white-space: pre-wrap !important;
+}
+
+.md-content a {
+  color: var(--hc-link-color);
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.md-content a:hover {
+  color: var(--hc-link-hover-color);
+}
+
+/* ============================================
+   Dark Mode Specific Overrides
+   ============================================ */
+
+/* Ensure dark background applies to all main areas */
+[data-md-color-scheme="slate"],
+[data-md-color-scheme="slate"] body,
+[data-md-color-scheme="slate"] .md-main,
+[data-md-color-scheme="slate"] .md-main__inner,
+[data-md-color-scheme="slate"] .md-content,
+[data-md-color-scheme="slate"] .md-content__inner,
+[data-md-color-scheme="slate"] .md-sidebar,
+[data-md-color-scheme="slate"] .md-sidebar__scrollwrap,
+[data-md-color-scheme="slate"] .md-container {
+  background-color: #1c1b1a;
+}
+
+/* Footer dark mode */
+[data-md-color-scheme="slate"] .md-footer {
+  background-color: #141312;
+}
+
+[data-md-color-scheme="slate"] .md-footer-meta {
+  background-color: #141312;
+}
+
+[data-md-color-scheme="slate"] .md-typeset {
+  color: var(--md-default-fg-color--light);
+}
+
+[data-md-color-scheme="slate"] .md-typeset p,
+[data-md-color-scheme="slate"] .md-typeset li,
+[data-md-color-scheme="slate"] .md-typeset td {
+  color: #cbc8c3;
+}
+
+/* Dark mode navigation */
+[data-md-color-scheme="slate"] .md-nav__link {
+  color: #cbc8c3;
+}
+
+[data-md-color-scheme="slate"] .md-nav__link:hover {
+  color: #ffffff;
+}
+
+[data-md-color-scheme="slate"] .md-nav__link--active {
+  color: #ffffff;
+}
+
+/* ============================================
+   Top Navigation Bar (Tabs) - Kedro-inspired
+   ============================================ */
+
+/* Header styling */
+.md-header {
+  padding-left: 24px;
+  border-radius: 0;
+  border-bottom: 1px solid #ece4dc;
+}
+
+/* Material's `primary: black` sets the header/tabs background with enough
+   specificity to beat our --md-primary-fg-color override, so force the warm
+   near-black directly (mirrors the cream header in light mode). */
+[data-md-color-scheme="slate"] .md-header,
+[data-md-color-scheme="slate"] .md-tabs {
+  background-color: #221e1b;
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  border-bottom-color: #2a2724;
+}
+
+.md-header--shadow {
+  box-shadow: none;
+}
+
+/* HealthChain wordmark in Jersey 25 — scoped to the brand title only, not the
+   page title that slides in on scroll (the second topic). */
+.md-header__title .md-header__topic:first-child .md-ellipsis {
+  font-family: "Jersey 25", var(--md-text-font-family), sans-serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* Tab link styling - larger like Kedro */
+.md-tabs__link {
+  font-size: 16px;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.md-tabs__link:hover {
+  opacity: 1;
+}
+
+/* Active tab - underline effect like Kedro */
+.md-tabs__item--active {
+  font-weight: 600;
+}
+
+.md-tabs__item--active .md-tabs__link {
+  opacity: 1;
+}
+
+/* Underline on active tab */
+.md-tabs__item {
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.md-tabs__item:hover {
+  border-bottom-color: currentColor;
+}
+
+.md-tabs__item--active {
+  border-bottom: 2px solid currentColor;
+}
+
+/* ============================================
+   Light Mode Color Accents
+   ============================================ */
+
+/* Heading rule — a quiet hairline rather than a bold accent bar */
+.md-typeset h1 {
+  color: var(--hc-heading-color);
+  border-bottom: 2px solid var(--hc-accent-soft);
+  padding-bottom: 0.4rem;
+  display: inline-block;
+}
+
+/* H2 section spacing (no left accent bar — keep heading furniture calm) */
+.md-typeset h2 {
+  margin-top: 2.5rem;
+}
+
+/* Admonitions use Material's native per-type colors — no custom left border. */
+
+/* Accent color for blockquotes */
+.md-typeset blockquote {
+  border-left: 3px solid var(--hc-accent-soft);
+  background-color: #f8f4f2;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+}
+
+/* Table header — soft warm fill with a hairline rule */
+.md-typeset table:not([class]) th {
+  background-color: #f8f5f3;
+  border-bottom: 1px solid var(--hc-accent-soft);
+}
+
+/* Sidebar accent - active item */
+.md-nav__link--active {
+  color: var(--hc-accent) !important;
+  font-weight: 600;
+}
+
+.md-nav__item--active > .md-nav__link {
+  color: var(--hc-accent);
+}
+
+/* Search bar styling */
+.md-search__input {
+  border-radius: 8px;
+}
+
+.md-search__input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Button/CTA accent colors */
+.md-typeset .md-button {
+  background-color: var(--hc-accent);
+  border-color: var(--hc-accent);
+  color: #ffffff;
+}
+
+.md-typeset .md-button:hover {
+  background-color: var(--hc-accent-strong);
+  border-color: var(--hc-accent-strong);
+}
+
+.md-typeset .md-button--primary {
+  background-color: var(--hc-accent);
+  border-color: var(--hc-accent);
+}
+
+/* Code block header accent */
+.md-typeset .highlight > .filename {
+  background-color: #f8f5f3;
+  border-bottom: 1px solid var(--hc-accent-soft);
+}
+
+/* ============================================
+   Dark Mode Color Accent Overrides
+   ============================================ */
+[data-md-color-scheme="slate"] .md-typeset h1 {
+  color: var(--hc-heading-color);
+  border-bottom-color: var(--hc-accent-soft);
+}
+
+[data-md-color-scheme="slate"] .md-typeset blockquote {
+  background-color: #262320;
+  border-left-color: var(--hc-accent-soft);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+  background-color: #262320;
+  border-bottom-color: var(--hc-accent-soft);
+}
+
+[data-md-color-scheme="slate"] .md-nav__link--active {
+  color: var(--hc-accent) !important;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .highlight > .filename {
+  background-color: #262320;
+  border-bottom-color: var(--hc-accent-soft);
+}
+
+/* Brand "Plug" logo: show the dark-prong mark on the light header and the
+   white-prong (-reverse) mark on the dark header so the prongs stay legible.
+   Both <img>s render via docs/overrides/partials/logo.html. */
+/* `!important` so the hidden variant beats Material's logo `display:block` in
+   both render spots — the header (specificity 0,2,1) and the mobile nav drawer
+   (.md-nav__title …, specificity 0,3,1, which a plain selector can't outrank). */
+[data-md-color-scheme="default"] .md-logo .hc-logo--dark,
+[data-md-color-scheme="slate"] .md-logo .hc-logo--light {
+  display: none !important;
+}
+
+/* Reusable scheme-swap for brand marks: pair a `--light` (dark-detail) and a
+   `--dark` (white-detail / -reverse) variant, and the wrong one is hidden per
+   color scheme. Used by the 404 and footer marks below. */
+[data-md-color-scheme="default"] .hc-mark--dark,
+[data-md-color-scheme="slate"] .hc-mark--light {
+  display: none;
+}
+
+/* ============================================
+   404 — "disconnected" page
+   ============================================ */
+/* Drop the nav columns and let the content span full width so the centered
+   content centers to the viewport, not to the sidebar-offset content column. */
+.md-main__inner:has(.hc-404) .md-sidebar {
+  display: none;
+}
+
+.md-main__inner:has(.hc-404),
+.md-content:has(.hc-404),
+.md-content__inner:has(.hc-404) {
+  max-width: none !important;
+}
+
+.hc-404 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 16px 96px;
+}
+
+.hc-404__mark {
+  display: inline-flex;
+  /* Tip the plug so it reads as unplugged — nothing to connect to here. */
+  transform: rotate(-12deg);
+  margin-bottom: 28px;
+}
+
+.hc-404__mark img {
+  display: block;
+  width: 104px;
+  height: auto;
+}
+
+.hc-404__title {
+  margin: 0 0 12px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.hc-404__text {
+  margin: 0 0 28px;
+  max-width: 32rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.hc-404__home {
+  font-weight: 600;
+  color: var(--hc-accent);
+}
+
+/* ============================================
+   Footer — "made with care" heart mark
+   ============================================ */
+.hc-footer-mark {
+  height: 0.68rem;
+  width: auto;
+  vertical-align: -0.07rem;
+  margin: 0 0.05rem;
+}
