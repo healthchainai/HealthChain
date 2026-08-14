@@ -22,10 +22,10 @@ codex plugin marketplace add healthchainai/HealthChain
 codex plugin add healthchain@healthchain
 ```
 
-For local development, point Codex at the repository's `.agents/plugins` marketplace directory instead:
+For local development, point Codex at the repository root instead:
 
 ```
-codex plugin marketplace add /path/to/HealthChain/.agents/plugins
+codex plugin marketplace add /path/to/HealthChain
 codex plugin add healthchain@healthchain
 ```
 
