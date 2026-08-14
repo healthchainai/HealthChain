@@ -168,6 +168,21 @@ def test_new_project_fhir_gateway_template_generates_working_app(tmp_path):
     assert "merge_bundles" in app_py
 
 
+def test_new_project_fhir_gateway_template_configures_one_source(tmp_path):
+    """The starter service has one fully documented source, not a broken second one."""
+    project_dir = tmp_path / "my-fhir-app"
+
+    with patch("builtins.print"):
+        new_project(str(project_dir), "fhir-gateway")
+
+    config = (project_dir / "healthchain.yaml").read_text()
+    env_example = (project_dir / ".env.example").read_text()
+    assert "  epic:\n    env_prefix: EPIC" in config
+    assert "cerner:" not in config
+    assert "EPIC_TOKEN_URL" in env_example
+    assert "CERNER_" not in env_example
+
+
 def test_new_project_default_template_generates_stub(tmp_path):
     """new_project with default template generates a minimal stub app.py."""
     project_dir = tmp_path / "my-stub-app"
@@ -217,6 +232,54 @@ def test_new_project_rejects_existing_directory(tmp_path):
 
     print_output = " ".join(str(call) for call in mock_print.call_args_list)
     assert "already exists" in print_output
+
+
+@pytest.mark.parametrize("here", [".", "./"])
+def test_new_project_scaffolds_into_current_directory(tmp_path, monkeypatch, here):
+    """`healthchain new .` writes into the current directory instead of creating one."""
+    monkeypatch.chdir(tmp_path)
+
+    with patch("builtins.print"):
+        new_project(here, "fhir-gateway")
+
+    for filename in (
+        "app.py",
+        "healthchain.yaml",
+        ".env.example",
+        "requirements.txt",
+        "Dockerfile",
+    ):
+        assert (tmp_path / filename).exists()
+    assert not [child for child in tmp_path.iterdir() if child.is_dir()]
+
+
+def test_new_project_in_place_names_config_after_current_directory(
+    tmp_path, monkeypatch
+):
+    """With no name to use, the project name comes from the directory."""
+    project_dir = tmp_path / "existing-repo"
+    project_dir.mkdir()
+    monkeypatch.chdir(project_dir)
+
+    with patch("builtins.print"):
+        new_project(".", "default")
+
+    assert "existing-repo" in (project_dir / "healthchain.yaml").read_text()
+
+
+def test_new_project_in_place_refuses_rather_than_overwriting(tmp_path, monkeypatch):
+    """A collision leaves the existing file untouched and writes nothing else."""
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "app.py").write_text("MY CODE")
+
+    with patch("builtins.print") as mock_print:
+        new_project(".", "fhir-gateway")
+
+    print_output = " ".join(str(call) for call in mock_print.call_args_list)
+    assert "app.py" in print_output and "already exists" in print_output
+    assert (tmp_path / "app.py").read_text() == "MY CODE"
+    assert not (tmp_path / "healthchain.yaml").exists()
+    assert not (tmp_path / "Dockerfile").exists()
 
 
 @patch("healthchain.config.appconfig.AppConfig.load", return_value=None)

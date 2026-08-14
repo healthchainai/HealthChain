@@ -1,0 +1,15 @@
+{
+  "name": "healthchain",
+  "description": "Official Claude Code plugins published from the HealthChain repository, versioned alongside the library they document",
+  "owner": {
+    "name": "dotimplement ai",
+    "url": "https://dotimplement.ai"
+  },
+  "plugins": [
+    {
+      "name": "healthchain",
+      "source": "./plugins/healthchain",
+      "description": "Build healthcare AI services with HealthChain: FHIR gateways, validated FHIR resources, and typed agent tools"
+    }
+  ]
+}
