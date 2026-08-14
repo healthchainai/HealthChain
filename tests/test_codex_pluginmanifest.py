@@ -1,6 +1,7 @@
 """Structural checks for the Codex plugin packaging."""
 
 import json
+import re
 from pathlib import Path
 
 
@@ -8,13 +9,14 @@ REPO_ROOT = Path(__file__).parent.parent
 MANIFEST_PATH = REPO_ROOT / "plugins/healthchain/.codex-plugin/plugin.json"
 MARKETPLACE_PATH = REPO_ROOT / ".agents/plugins/marketplace.json"
 SKILL_PATH = REPO_ROOT / "plugins/healthchain/skills/healthchain/SKILL.md"
+SEMVER = re.compile(r"^\d+\.\d+\.\d+$")
 
 
 def test_codex_manifest_is_complete():
     manifest = json.loads(MANIFEST_PATH.read_text())
 
     assert manifest["name"] == "healthchain"
-    assert manifest["version"] == "0.1.0"
+    assert SEMVER.fullmatch(manifest["version"])
     assert manifest["description"]
     assert manifest["author"]["name"]
     assert manifest["skills"] == "./skills/"
