@@ -57,22 +57,6 @@ Edit `app.py` to add your model, and `healthchain.yaml` to configure deployment 
 
 See the [CLI reference](https://healthchainai.github.io/HealthChain/cli/) for all commands.
 
-Building with an AI assistant? Install the Claude Code plugin so it knows the API:
-
-```
-/plugin marketplace add healthchainai/HealthChain
-/plugin install healthchain@healthchain
-```
-
-Codex users can install the same skill from the repository marketplace:
-
-```
-codex plugin marketplace add healthchainai/HealthChain
-codex plugin add healthchain@healthchain
-```
-
-Or point any assistant at [llms.txt](https://healthchainai.github.io/HealthChain/llms.txt) for a map of the current API docs.
-
 ## Core Features
 
 The quickest way for AI developers and researchers to ship healthcare AI — everything you need out of the box, built to scale with you.
@@ -220,6 +204,22 @@ Or straight from the terminal, no code:
 ```bash
 healthchain mcp --bundle patient_bundle.json
 ```
+
+### Building with an AI assistant
+
+Install the HealthChain plugin to give Claude Code or Codex the current API, CLI, and recipes:
+
+```text
+# Claude Code
+/plugin marketplace add healthchainai/HealthChain
+/plugin install healthchain@healthchain
+
+# Codex
+codex plugin marketplace add healthchainai/HealthChain
+codex plugin add healthchain@healthchain
+```
+
+Or point any assistant at [llms.txt](https://healthchainai.github.io/HealthChain/llms.txt) for a map of the current API docs.
 
 ## 🛣️ What we're building towards
 
