@@ -1,6 +1,6 @@
 {
   "name": "healthchain",
-  "version": "0.1.0",
+  "version": "0.16.1",
   "description": "Build healthcare AI services with HealthChain: FHIR gateways, validated FHIR resources, and typed agent tools",
   "author": {
     "name": "Jennifer Jiang-Kells",
