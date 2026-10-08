@@ -1,0 +1,105 @@
+{
+  "resourceType": "Bundle",
+  "id": "prior-auth-chart-pull",
+  "type": "transaction",
+  "timestamp": "2026-08-19T14:02:11Z",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:843e26e8-9109-5414-b77e-5ab9075287ea",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "wc-claimant-001",
+        "identifier": [
+          {
+            "system": "http://example.org/fhir/sid/wc-claim-number",
+            "value": "WC-2026-004417"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1979-04-12"
+      },
+      "request": {
+        "method": "POST",
+        "url": "Patient"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:5bb12acd-47b4-5f7b-bc39-e59db010e59d",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-lumbar-radic",
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "code": {
+          "text": "lumbar radiculopathy, right L5 distribution"
+        },
+        "subject": {
+          "reference": "urn:uuid:843e26e8-9109-5414-b77e-5ab9075287ea"
+        },
+        "onsetDateTime": "2026-06-02"
+      },
+      "request": {
+        "method": "POST",
+        "url": "Condition"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:181de4a4-e626-5dd9-bd87-6710219dfb75",
+      "resource": {
+        "resourceType": "ServiceRequest",
+        "id": "sr-mri-lumbar",
+        "status": "draft",
+        "intent": "order",
+        "code": {
+          "text": "MRI lumbar spine without contrast"
+        },
+        "subject": {
+          "reference": "urn:uuid:843e26e8-9109-5414-b77e-5ab9075287ea"
+        },
+        "reasonReference": [
+          {
+            "reference": "urn:uuid:5bb12acd-47b4-5f7b-bc39-e59db010e59d"
+          }
+        ],
+        "authoredOn": "2026-08-18"
+      },
+      "request": {
+        "method": "POST",
+        "url": "ServiceRequest"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:6c08a3c7-cd21-594b-9774-0ea1ed72e50f",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "doc-treating-note",
+        "status": "current",
+        "description": "Treating physician progress note",
+        "subject": {
+          "reference": "urn:uuid:843e26e8-9109-5414-b77e-5ab9075287ea"
+        },
+        "date": "2026-08-18T17:30:00Z",
+        "content": [
+          {
+            "attachment": {
+              "contentType": "text/plain",
+              "language": "en-US",
+              "title": "Progress note 2026-08-18",
+              "data": "VHJlYXRpbmcgcGh5c2ljaWFuIHByb2dyZXNzIG5vdGUgLSAyMDI2LTA4LTE4CgpQYXRpZW50OiA0Ny15ZWFyLW9sZCB3YXJlaG91c2Ugc2VsZWN0b3IuIEluZHVzdHJpYWwgaW5qdXJ5IDIwMjYtMDYtMDIgd2hpbGUKbGlmdGluZyBhIDYwIGxiIGNhcnRvbiBmcm9tIGZsb29yIGxldmVsLgoKU3ViamVjdGl2ZTogT25nb2luZyByaWdodC1zaWRlZCBsb3cgYmFjayBwYWluIHJhZGlhdGluZyBiZWxvdyB0aGUga25lZSBpbnRvIHRoZQpsYXRlcmFsIGNhbGYgYW5kIGRvcnN1bSBvZiB0aGUgZm9vdC4gTnVtYm5lc3MgaW4gdGhlIEw1IGRlcm1hdG9tZS4gUGFpbiA3LzEwIHdpdGgKcHJvbG9uZ2VkIHN0YW5kaW5nLgoKT2JqZWN0aXZlOiBTdHJhaWdodCBsZWcgcmFpc2UgcG9zaXRpdmUgb24gdGhlIHJpZ2h0IGF0IDQwIGRlZ3JlZXMuIE1vdG9yIDQvNQpyaWdodCBleHRlbnNvciBoYWxsdWNpcyBsb25ndXMuIERlZXAgdGVuZG9uIHJlZmxleGVzIHN5bW1ldHJpYy4gTm8gc2FkZGxlCmFuZXN0aGVzaWEsIG5vIGJvd2VsIG9yIGJsYWRkZXIgZHlzZnVuY3Rpb24sIG5vIGZldmVyLCBubyBoaXN0b3J5IG9mIG1hbGlnbmFuY3kuCgpDb25zZXJ2YXRpdmUgY2FyZSB0byBkYXRlOiA4IHdlZWtzLiBQaHlzaWNhbCB0aGVyYXB5IDEyIHZpc2l0cyAoMjAyNi0wNi0wOQp0aHJvdWdoIDIwMjYtMDgtMTEpLCBOU0FJRHMsIGFjdGl2aXR5IG1vZGlmaWNhdGlvbiwgaG9tZSBleGVyY2lzZSBwcm9ncmFtLgpObyBtZWFuaW5nZnVsIGZ1bmN0aW9uYWwgaW1wcm92ZW1lbnQuCgpBc3Nlc3NtZW50OiBMdW1iYXIgcmFkaWN1bG9wYXRoeSwgcmlnaHQgTDUgZGlzdHJpYnV0aW9uLgoKUGxhbjogUmVxdWVzdCBNUkkgbHVtYmFyIHNwaW5lIHdpdGhvdXQgY29udHJhc3QgdG8gZXZhbHVhdGUgZm9yIGRpc2MgaGVybmlhdGlvbgp3aXRoIG5lcnZlIHJvb3QgY29tcHJlc3Npb24sIHByaW9yIHRvIGNvbnNpZGVyYXRpb24gb2YgZXBpZHVyYWwgc3Rlcm9pZAppbmplY3Rpb24gb3Igc3VyZ2ljYWwgcmVmZXJyYWwuCg=="
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "DocumentReference"
+      }
+    }
+  ]
+}

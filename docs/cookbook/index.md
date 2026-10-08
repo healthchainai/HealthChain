@@ -110,6 +110,20 @@ Hands-on, runnable recipes for building healthcare AI applications with HealthCh
   </div>
 </a>
 
+<a href="prior_auth_packet/" class="cookbook-card" data-tags="fhir-gateway interop intermediate zero-setup">
+  <div class="cookbook-card-icon">📋</div>
+  <div class="cookbook-card-title">Prior Authorization: Chart Pull to Coded Packet</div>
+  <div class="cookbook-card-description">
+    Pull a chart from a live FHIR server, code the free-text diagnosis and requested service with retrieve-then-rerank terminology lookup, check the utilization-review criteria, and emit a validated authorization packet.
+  </div>
+  <div class="cookbook-tags">
+    <span class="tag tag-intermediate">Intermediate</span>
+    <span class="tag tag-fhirgateway">FHIR Gateway</span>
+    <span class="tag tag-interop">Interop</span>
+    <span class="tag tag-zerosetup">Zero Setup</span>
+  </div>
+</a>
+
 <a href="discharge_summarizer/" class="cookbook-card" data-tags="cdshooks beginner zero-setup">
   <div class="cookbook-card-icon">📝</div>
   <div class="cookbook-card-title">Summarize Discharge Notes with CDS Hooks</div>

@@ -38,6 +38,7 @@ nav:
       - Automated Clinical Coding: cookbook/clinical_coding.md
       - Discharge Summarizer: cookbook/discharge_summarizer.md
       - ML Model Deployment: cookbook/ml_model_deployment.md
+      - Prior Authorization Packet: cookbook/prior_auth_packet.md
   - Docs:
       - Welcome: reference/index.md
       - Core Concepts: reference/concepts.md
@@ -188,6 +189,7 @@ plugins:
           - cookbook/clinical_coding.md
           - cookbook/discharge_summarizer.md
           - cookbook/ml_model_deployment.md
+          - cookbook/prior_auth_packet.md
         Reference:
           - reference/*.md
           - security.md: Security and compliance configuration
