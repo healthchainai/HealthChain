@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 460" role="img" aria-label="Epic, Cerner and your EHR flow through FHIRGateway into one patient record; manual extracts are crossed out">
+  <rect x="0" y="0" width="880" height="460" rx="16" fill="#faf8f7"/>
+  <rect x="36" y="60"  width="216" height="72" rx="12" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="56" y="106" font-size="30" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">Epic</text>
+  <rect x="36" y="160" width="216" height="72" rx="12" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="56" y="206" font-size="30" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">Cerner</text>
+  <rect x="36" y="260" width="216" height="72" rx="12" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="56" y="306" font-size="30" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">your EHR</text>
+
+  <g opacity="0.5">
+    <text x="46" y="416" font-size="26" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">manual extracts</text>
+    <line x1="38" y1="407" x2="296" y2="407" stroke="#bf6b4a" stroke-width="3"/>
+  </g>
+
+  <path d="M252 96 C310 96 320 170 352 188" stroke="#5f5866" stroke-width="2.5" fill="none" marker-end="url(#s1)"/>
+  <path d="M252 196 L352 208" stroke="#5f5866" stroke-width="2.5" fill="none" marker-end="url(#s1)"/>
+  <path d="M252 296 C310 296 320 246 352 228" stroke="#5f5866" stroke-width="2.5" fill="none" marker-end="url(#s1)"/>
+
+  <rect x="372" y="140" width="272" height="140" rx="14" fill="#fdf0e8" stroke="#e59875" stroke-width="2.5"/>
+  <text x="400" y="198" font-size="32" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#bf6b4a">FHIRGateway</text>
+  <text x="400" y="242" font-size="23" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">live · deduped</text>
+  <rect x="614" y="152" width="12" height="12" fill="#e59875"/>
+  <rect x="600" y="166" width="12" height="12" fill="#f0b49a"/>
+  <rect x="614" y="180" width="12" height="12" fill="#e59875"/>
+
+  <path d="M644 210 L698 210" stroke="#bf6b4a" stroke-width="3" fill="none" marker-end="url(#s2)"/>
+
+  <rect x="702" y="140" width="148" height="140" rx="14" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="728" y="192" font-size="30" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">one</text>
+  <text x="796" y="192" font-size="28" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#bf6b4a">✓</text>
+  <text x="728" y="234" font-size="30" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">record</text>
+
+  <defs>
+    <marker id="s1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5f5866"/>
+    </marker>
+    <marker id="s2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#bf6b4a"/>
+    </marker>
+  </defs>
+</svg>
