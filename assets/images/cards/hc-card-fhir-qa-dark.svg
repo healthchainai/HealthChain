@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 460" role="img" aria-label="A patient question plus the live FHIR record produces a grounded answer">
+  <rect x="0" y="0" width="880" height="460" rx="16" fill="#2b2532"/>
+  <rect x="36" y="80" width="300" height="146" rx="20" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="62" y="136" font-size="26" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">"when's my next</text>
+  <text x="62" y="176" font-size="26" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">appointment?"</text>
+  <path d="M96 226 L124 226 L104 260 z" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+
+  <path d="M336 152 L384 152" stroke="#a89fb0" stroke-width="2.5" fill="none" marker-end="url(#q1)"/>
+
+  <rect x="390" y="80" width="280" height="146" rx="14" fill="#3d2f28" stroke="#e59875" stroke-width="2.5"/>
+  <text x="420" y="136" font-size="31" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#e59875">live FHIR</text>
+  <text x="420" y="180" font-size="27" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">+ your LLM</text>
+  <rect x="642" y="92" width="12" height="12" fill="#e59875"/>
+  <rect x="628" y="106" width="12" height="12" fill="#f0b49a"/>
+
+  <path d="M530 226 L530 282" stroke="#e59875" stroke-width="3" fill="none" marker-end="url(#q2)"/>
+  <rect x="330" y="286" width="520" height="130" rx="20" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="380" y="336" font-size="30" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">"24 July, 9:30"</text>
+  <text x="380" y="380" font-size="25" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#e59875">grounded in the record ✓</text>
+
+  <defs>
+    <marker id="q1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#a89fb0"/>
+    </marker>
+    <marker id="q2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#e59875"/>
+    </marker>
+  </defs>
+</svg>

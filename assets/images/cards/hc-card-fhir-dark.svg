@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 460" role="img" aria-label="Messy model output goes through validate_resource and comes out as FHIR you can trust; failures loop back with fix and retry">
+  <rect x="0" y="0" width="880" height="460" rx="16" fill="#2b2532"/>
+  <rect x="36" y="150" width="240" height="130" rx="14" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="60" y="204" font-size="27" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">messy model</text>
+  <text x="60" y="242" font-size="27" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">output</text>
+
+  <path d="M276 215 L336 215" stroke="#a89fb0" stroke-width="2.5" fill="none" marker-end="url(#v1)"/>
+
+  <rect x="346" y="150" width="282" height="130" rx="14" fill="#3d2f28" stroke="#e59875" stroke-width="2.5"/>
+  <text x="376" y="204" font-size="30" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#e59875">validate_</text>
+  <text x="376" y="242" font-size="30" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#e59875">resource()</text>
+  <rect x="598" y="162" width="12" height="12" fill="#e59875"/>
+  <rect x="584" y="176" width="12" height="12" fill="#f0b49a"/>
+
+  <path d="M628 215 L668 215" stroke="#e59875" stroke-width="3" fill="none" marker-end="url(#v2)"/>
+
+  <rect x="674" y="150" width="174" height="130" rx="14" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="698" y="196" font-size="25" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">FHIR you</text>
+  <text x="698" y="230" font-size="25" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">can trust</text>
+  <text x="698" y="266" font-size="28" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#e59875">✓</text>
+
+  <path d="M487 280 C487 372 268 372 180 288" stroke="#a89fb0" stroke-width="1.75" stroke-dasharray="6 6" fill="none" marker-end="url(#v1)"/>
+  <text x="330" y="412" font-size="25" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0b49a">✗ fix &amp; retry</text>
+
+  <defs>
+    <marker id="v1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#a89fb0"/>
+    </marker>
+    <marker id="v2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#e59875"/>
+    </marker>
+  </defs>
+</svg>
