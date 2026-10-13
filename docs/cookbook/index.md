@@ -1,8 +1,10 @@
 # Cookbook
 
-Hands-on, runnable recipes for building healthcare AI applications with HealthChain.
+Runnable patterns for building reusable applications with healthcare data.
 
-!!! tip "Getting started"
+Connect live FHIR sources, turn extracts and model output into coded, validated FHIR, and deliver results through standard healthcare and agent interfaces.
+
+!!! tip "Run a recipe"
     Cookbooks are runnable scripts in the HealthChain repository. Clone the repo to get started:
 
     ```bash
@@ -13,48 +15,48 @@ Hands-on, runnable recipes for building healthcare AI applications with HealthCh
 
     Each cookbook page states the exact `pip install` line it needs — optional capabilities live in extras (`[cda]`, `[examples]`, `[sandbox]`, ...), so you only install what the example uses.
 
-    Run any cookbook from the repo root — e.g. `python cookbook/ml_risk_to_fhir.py`. Filter by **Zero Setup** below to find examples that run immediately with no external accounts.
+    Run any cookbook from the repo root — e.g. `python cookbook/ml_risk_to_fhir.py`. Filter by **Zero Setup** below to find examples that run immediately with no external accounts. Connecting to a live FHIR API? Start with [Working with FHIR Sandboxes](setup_fhir_sandboxes.md).
 
 <div class="tag-legend">
   <span class="tag-legend-title">Filter:</span>
+  <span class="tag tag-filter tag-zerosetup" data-tag="zero-setup">Zero Setup</span>
   <span class="tag tag-filter tag-beginner" data-tag="beginner">Beginner</span>
   <span class="tag tag-filter tag-intermediate" data-tag="intermediate">Intermediate</span>
   <span class="tag tag-filter tag-advanced" data-tag="advanced">Advanced</span>
-  <span class="tag tag-filter tag-genai" data-tag="genai">GenAI</span>
-  <span class="tag tag-filter tag-ml" data-tag="ml">ML Research</span>
-  <span class="tag tag-filter tag-cdshooks" data-tag="cdshooks">CDS Hooks</span>
   <span class="tag tag-filter tag-fhirgateway" data-tag="fhir-gateway">FHIR Gateway</span>
+  <span class="tag tag-filter tag-cdshooks" data-tag="cdshooks">CDS Hooks</span>
   <span class="tag tag-filter tag-interop" data-tag="interop">Interop</span>
-  <span class="tag tag-filter tag-zerosetup" data-tag="zero-setup">Zero Setup</span>
+  <span class="tag tag-filter tag-ml" data-tag="ml">Research / ML</span>
+  <span class="tag tag-filter tag-genai" data-tag="genai">GenAI</span>
   <span class="tag-clear hidden" id="clearFilters">Clear</span>
 </div>
 
 <div class="cookbook-wrapper">
 <div class="cookbook-grid" id="cookbookGrid">
 
-<a href="setup_fhir_sandboxes/" class="cookbook-card" data-tags="beginner fhir-gateway">
-  <div class="cookbook-card-icon">🚦</div>
-  <div class="cookbook-card-title">Working with FHIR Sandboxes</div>
+<a href="research_extract_fhir_api/" class="cookbook-card" data-tags="ml fhir-gateway beginner zero-setup">
+  <div class="cookbook-card-icon">🗄️</div>
+  <div class="cookbook-card-title">Research Extract to Validated FHIR API</div>
   <div class="cookbook-card-description">
-    Spin up and access free Epic, Medplum, and other FHIR sandboxes for safe experimentation. Recommended first step before the other tutorials.
+    Turn a research database extract into typed FHIR resources, identify structural and required-code errors, and load the validated output into a queryable FHIR server.
   </div>
   <div class="cookbook-tags">
     <span class="tag tag-beginner">Beginner</span>
+    <span class="tag tag-ml">Research / ML</span>
     <span class="tag tag-fhirgateway">FHIR Gateway</span>
+    <span class="tag tag-zerosetup">Zero Setup</span>
   </div>
 </a>
 
-<a href="ml_model_deployment/" class="cookbook-card" data-tags="ml fhir-gateway intermediate zero-setup">
-  <div class="cookbook-card-icon">🔬</div>
-  <div class="cookbook-card-title">Deploy ML Models: Predictions to FHIR RiskAssessments</div>
+<a href="multi_ehr_aggregation/" class="cookbook-card" data-tags="fhir-gateway intermediate">
+  <div class="cookbook-card-icon">🔗</div>
+  <div class="cookbook-card-title">Multi-Source FHIR Data</div>
   <div class="cookbook-card-description">
-    Turn the risk scores your model already produces — XGBoost, scikit-learn, anything — into spec-valid FHIR RiskAssessment resources, then write them back to a live FHIR server through FHIRGateway.
+    Query multiple FHIR sources, deduplicate conditions, preserve provenance, and handle source-specific failures through one interface.
   </div>
   <div class="cookbook-tags">
     <span class="tag tag-intermediate">Intermediate</span>
-    <span class="tag tag-ml">ML Research</span>
     <span class="tag tag-fhirgateway">FHIR Gateway</span>
-    <span class="tag tag-zerosetup">Zero Setup</span>
   </div>
 </a>
 
@@ -62,7 +64,7 @@ Hands-on, runnable recipes for building healthcare AI applications with HealthCh
   <div class="cookbook-card-icon">💬</div>
   <div class="cookbook-card-title">FHIR-Grounded Patient Q&A</div>
   <div class="cookbook-card-description">
-    Build a patient Q&A service that fetches live FHIR data, formats it as LLM context via a pipeline, and returns grounded answers. Foundation pattern for patient portal chatbots and care navigation assistants.
+    Use live FHIR as model context and return answers grounded in the underlying record — for research exploration or patient-facing applications.
   </div>
   <div class="cookbook-tags">
     <span class="tag tag-beginner">Beginner</span>
@@ -71,42 +73,17 @@ Hands-on, runnable recipes for building healthcare AI applications with HealthCh
   </div>
 </a>
 
-<a href="multi_ehr_aggregation/" class="cookbook-card" data-tags="genai fhir-gateway intermediate">
-  <div class="cookbook-card-icon">🔗</div>
-  <div class="cookbook-card-title">Multi-Source Patient Data Aggregation</div>
+<a href="ml_model_deployment/" class="cookbook-card" data-tags="ml fhir-gateway intermediate zero-setup">
+  <div class="cookbook-card-icon">🔬</div>
+  <div class="cookbook-card-title">Turn Model Predictions into FHIR RiskAssessments</div>
   <div class="cookbook-card-description">
-    Merge patient data from multiple FHIR sources (Epic, Cerner, etc.), deduplicate conditions, prove provenance, and handle cross-vendor errors. Foundation for RAG and analytics workflows.
+    Turn risk scores from XGBoost, scikit-learn, or another model into validated FHIR RiskAssessment resources, then optionally write them to a live FHIR server.
   </div>
   <div class="cookbook-tags">
     <span class="tag tag-intermediate">Intermediate</span>
-    <span class="tag tag-genai">GenAI</span>
-    <span class="tag tag-fhirgateway">FHIR Gateway</span>
-  </div>
-</a>
-
-<a href="research_extract_fhir_api/" class="cookbook-card" data-tags="ml fhir-gateway beginner zero-setup">
-  <div class="cookbook-card-icon">🗄️</div>
-  <div class="cookbook-card-title">Research Extract to Validated FHIR API</div>
-  <div class="cookbook-card-description">
-    Turn a research database extract into typed, validated FHIR resources and load them into a FHIR server you can query like any EHR — validation catches the dirty rows before they ship.
-  </div>
-  <div class="cookbook-tags">
-    <span class="tag tag-beginner">Beginner</span>
-    <span class="tag tag-ml">ML Research</span>
+    <span class="tag tag-ml">Research / ML</span>
     <span class="tag tag-fhirgateway">FHIR Gateway</span>
     <span class="tag tag-zerosetup">Zero Setup</span>
-  </div>
-</a>
-
-<a href="clinical_coding/" class="cookbook-card" data-tags="interop advanced">
-  <div class="cookbook-card-icon">🧾</div>
-  <div class="cookbook-card-title">Automate Clinical Coding & FHIR Integration</div>
-  <div class="cookbook-card-description">
-    Extract medical conditions from clinical documentation using AI, map to SNOMED CT codes, and sync as FHIR Condition resources for billing, analytics, and interoperability.
-  </div>
-  <div class="cookbook-tags">
-    <span class="tag tag-advanced">Advanced</span>
-    <span class="tag tag-interop">Interop</span>
   </div>
 </a>
 
@@ -124,16 +101,40 @@ Hands-on, runnable recipes for building healthcare AI applications with HealthCh
   </div>
 </a>
 
+<a href="clinical_coding/" class="cookbook-card" data-tags="interop advanced">
+  <div class="cookbook-card-icon">🧾</div>
+  <div class="cookbook-card-title">Automated Coding and FHIR Integration</div>
+  <div class="cookbook-card-description">
+    Run extraction and coding logic over clinical documents, map conditions to SNOMED CT, and return structured FHIR for downstream use.
+  </div>
+  <div class="cookbook-tags">
+    <span class="tag tag-advanced">Advanced</span>
+    <span class="tag tag-interop">Interop</span>
+  </div>
+</a>
+
 <a href="discharge_summarizer/" class="cookbook-card" data-tags="cdshooks beginner zero-setup">
   <div class="cookbook-card-icon">📝</div>
-  <div class="cookbook-card-title">Summarize Discharge Notes with CDS Hooks</div>
+  <div class="cookbook-card-title">Deliver Discharge Summaries with CDS Hooks</div>
   <div class="cookbook-card-description">
-    Deploy a CDS Hooks-compliant service that listens for discharge events, auto-generates concise plain-language summaries, and delivers actionable clinical cards directly into the EHR workflow.
+    Build a CDS Hooks service that turns discharge notes into concise summaries and delivers structured cards in the EHR workflow.
   </div>
   <div class="cookbook-tags">
     <span class="tag tag-beginner">Beginner</span>
     <span class="tag tag-cdshooks">CDS Hooks</span>
     <span class="tag tag-zerosetup">Zero Setup</span>
+  </div>
+</a>
+
+<a href="setup_fhir_sandboxes/" class="cookbook-card" data-tags="beginner fhir-gateway">
+  <div class="cookbook-card-icon">🚦</div>
+  <div class="cookbook-card-title">Working with FHIR Sandboxes</div>
+  <div class="cookbook-card-description">
+    Connect to Epic, Medplum, and other FHIR sandboxes when you need a safe live endpoint for the gateway examples.
+  </div>
+  <div class="cookbook-tags">
+    <span class="tag tag-beginner">Beginner</span>
+    <span class="tag tag-fhirgateway">FHIR Gateway</span>
   </div>
 </a>
 
@@ -146,9 +147,9 @@ Hands-on, runnable recipes for building healthcare AI applications with HealthCh
 
 ---
 
-## From cookbook to service
+## From recipe to reusable application {#from-cookbook-to-service}
 
-Cookbooks are standalone scripts — run them directly to explore and experiment. When you're ready to build a proper service, scaffold a project and move your logic in:
+Cookbooks keep every step visible in one runnable script. Once a pattern fits your use case, move the same logic into an application and choose the interface it needs: FHIR REST, CDS Hooks, CDA, MCP, or LangChain.
 
 ```bash
 # 1. Run a cookbook locally
@@ -162,23 +163,22 @@ cd my-cds-service
 healthchain serve
 ```
 
-`app.run()` (used in cookbooks) is a convenience wrapper — equivalent to running uvicorn directly. `healthchain serve` reads `healthchain.yaml` for port, TLS, and deployment settings, and prints a startup banner so you can see what's active at a glance.
+`app.run()` keeps a standalone recipe easy to execute. When you need a configurable service, `healthchain serve` reads `healthchain.yaml` for the service port and FHIR source names while credentials remain in environment variables.
 
-**What moves from your script into `healthchain.yaml`:**
+**Separate application logic from connection config:**
 
 ```python
-# cookbook — everything hardcoded in Python
+# cookbook — source configuration lives beside the example
 gateway = FHIRGateway()
 gateway.add_source("medplum", FHIRAuthConfig.from_env("MEDPLUM").to_connection_string())
 
-llm = ChatAnthropic(model="claude-opus-4-8", max_tokens=512)
-
 app = HealthChainAPI(title="My App", service_type="fhir-gateway")
+app.register_gateway(gateway)
 app.run(port=8000)
 ```
 
 ```yaml
-# healthchain.yaml — port, sources, and LLM provider declared here
+# healthchain.yaml — service and source names are reusable across environments
 service:
   type: fhir-gateway
   port: 8000
@@ -186,28 +186,21 @@ service:
 sources:
   medplum:
     env_prefix: MEDPLUM   # credentials stay in .env
-
-llm:
-  provider: anthropic
-  model: claude-opus-4-8
-  max_tokens: 512
 ```
 
 ```python
-# app.py — load from config instead
-from langchain.chat_models import init_chat_model
-
-from healthchain.config.appconfig import AppConfig
+# app.py — keep application logic independent of site credentials
+from healthchain.config import AppConfig
 from healthchain.gateway import FHIRGateway, HealthChainAPI
 
 config = AppConfig.load()
 gateway = FHIRGateway.from_config(config)
-llm = init_chat_model(f"{config.llm.provider}:{config.llm.model}")
 
 app = HealthChainAPI(title="My App")
+app.register_gateway(gateway)
 ```
 
 Credentials (API keys, client secrets) always stay in `.env` — never in `healthchain.yaml`.
 
 !!! tip "Configuration reference"
-    See the [configuration reference](../reference/config.md) for all available settings — security, compliance, and more.
+    See the [configuration reference](../reference/config.md) for service, FHIR source, and security settings.

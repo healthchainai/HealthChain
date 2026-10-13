@@ -9,7 +9,7 @@
     {
       "name": "healthchain",
       "source": "./plugins/healthchain",
-      "description": "Build healthcare AI services with HealthChain: FHIR gateways, validated FHIR resources, and typed agent tools"
+      "description": "Build FHIR-connected Python applications with live data access, validation, and typed agent tools"
     }
   ]
 }

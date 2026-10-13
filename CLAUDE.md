@@ -4,15 +4,16 @@
 
 ## 0. Project Overview
 
-HealthChain is an open-source Python framework for productionizing healthcare AI applications with native protocol understanding. It provides built-in FHIR support, real-time EHR connectivity, and deployment tooling for healthcare AI/ML systems.
+HealthChain is an open-source Python library for live FHIR connectivity and validated FHIR tooling. It connects Python pipelines and applications to FHIR APIs, helps them produce coded, validated FHIR, and delivers results through healthcare and agent interfaces.
 
-**Key Problem**: EHR data is specific, complex, and fragmented. HealthChain eliminates months of custom integration work by understanding healthcare protocols and data formats out of the box.
+**Key Problem**: Healthcare data applications are often tied to one site's schemas and connection logic, while structural and coding errors may surface only after FHIR reaches a downstream system. HealthChain provides a consistent FHIR boundary around user-owned logic.
 
-**Target Users** (two audiences, one platform):
-- Clinical AI builders and healthtech teams shipping AI into real healthcare systems — EHR integration, FHIR, reliability
-- AI and agent engineers building on healthcare data — agents, LLMs, and models that read and write validated FHIR
+**Target Users** (in priority order):
+- Research software and healthcare data teams building reusable tools, studies, and data services
+- Healthcare integration engineers working across research organizations, hospitals, payers, and health technology companies
+- AI, agent, and general Python developers building healthcare and personal health applications
 
-For more background, see @README.md and @docs/index.md.
+For more background, read README.md and docs/index.md.
 
 ---
 
@@ -40,36 +41,12 @@ For more background, see @README.md and @docs/index.md.
 
 ---
 
-## 3. Build, Test & Utility Commands
-
-Use `uv` for all development tasks:
-
-```bash
-# Testing
-uv run pytest
-
-# Linting & Formatting
-uv run ruff check . --fix              # Lint and auto-fix
-uv run ruff format .                   # Format code
-
-# Dependency Management
-uv sync                                # Install/sync dependencies
-uv add <package>                       # Add dependency
-uv add --dev <package>                 # Add dev dependency
-
-# Security
-uv run pip-audit                       # Audit installed deps for known vulnerabilities
-```
-
-> Vulnerability fixes arrive via Dependabot security PRs; CI runs `pip-audit` advisory-only on PRs. Run `pip-audit` locally for a full on-demand check.
-
----
-
-## 4. Coding Standards
+## 3. Coding Standards
 
 - **Python**: 3.10-3.13, prefer sync for legacy EHR compatibility; async available for modern systems but use only when explicitly needed
-- **Dependencies**: Pydantic v2 (<2.11.0), NumPy <2.0.0 (spaCy compatibility)
-- **Environment**: Use `uv` to manage dependencies and run commands (`uv run <command>`)
+- **Dependencies**: NumPy must stay <2.0.0 (spaCy compatibility)
+- **Environment**: Use `uv` for all development tasks — manage dependencies and run commands with `uv run <command>`
+- **Dependency security**: Vulnerability fixes arrive via Dependabot security PRs; CI runs `pip-audit` advisory-only on PRs. Run `uv run pip-audit` locally for a full on-demand check.
 - **Formatting**: `ruff` enforces project style
 - **Typing**: Always use explicit type hints, even for obvious types; Pydantic v2 models for external data
 - **Naming**:
@@ -82,27 +59,7 @@ uv run pip-audit                       # Audit installed deps for known vulnerab
 
 ---
 
-## 5. Project Layout & Core Components
-
-```
-healthchain/
-├── cli.py        # CLI entrypoint
-├── config/       # Configuration management
-├── configs/      # YAML + Liquid configs/templates
-├── fhir/         # FHIR utilities and helpers
-├── gateway/      # API gateways (FHIR, CDS Hooks)
-├── interop/      # Format conversion (FHIR ↔ CDA, etc.)
-├── io/           # Data containers, adapters, mappers (external formats ↔ HealthChain)
-├── models/       # Pydantic data models
-├── pipeline/     # Pipeline components and NLP integrations
-├── sandbox/      # CDS Hooks testing scenarios & data loaders
-├── templates/    # Code generation templates
-└── utils/        # Shared utilities
-
-tests/            # Test suite
-cookbook/         # Usage examples and tutorials
-docs/             # MkDocs documentation
-```
+## 4. Core Components
 
 ### Key Modules (When to Use What)
 
@@ -112,21 +69,12 @@ docs/             # MkDocs documentation
 | `gateway/` | EHR connectivity and protocol handling (CDS Hooks, FHIR APIs, SOAP/CDA) |
 | `fhir/` | FHIR resource utilities (fhir.resources models) and helpers |
 | `interop/` | Format conversion with Liquid templates + YAML (FHIR ↔ CDA, etc.) |
-| `io/` | **Containers**: FHIR+AI native structures<br>**Mappers**: semantic mapping (ML features, OMOP)<br>**Adapters**: interface with external formats (CDA, CSV) |
+| `io/` | **Containers**: FHIR-aware structures<br>**Mappers**: semantic mapping (ML features, OMOP)<br>**Adapters**: interface with external formats (CDA, CSV) |
 | `sandbox/` | Testing client for healthcare services (CDS Hooks, SOAP) & dataset loaders for common test datasets (MIMIC-IV on FHIR, Synthea, etc.) |
-
-### Key File References
-
-**FHIR Utilities Pattern**: @healthchain/fhir/
-**Adapter Pattern**: @healthchain/io/adapters/
-**Container Pattern**: @healthchain/io/containers/
-**Mapper Pattern**: @healthchain/io/mappers/
-**Pipeline Pattern**: @healthchain/pipeline/
-**Gateway Pattern**: @healthchain/gateway/
 
 ---
 
-## 6. Common Workflows
+## 5. Common Workflows
 
 ### AI Assistant Workflow
 
@@ -171,19 +119,7 @@ Follow the principles in [CONTRIBUTING.md — Writing Cookbooks](../CONTRIBUTING
 2. If missing, ask: "Create utility function for [ResourceType]?"
 3. Follow pattern: MINIMUM VIABLE resource, all variable data as parameters
 4. Avoid overly specific utilities; prefer generic
----
-
-## 7. Common Pitfalls
-
-**Do:**
-- Use `uv run` to run commands instead of directly running files in the environment
-
-**Don't:**
-- Commit secrets (use environment variables or `.env` file)
-- Make drive-by refactors
-- Write code before planning
-- Write tests during design phase
 
 ---
 
-**Last updated**: 2026-04-20
+**Last updated**: 2026-10-06

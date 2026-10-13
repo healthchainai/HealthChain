@@ -1,7 +1,7 @@
 [project]
 name = "healthchain"
 version = "0.0.0"
-description = "Python SDK for building AI in real healthcare systems — type-safe FHIR, real-time EHR connectivity, and production deployment"
+description = "Python library for connecting applications to FHIR APIs and producing coded, validated FHIR"
 authors = [
     { name = "Jennifer Jiang-Kells", email = "jenniferjiangkells@gmail.com" },
     { name = "Adam Kells", email = "adamjkells93@gmail.com" },
@@ -10,15 +10,17 @@ requires-python = ">=3.10,<3.14"
 readme = "README.md"
 license = { text = "Apache-2.0" }
 keywords = [
+    "research-software",
+    "healthcare-data",
+    "interoperability",
+    "fhir",
+    "fhir-tools",
+    "ehr",
     "ai",
     "llm",
     "agents",
     "mcp",
     "healthcare",
-    "ehr",
-    "mlops",
-    "fhir",
-    "fhir-tools",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
