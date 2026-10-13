@@ -1,48 +1,90 @@
-# Security & Data Handling
+# Security
 
-This page answers the most common information governance questions from NHS Trusts, academic hospitals, and research institutions evaluating HealthChain for clinical AI projects.
+## Does HealthChain store patient data?
 
----
+**No, not by default.** HealthChain does not include a patient-data database
+or managed storage service. FHIR resources and documents normally pass
+transiently through application memory for the duration of a request,
+workflow, or tool session.
 
-## Does HealthChain process or store patient data?
+Data is stored only when the application or operator configures a persistent
+destination, such as a FHIR write, saved file, application log, retained
+object, or external service that stores requests.
 
-**No.** HealthChain is a Python SDK. It provides the scaffolding to build clinical AI workflows — it does not host services, transmit data, or store anything. All data handling happens entirely within your own infrastructure and environment.
+## Can I use HealthChain with real patient data?
 
-When you build an application using HealthChain:
+**Yes, within an appropriately approved application and environment.**
+HealthChain can process real FHIR resources and clinical documents, but the
+library does not itself grant permission to use patient data or make the
+resulting application compliant.
 
-- Patient data **never leaves your environment**
-- HealthChain does not connect to any external servers or telemetry services
-- No data is sent to the HealthChain maintainers or any third party
+Before using real data, your organization must approve the purpose, access,
+configured endpoints, hosting, security controls, logging, retention, and any
+required information-governance or clinical-safety review. Use synthetic data
+for development and examples until those approvals and controls are in place.
+Never include real patient data in public repositories, issues, cookbooks, or
+support requests.
 
----
+## Does HealthChain send patient data outside my environment?
 
-## HIPAA Compliance
+**Not to the HealthChain maintainers.** The library has no HealthChain-hosted
+data service and does not collect telemetry.
 
-HealthChain does not transmit, store, or process Protected Health Information (PHI). The SDK operates entirely within the environment where it is deployed. No HealthChain service, telemetry, or dependency makes external calls with patient data.
+It does connect to endpoints that the application explicitly configures,
+including FHIR servers, terminology services, and model providers. Whether
+those endpoints are inside or outside your environment depends on your
+configuration.
 
-Your organisation is responsible for ensuring that the infrastructure on which HealthChain-based applications run is appropriately hardened and HIPAA-compliant. HealthChain does not introduce additional HIPAA risk.
+## Is HealthChain HIPAA compliant?
 
----
+HealthChain does not provide or claim HIPAA compliance. It is a software
+library rather than a hosted service or compliance product. The absence of a
+built-in patient datastore may simplify the application's data-flow review,
+but the organization remains responsible for assessing the complete
+application, infrastructure, access controls, integrations, and operating
+processes.
 
-## GDPR Compliance
+## Is HealthChain GDPR compliant?
 
-HealthChain is a software library, not a data processor. As such:
+HealthChain does not provide or claim GDPR compliance. Using the library does
+not by itself send data to the HealthChain maintainers, but the roles and
+obligations associated with a HealthChain application depend on how it is
+configured, deployed, and used. The deploying organization remains
+responsible for establishing an appropriate lawful basis, data flows,
+retention, security, and data-subject processes.
 
-- HealthChain itself is not subject to GDPR as a data processor
-- Your organisation, as the controller of any patient data processed using HealthChain, retains full responsibility for GDPR compliance
-- Because HealthChain processes no data itself and has no external network calls, it introduces no additional GDPR risk surface
+## Does HealthChain have an NHS DSPT registration?
 
-If your information governance team requires confirmation of any of the above, feel free to direct them to this page or contact [jenniferjiangkells@gmail.com](mailto:jenniferjiangkells@gmail.com).
+No. HealthChain is an open-source software library and does not have its own
+NHS Data Security and Protection Toolkit registration. NHS organizations must
+assess HealthChain as part of the application and infrastructure in which it
+is used.
 
----
+## Detailed Data Boundary
 
-## NHS Data Security and Protection Toolkit (DSPT)
+HealthChain runs inside the application and infrastructure where it is
+installed. During a request or workflow it can read, transform, validate, and
+transmit health data between components selected by the application. Any
+persistence comes from application code, configured destinations, or external
+services—not from a HealthChain patient database.
 
-HealthChain is a software library and does not have its own DSPT registration. However, because HealthChain introduces no external data flows, its use does not create new data-sharing agreements or processing activities that would require separate DSPT entries.
+The optional built-in audit log records request metadata rather than request
+or response bodies. Its path field can still contain identifiers, so it must
+be included in the application's data-flow and retention review.
 
-For NHS Trusts building HealthChain-based tools that will process patient data, the DSPT obligations remain with the Trust's own infrastructure and deployment environment.
+This transient-by-default boundary is relevant to information-governance
+assessment, but the deployed application's data flows and security properties
+are still determined by its code, configuration, dependencies, and
+infrastructure.
 
----
+## Security Configuration
+
+HealthChain provides configurable API-key authentication, request audit
+logging, and TLS support for services built with `HealthChainAPI`. These are
+application controls, not a compliance certification or a complete security
+programme. See the [security configuration
+documentation](https://healthchainai.github.io/HealthChain/security/) for
+their behavior and limitations.
 
 ## Dependency Security
 
@@ -63,7 +105,3 @@ If you discover a security vulnerability in HealthChain, please **do not open a 
 We aim to acknowledge reports within 2 working days and to issue a patch or mitigation within 14 days of confirmation.
 
 ---
-
-## Questions
-
-For IG queries, penetration test evidence requests, or data flow documentation for your organisation's approval process, contact [jenniferjiangkells@gmail.com](mailto:jenniferjiangkells@gmail.com).

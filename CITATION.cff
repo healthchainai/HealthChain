@@ -3,21 +3,22 @@ message: "If you use HealthChain in your research, please cite it using the meta
 type: software
 title: "HealthChain"
 abstract: >
-  HealthChain is a Python SDK for integrating AI models into healthcare systems
-  systems. It provides a clean interface for building FHIR API Gateways, CDS Hooks services, NLP pipelines,
-  and other clinical AI workflows without boilerplate infrastructure overhead.
-version: "0.14.4"
-date-released: "2026-04-30"
+  HealthChain is an open-source Python library for connecting pipelines and
+  applications to live FHIR APIs, producing coded and validated FHIR, and
+  delivering results through healthcare and agent interfaces.
+version: "0.16.1"
+date-released: "2026-08-14"
 url: "https://github.com/healthchainai/HealthChain"
 repository-code: "https://github.com/healthchainai/HealthChain"
 license: Apache-2.0
 keywords:
-  - clinical AI
+  - research software
+  - healthcare data
+  - interoperability
   - healthcare
-  - Python SDK
+  - Python
   - FHIR
   - CDS Hooks
-  - NLP
   - electronic health records
   - open source
 authors:
@@ -27,7 +28,7 @@ authors:
     email: "jenniferjiangkells@gmail.com"
 preferred-citation:
   type: software
-  title: "HealthChain: A Python SDK for Clinical AI Integration"
+  title: "HealthChain: Open infrastructure for healthcare data applications"
   authors:
     - family-names: "Jiang-Kells"
       given-names: "Jennifer"

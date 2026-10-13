@@ -1,6 +1,6 @@
 # HealthChain plugins for Claude Code and Codex
 
-Gives Claude Code and Codex the HealthChain API and CLI so they can build a working healthcare AI service without reading the docs site first. Both integrations use the same `skills/healthchain/` content.
+Gives Claude Code and Codex the HealthChain API and CLI so they can build FHIR-connected Python applications without reading the docs site first. Both integrations use the same `skills/healthchain/` content.
 
 ## Install in Claude Code
 

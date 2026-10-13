@@ -1,6 +1,14 @@
-# Security & Compliance
+# Security Configuration
 
-HealthChain includes built-in support for API key authentication, audit logging, and TLS — configured via `healthchain.yaml` and enforced at runtime by the gateway middleware stack.
+For answers about patient-data storage, real patient data, configured external
+services, HIPAA, GDPR, and the NHS DSPT, see the project
+[Security and data-handling FAQ](https://github.com/healthchainai/HealthChain/blob/main/SECURITY.md).
+
+## Security controls
+
+HealthChain includes configurable API-key authentication, audit logging, and
+TLS support through `healthchain.yaml`. These application controls are not a
+compliance certification or a complete security programme.
 
 ---
 
@@ -92,4 +100,4 @@ openssl req -x509 -newkey rsa:4096 -keyout certs/server.key \
   -subj "/CN=localhost"
 ```
 
-**For production**, use a certificate issued by a trusted CA. If you're deploying behind a reverse proxy (nginx, Caddy, an NHS load balancer), terminate TLS at the proxy and leave `tls.enabled: false` in HealthChain — the proxy handles the certificate, HealthChain handles the application.
+**For an internet-accessible service**, use a certificate issued by a trusted CA. If the application runs behind a reverse proxy such as nginx or Caddy, terminate TLS at the proxy and leave `tls.enabled: false` in HealthChain — the proxy handles the certificate and HealthChain serves the application.

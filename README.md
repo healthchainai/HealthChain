@@ -24,11 +24,11 @@
 
 </div>
 
-<h2 align="center" style="border-bottom: none">Open-Source Python SDK for Healthcare AI</h2>
+<h2 align="center" style="border-bottom: none">Open infrastructure for healthcare data applications.</h2>
 
 <div align="center">
 
-Agents read clinical data fine — writing it back correctly is the hard part, and generic agent frameworks don't check it. HealthChain gives any model or agent typed, validated FHIR tools they can trust: the right code from the right system, on the right patient, with a valid status. Plus real-time EHR connectivity and production deployment — so what you build holds up outside the demo.
+Connect Python pipelines and applications to live FHIR APIs, build and validate structured output, and deliver it through REST, CDS Hooks, CDA, MCP, or LangChain.
 
 </div>
 
@@ -38,41 +38,22 @@ Agents read clinical data fine — writing it back correctly is the hard part, a
 pip install healthchain
 ```
 
-## Quick Start
+## What HealthChain Does
 
-```bash
-# Scaffold a FHIR Gateway project
-healthchain new my-app -t fhir-gateway
-cd my-app
-
-# Run locally
-healthchain serve
-```
-
-<div align="center">
-  <img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/images/demo.gif" alt="HealthChain CLI demo" width="700">
-</div>
-
-Edit `app.py` to add your model, and `healthchain.yaml` to configure deployment settings.
-
-See the [CLI reference](https://healthchainai.github.io/HealthChain/cli/) for all commands.
-
-## Core Features
-
-The quickest way for AI developers and researchers to ship healthcare AI — everything you need out of the box, built to scale with you.
+HealthChain puts a consistent FHIR boundary around your Python code: live data in, your own logic in the middle, and validated FHIR out. Built for research software, healthcare data, and AI teams.
 
 <table>
   <tr>
     <td width="50%" valign="top">
       <picture>
         <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/images/cards/hc-card-aggregation-dark.svg">
-        <img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/images/cards/hc-card-aggregation-light.svg" alt="Epic, Cerner and your EHR flow through FHIRGateway into one patient record; manual extracts are crossed out" width="100%">
+        <img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/images/cards/hc-card-aggregation-light.svg" alt="Epic, Cerner, and other FHIR sources flow through FHIRGateway into one patient record" width="100%">
       </picture>
       <div align="center">
         <br>
-        <a href="https://healthchainai.github.io/HealthChain/reference/gateway/gateway/"><strong>🔌 Multi-EHR Data Aggregation</strong></a>
+        <a href="https://healthchainai.github.io/HealthChain/reference/gateway/gateway/"><strong>🔌 Connect to Live FHIR APIs</strong></a>
         <br><br>
-        <div>Connect to live FHIR APIs across Epic, Cerner, and more — and move research pipelines off manual database extracts onto data infrastructure that scales past one site</div><br>
+        <div>Connect to Epic, Cerner, Medplum, and other FHIR R4 servers through one interface that handles authentication, source routing, and common FHIR operations.</div><br>
         <a href="https://healthchainai.github.io/HealthChain/cookbook/multi_ehr_aggregation/">Getting Started →</a>
         <br><br>
       </div>
@@ -80,13 +61,13 @@ The quickest way for AI developers and researchers to ship healthcare AI — eve
     <td width="50%" valign="top">
       <picture>
         <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/images/cards/hc-card-fhir-dark.svg">
-        <img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/images/cards/hc-card-fhir-light.svg" alt="Messy model output goes through validate_resource and comes out as FHIR you can trust" width="100%">
+        <img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/images/cards/hc-card-fhir-light.svg" alt="Structured output goes through validate_resource, which reports any FHIR issues to correct" width="100%">
       </picture>
       <div align="center">
         <br>
-        <a href="https://healthchainai.github.io/HealthChain/reference/utilities/fhir_helpers/"><strong>🔥 FHIR as a Superpower</strong></a>
+        <a href="https://healthchainai.github.io/HealthChain/reference/utilities/fhir_helpers/"><strong>🔥 Build and Validate FHIR</strong></a>
         <br><br>
-        <div>Type-safe FHIR resources, validation that catches broken data before it ships, and terminology lookups — the strict schema that turns healthcare data into a built-in unit test</div><br>
+        <div>Build typed resources without hand-writing deeply nested FHIR. Structured validation identifies failing fields and invalid required codes before delivery.</div><br>
         <a href="https://healthchainai.github.io/HealthChain/reference/utilities/fhir_helpers/">Getting Started →</a>
         <br><br>
       </div>
@@ -100,9 +81,9 @@ The quickest way for AI developers and researchers to ship healthcare AI — eve
       </picture>
       <div align="center">
         <br>
-        <a href="https://healthchainai.github.io/HealthChain/reference/utilities/tools/"><strong>🤖 Tools Your Agents Can Trust</strong></a>
+        <a href="https://healthchainai.github.io/HealthChain/reference/utilities/tools/"><strong>🤖 Use the Same Tools with Agents</strong></a>
         <br><br>
-        <div>Hand any agent typed, validated FHIR tools from one toolkit — served to Claude over MCP or dropped into LangChain, so what your agent writes is valid and correctly coded</div><br>
+        <div>Expose the same build, validate, read, and terminology operations over MCP or LangChain, with structured errors an agent can inspect and correct.</div><br>
         <a href="https://healthchainai.github.io/HealthChain/reference/utilities/tools/">Getting Started →</a>
         <br><br>
       </div>
@@ -114,9 +95,9 @@ The quickest way for AI developers and researchers to ship healthcare AI — eve
       </picture>
       <div align="center">
         <br>
-        <a href="https://healthchainai.github.io/HealthChain/cookbook/fhir_qa/"><strong>💬 FHIR-Grounded Patient Q&A</strong></a>
+        <a href="https://healthchainai.github.io/HealthChain/cookbook/fhir_qa/"><strong>💬 Build FHIR-Backed Applications</strong></a>
         <br><br>
-        <div>Answer patient questions from their live clinical record — the foundational pattern for portal chatbots and care-plan assistants, with a schema for truth</div><br>
+        <div>Use live or local FHIR data in research software, patient-facing applications, analytics, decision support, and AI-assisted workflows.</div><br>
         <a href="https://healthchainai.github.io/HealthChain/cookbook/fhir_qa/">Getting Started →</a>
         <br><br>
       </div>
@@ -126,16 +107,16 @@ The quickest way for AI developers and researchers to ship healthcare AI — eve
 
 ## Why HealthChain?
 
-Every serious healthcare AI project builds the same integration infrastructure from scratch. Whether you're deploying a logistic regression, a 70B-parameter model, or an agentic workflow, the wall between a trained model and a live clinical system is the same: real FHIR APIs, validated writes, multi-site deployments, auditable governance. No off-the-shelf solution exists, and engineers who understand both AI and healthcare protocols are scarce and hard to retain.
+Every healthcare data team rebuilds the same integration layer. Whether your logic is rule-based, a logistic regression, or an agent, it needs authenticated access to real FHIR APIs and a reliable way to turn output into coded FHIR. Pipelines tied to one site's warehouse don't travel, and structural or coding errors may only be discovered downstream.
 
-HealthChain handles that complexity so you can focus on what actually matters: the model and the patient.
+HealthChain handles that layer so you can focus on your logic and your domain.
 
-- **Optimized for real-time** - Connect to live FHIR APIs and integration points instead of stale data exports
-- **Validation built in** - Type-safe FHIR resources and validation reports that catch broken data before it ships — including spec-invalid clinical codes that type checks alone let through
-- **No invented facts** - Helpers never add clinical claims you didn't pass: no auto-generated timestamps, no guessed statuses — what enters the record is exactly what your model produced
-- **Bring any model or agent** - LLMs, agents, or classical ML — and output validated FHIR
-- **Works with your existing stack** - Integrates with FastAPI, MCP, and LangChain
-- **Production-ready foundations** - Dockerized deployment, configurable security, and an architecture built for NHS and HIPAA environments
+- **Live data, not exports** — Connect to live FHIR APIs instead of site-specific warehouse queries and stale extracts
+- **Keep connection details out of pipeline logic** — Load endpoints and credentials from environment-backed configuration
+- **Build FHIR with less boilerplate** — Use flat, typed helpers instead of manually assembling deeply nested resources
+- **Catch errors early** — Get structured validation reports with failing field paths and actionable diagnostics
+- **Resolve codes instead of guessing them** — Map free text through a swappable terminology lookup before building a resource
+- **Choose how to deliver the result** — Expose output through FHIR REST services, CDS Hooks, SOAP/CDA, MCP, or LangChain
 
 ## 🏆 Recognition & Community
 
@@ -146,48 +127,68 @@ HealthChain handles that complexity so you can focus on what actually matters: t
 - Presented at [NHS Python Open Source Conference](https://github.com/nhs-r-community/conference-2024/blob/main/Talks/2024-11-21_jiang-kells_building-healthchain.md) ([watch talk](https://www.youtube.com/watch?v=_ZqlPsDUdSY&t=1967s))
 - [Built from NHS AI deployment experience](https://open.substack.com/pub/jenniferjiangkells/p/healthchain-building-the-tool-i-wish) – read the origin story
 
-## 🤝 Partnerships & Production Use
+## 🤝 Pilots & Partnerships
 
 Exploring HealthChain for your product or organization? [Get in touch](mailto:jenniferjiangkells@gmail.com) to discuss integrations, pilots, or collaborations, or join our [Discord](https://discord.gg/UQC6uAepUz) to connect with the community.
 
 ## Usage Examples
 
-### Creating a Gateway [[Docs](https://healthchainai.github.io/HealthChain/reference/gateway/gateway)]
+### Build a FHIR Service
+
+#### Expose Multiple FHIR Sources [[Docs](https://healthchainai.github.io/HealthChain/reference/gateway/gateway)]
 
 ```python
 from healthchain.gateway import HealthChainAPI, FHIRGateway
-from healthchain.fhir.r4b import Patient
+from healthchain.gateway.clients import FHIRAuthConfig
+from healthchain.fhir.r4b import Bundle, Patient
 
-# Create healthcare application
+# Create a FHIR-connected service
 app = HealthChainAPI(title="Multi-EHR Patient Data")
 
-# Connect to multiple FHIR sources
+# Credentials are loaded from EPIC_* and CERNER_* environment variables
 fhir = FHIRGateway()
-fhir.add_source("epic", "fhir://fhir.epic.com/r4?client_id=epic_client_id")
-fhir.add_source("cerner", "fhir://fhir.cerner.com/r4?client_id=cerner_client_id")
+fhir.add_source("epic", FHIRAuthConfig.from_env("EPIC").to_connection_string())
+fhir.add_source("cerner", FHIRAuthConfig.from_env("CERNER").to_connection_string())
 
 @fhir.aggregate(Patient)
-def enrich_patient_data(id: str, source: str) -> Patient:
-    """Get patient data from any connected EHR and add AI enhancements"""
+def patient_data(id: str, source: str) -> Bundle:
+    """Fetch patient data from any configured FHIR source."""
     bundle = fhir.search(
         Patient,
         {"_id": id},
         source,
         add_provenance=True,
-        provenance_tag="ai-enhanced",
+        provenance_tag="healthchain-source",
     )
     return bundle
 
 app.register_gateway(fhir)
 
-# Available at: GET /fhir/transform/Patient/123?source=epic
-# Available at: GET /fhir/transform/Patient/123?source=cerner
+# Available at: GET /fhir/aggregate/Patient?id=123&sources=epic&sources=cerner
 
 if __name__ == "__main__":
     app.run(port=8888)
 ```
 
-### Giving an Agent FHIR Tools [[Docs](https://healthchainai.github.io/HealthChain/reference/utilities/tools/)]
+#### Scaffold with the CLI
+
+Turn a working pipeline into a configurable FHIR service:
+
+```bash
+healthchain new my-app -t fhir-gateway
+cd my-app
+healthchain serve
+```
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/healthchainai/HealthChain/main/docs/assets/images/demo.gif" alt="HealthChain CLI scaffolding and running a FHIR Gateway service" width="700">
+</div>
+
+Add your logic in `app.py`. Use `healthchain.yaml` to configure FHIR sources and service settings while keeping credentials in environment variables. See the [CLI reference](https://healthchainai.github.io/HealthChain/cli/) for all commands.
+
+### Agent and Assistant Workflows
+
+#### Give an Agent FHIR Tools [[Docs](https://healthchainai.github.io/HealthChain/reference/utilities/tools/)]
 
 ```python
 from healthchain.tools import FHIRToolkit
@@ -199,13 +200,13 @@ kit.as_mcp().run()          # serve to Claude or any MCP client
 tools = kit.as_langchain()  # or drop into a LangChain agent
 ```
 
-Or straight from the terminal, no code:
+Or serve the tools straight from the terminal:
 
 ```bash
 healthchain mcp --bundle patient_bundle.json
 ```
 
-### Building with an AI assistant
+#### Build with an AI Assistant
 
 Install the HealthChain plugin to give Claude Code or Codex the current API, CLI, and recipes:
 
@@ -223,19 +224,15 @@ Or point any assistant at [llms.txt](https://healthchainai.github.io/HealthChain
 
 ## 🛣️ What we're building towards
 
-- [x] 🔒 **Security foundations** — API-key authentication, audit logging, and TLS, configured via `healthchain.yaml` and enforced by the gateway middleware
-- [ ] 📋 **Governance as config** — clinical safety, data access agreements, and compliance standards for NHS/HIPAA deployments as a first-class deployment artifact in `healthchain.yaml`
-- [ ] 🔌 **Deeper EHR connectivity** — more FHIR sources, live data patterns, and real-world integration examples from pilot deployments
-- [ ] 📊 **Observability** — deployment telemetry and audit trails for healthcare systems
-- [x] 🤖 **A toolkit for clinical AI agents** — typed FHIR tools with validation and terminology built in, served over MCP and LangChain
+- 🔌 **Deeper FHIR connectivity** — more authentication patterns, write workflows, and real-world examples from pilot deployments
+- 🧪 **Broader validation** — cover more resource types and value-set bindings, with clearer correction reports and optional server-backed profile validation
+- 🧭 **Terminology integrations** — connect the `TerminologyLookup` interface to FHIR terminology servers and licensed vocabularies
+- 🔎 **Traceable data movement** — carry provenance, validation results, and source errors through transformations and downstream delivery
+- 🧱 **Reusable data workflows** — strengthen the patterns for moving research extracts, claims, and application data behind consistent FHIR interfaces
 
 ## 🤝 Contributing
 
-HealthChain is built by and for the next generation of healthcare developers — researchers moving models from retrospective data into live systems, AI developers who don't want to spend months learning FHIR before they can ship anything. The best contributions come from people who have hit a real problem and have something specific to say about it.
-
-**Get started:**
-
-- **Working with healthcare or research data?** [Contribute a cookbook](https://github.com/healthchainai/HealthChain/issues/208) — bring your use case, I'll personally support you through it
+- **Building research software or working with healthcare data?** [Contribute a cookbook](https://github.com/healthchainai/HealthChain/issues/208) — bring your use case, and I'll personally support you through it
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines
 - Technical questions and ideas → [GitHub Discussions](https://github.com/healthchainai/HealthChain/discussions)
 - Pilots and partnerships → [email](mailto:jenniferjiangkells@gmail.com?subject=HealthChain)
@@ -243,8 +240,6 @@ HealthChain is built by and for the next generation of healthcare developers —
 ## 🤗 Acknowledgements
 
 This project builds on [fhir.resources](https://github.com/nazrulworld/fhir.resources) and [CDS Hooks](https://cds-hooks.org/) standards developed by [HL7](https://www.hl7.org/) and [Boston Children's Hospital](https://www.childrenshospital.org/).
-
-See also [groundeval](https://github.com/healthchainai/groundeval) — the open-source eval harness for healthcare AI agents.
 
 ---
 

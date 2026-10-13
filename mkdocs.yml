@@ -1,6 +1,6 @@
 site_name: HealthChain
 site_url: https://healthchainai.github.io/HealthChain/
-site_description: An open-source Python SDK for healthcare AI — typed, validated FHIR tools your models and agents can trust, plus real-time EHR connectivity and production deployment.
+site_description: Open-source Python infrastructure for connecting pipelines and applications to FHIR APIs and producing coded, validated FHIR.
 site_author: Jennifer Jiang-Kells
 
 # Repository
@@ -69,7 +69,7 @@ nav:
           - CDA Adapter: reference/io/adapters/cdaadapter.md
           - CDS FHIR Adapter: reference/io/adapters/cdsfhiradapter.md
       - Configuration: reference/config.md
-      - Security & Compliance: security.md
+      - Security Configuration: security.md
       - Interoperability (CDA):
         - Overview: reference/interop/interop.md
         - Engine: reference/interop/engine.md
@@ -170,10 +170,9 @@ plugins:
   - blog
   - llmstxt:
       markdown_description: >-
-        HealthChain is an open-source Python SDK for building healthcare AI
-        applications — type-safe FHIR resources with validation, agent tools
-        served over MCP and LangChain, real-time EHR connectivity (FHIR APIs,
-        CDS Hooks, SOAP/CDA), and production deployment tooling.
+        HealthChain is open-source Python infrastructure for connecting
+        pipelines and applications to FHIR APIs, producing coded and validated
+        FHIR, and delivering it through REST, CDS Hooks, CDA, MCP, or LangChain.
       full_output: llms-full.txt
       sections:
         Getting started:
@@ -192,7 +191,7 @@ plugins:
           - cookbook/prior_auth_packet.md
         Reference:
           - reference/*.md
-          - security.md: Security and compliance configuration
+          - security.md: Security configuration and application responsibilities
         API:
           - api/*.md
   - mkdocstrings:
