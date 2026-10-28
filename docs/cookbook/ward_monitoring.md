@@ -77,7 +77,7 @@ Admissions are arrivals into the area in the last 12 hours. Acuity is a syntheti
 
 The workflow needs three kinds of record: hospital stays (`Encounter`), the places they happen in (`Location`), and measurements taken during them (`Observation`). In a hospital these come from a live FHIR API.
 
-[**FHIRGateway**](../reference/gateway/fhir_gateway.md) connects to it, handles, authentication and returns typed `Bundles`, so each query is a fresh snapshot rather than last night's extract:
+[**FHIRGateway**](../reference/gateway/fhir_gateway.md) connects to it, handles authentication and returns typed `Bundles`, so each query is a fresh snapshot rather than last night's extract:
 
 ```python
 from healthchain.gateway import FHIRGateway
