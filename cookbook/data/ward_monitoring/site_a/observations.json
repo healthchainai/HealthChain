@@ -1,0 +1,259 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "timestamp": "2026-10-23T12:00:00Z",
+  "entry": [
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Observation/obs-recent",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-recent",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/observation",
+            "value": "obs-recent"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-a/observation",
+              "code": "ACU",
+              "display": "Acuity score (synthetic)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "Encounter/recent"
+        },
+        "effectiveDateTime": "2026-10-23T10:00:00Z",
+        "valueInteger": 3
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Observation/obs-move-old",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-move-old",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/observation",
+            "value": "obs-move-old"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-a/observation",
+              "code": "ACU",
+              "display": "Acuity score (synthetic)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "Encounter/same-area-move"
+        },
+        "effectiveDateTime": "2026-10-22T22:00:00Z",
+        "valueInteger": 4
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Observation/obs-move",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-move",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/observation",
+            "value": "obs-move"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-a/observation",
+              "code": "ACU",
+              "display": "Acuity score (synthetic)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "Encounter/same-area-move"
+        },
+        "effectiveDateTime": "2026-10-23T11:00:00Z",
+        "valueInteger": 2
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Observation/obs-boundary",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-boundary",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/observation",
+            "value": "obs-boundary"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-a/observation",
+              "code": "ACU",
+              "display": "Acuity score (synthetic)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "Encounter/boundary"
+        },
+        "effectiveDateTime": "2026-10-23T01:00:00Z",
+        "valueInteger": 4
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Observation/obs-cross-stale",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-cross-stale",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/observation",
+            "value": "obs-cross-stale"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-a/observation",
+              "code": "ACU",
+              "display": "Acuity score (synthetic)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "Encounter/cross-area-move"
+        },
+        "effectiveDateTime": "2026-10-22T23:00:00Z",
+        "valueInteger": 3
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Observation/obs-south",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-south",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/observation",
+            "value": "obs-south"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-a/observation",
+              "code": "ACU",
+              "display": "Acuity score (synthetic)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "Encounter/older-south"
+        },
+        "effectiveDateTime": "2026-10-23T09:00:00Z",
+        "valueInteger": 1
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Observation/obs-south-later",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-south-later",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/observation",
+            "value": "obs-south-later"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-a/observation",
+              "code": "ACU",
+              "display": "Acuity score (synthetic)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "Encounter/older-south"
+        },
+        "effectiveDateTime": "2026-10-23T12:30:00Z",
+        "valueInteger": 4
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Observation/obs-left",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-left",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/observation",
+            "value": "obs-left"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-a/observation",
+              "code": "ACU",
+              "display": "Acuity score (synthetic)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "Encounter/left-early"
+        },
+        "effectiveDateTime": "2026-10-23T02:00:00Z",
+        "valueInteger": 4
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Observation/obs-overflow",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-overflow",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/observation",
+            "value": "obs-overflow"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-a/observation",
+              "code": "ACU",
+              "display": "Acuity score (synthetic)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "Encounter/overflow"
+        },
+        "effectiveDateTime": "2026-10-23T10:30:00Z",
+        "valueInteger": 4
+      }
+    }
+  ]
+}
