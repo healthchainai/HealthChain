@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" role="img" aria-label="Ward monitoring application: FHIR data from a live API or saved files enters HealthChain, which reads and checks it with FHIRGateway, load_bundle, validation and reference resolution. Inside the HealthChain boundary, your site config maps local locations and codes and ward_definitions.py computes the measures. HealthChainAPI serves the per-area summary at GET /ward-summary to a dashboard.">
+  <rect x="0" y="0" width="880" height="560" rx="16" fill="#faf8f7"/>
+  <g transform="translate(0,35)">
+  <text x="20" y="52" font-size="16" letter-spacing="2" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">SOURCES</text>
+  <text x="756" y="52" font-size="16" letter-spacing="2" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">USERS</text>
+  <rect x="20" y="186" width="130" height="56" rx="8" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="34" y="220" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">FHIR API</text>
+  <rect x="20" y="276" width="130" height="56" rx="8" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="34" y="310" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">saved files</text>
+  <rect x="170" y="90" width="570" height="360" rx="14" fill="#fdf0e8" stroke="#e59875" stroke-width="2.5"/>
+  <text x="186" y="124" font-size="16" font-weight="700" letter-spacing="2" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#bf6b4a">HEALTHCHAIN</text>
+  <rect x="722" y="100" width="10" height="10" fill="#e59875"/>
+  <rect x="710" y="112" width="10" height="10" fill="#f0b49a"/>
+  <rect x="722" y="124" width="10" height="10" fill="#e59875"/>
+  <path d="M150 214 L178 216" stroke="#5f5866" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <path d="M150 304 C164 304 164 258 178 258" stroke="#5f5866" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <text x="186" y="184" font-size="16" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#bf6b4a">data in</text>
+  <rect x="182" y="200" width="138" height="32" rx="16" fill="#ffffff" stroke="#e59875" stroke-width="1.5"/>
+  <text x="196" y="221" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">FHIRGateway</text>
+  <rect x="182" y="242" width="138" height="32" rx="16" fill="#ffffff" stroke="#e59875" stroke-width="1.5"/>
+  <text x="196" y="263" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">load_bundle</text>
+  <rect x="182" y="284" width="138" height="32" rx="16" fill="#ffffff" stroke="#e59875" stroke-width="1.5"/>
+  <text x="196" y="305" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">validation</text>
+  <rect x="182" y="326" width="138" height="32" rx="16" fill="#ffffff" stroke="#e59875" stroke-width="1.5"/>
+  <text x="196" y="347" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">references</text>
+  <text x="186" y="386" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">typed FHIR</text>
+  <rect x="342" y="142" width="228" height="270" rx="10" fill="#faf8f7" stroke="#c9c2cd" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="356" y="170" font-size="16" letter-spacing="2" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">YOUR CODE</text>
+  <rect x="356" y="186" width="200" height="96" rx="8" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="370" y="214" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">site config</text>
+  <text x="370" y="242" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">locations → areas</text>
+  <text x="370" y="266" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">codes → variables</text>
+  <rect x="356" y="302" width="200" height="96" rx="8" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="370" y="330" font-size="14" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">ward_definitions.py</text>
+  <text x="370" y="356" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">admissions · window</text>
+  <text x="370" y="380" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">acuity threshold</text>
+  <path d="M320 216 C336 216 336 234 352 234" stroke="#5f5866" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <path d="M456 282 L456 298" stroke="#5f5866" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <path d="M556 350 C568 350 566 216 580 216" stroke="#5f5866" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <text x="590" y="184" font-size="16" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#bf6b4a">data out</text>
+  <rect x="584" y="200" width="148" height="32" rx="16" fill="#ffffff" stroke="#e59875" stroke-width="1.5"/>
+  <text x="598" y="221" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">HealthChainAPI</text>
+  <rect x="584" y="242" width="148" height="32" rx="16" fill="#ffffff" stroke="#e59875" stroke-width="1.5"/>
+  <text x="598" y="263" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">/ward-summary</text>
+  <path d="M732 216 L752 216" stroke="#5f5866" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <rect x="756" y="186" width="110" height="56" rx="8" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="770" y="220" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">dashboard</text>
+  <text x="756" y="276" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">occupancy</text>
+  <text x="756" y="302" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">admissions</text>
+  <text x="756" y="328" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">acuity</text>
+  </g>
+  <defs>
+    <marker id="wa1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#5f5866"/></marker>
+  </defs>
+</svg>

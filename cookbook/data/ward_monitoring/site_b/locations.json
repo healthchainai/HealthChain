@@ -1,0 +1,426 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "timestamp": "2026-10-23T12:00:00Z",
+  "entry": [
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-100",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-100",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WEST"
+          }
+        ],
+        "name": "West Wing",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "wa"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-110",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-110",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WEST-NORTH"
+          }
+        ],
+        "name": "West North",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "area"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-100"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-111",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-111",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WEST-NORTH-BAY-A"
+          }
+        ],
+        "name": "West North bay A",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "ro"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-110"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-120",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-120",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WEST-SOUTH"
+          }
+        ],
+        "name": "West South",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "area"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-100"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-121",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-121",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WEST-SOUTH-BAY-A"
+          }
+        ],
+        "name": "West South bay A",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "ro"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-120"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-130",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-130",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WEST-SURGE"
+          }
+        ],
+        "name": "West surge",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "area"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-100"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-900",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-900",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "CLINIC"
+          }
+        ],
+        "name": "Day clinic",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "wa"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-1111",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-1111",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WN-A01"
+          }
+        ],
+        "name": "West North bed A1",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-111"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-1122",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-1122",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WN-A02"
+          }
+        ],
+        "name": "West North bed A2",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-111"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-1133",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-1133",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WN-A03"
+          }
+        ],
+        "name": "West North bed A3",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-111"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-1144",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-1144",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WN-A04"
+          }
+        ],
+        "name": "West North bed A4",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-111"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-1155",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-1155",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WN-A05"
+          }
+        ],
+        "name": "West North bed A5",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-111"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-1211",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-1211",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WS-A01"
+          }
+        ],
+        "name": "West South bed A1",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-121"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-1222",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-1222",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WS-A02"
+          }
+        ],
+        "name": "West South bed A2",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-121"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-1233",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-1233",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WS-A03"
+          }
+        ],
+        "name": "West South bed A3",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-121"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-1311",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-1311",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WX-01"
+          }
+        ],
+        "name": "Surge bed 1",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-130"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-b/fhir/Location/loc-901",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc-901",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "CLINIC-1"
+          }
+        ],
+        "name": "Clinic chair 1",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/loc-900"
+        }
+      }
+    }
+  ]
+}

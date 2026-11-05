@@ -35,6 +35,7 @@ nav:
       - FHIR-Grounded Patient Q&A: cookbook/fhir_qa.md
       - Multi-Source Data Integration: cookbook/multi_ehr_aggregation.md
       - Research Extract to FHIR API: cookbook/research_extract_fhir_api.md
+      - Ward Monitoring on Live FHIR Data: cookbook/ward_monitoring.md
       - Automated Clinical Coding: cookbook/clinical_coding.md
       - Discharge Summarizer: cookbook/discharge_summarizer.md
       - ML Model Deployment: cookbook/ml_model_deployment.md
@@ -185,6 +186,7 @@ plugins:
           - cookbook/fhir_qa.md
           - cookbook/multi_ehr_aggregation.md
           - cookbook/research_extract_fhir_api.md
+          - cookbook/ward_monitoring.md
           - cookbook/clinical_coding.md
           - cookbook/discharge_summarizer.md
           - cookbook/ml_model_deployment.md

@@ -1,0 +1,1508 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:47c80d88-9cb9-5fca-94f5-9a598f6d09d8",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WEST"
+          }
+        ],
+        "name": "West Wing",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "wa"
+            }
+          ]
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WEST&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:bb15666c-1f43-556f-86a6-d1fdeb11c18a",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WEST-NORTH"
+          }
+        ],
+        "name": "West North",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "area"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:47c80d88-9cb9-5fca-94f5-9a598f6d09d8"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WEST-NORTH&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:cb202eca-2b18-5917-abf2-eb8e4fb39f0c",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WEST-NORTH-BAY-A"
+          }
+        ],
+        "name": "West North bay A",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "ro"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:bb15666c-1f43-556f-86a6-d1fdeb11c18a"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WEST-NORTH-BAY-A&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9913a99b-8404-5317-b610-6369aab844cc",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WEST-SOUTH"
+          }
+        ],
+        "name": "West South",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "area"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:47c80d88-9cb9-5fca-94f5-9a598f6d09d8"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WEST-SOUTH&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:d0dd8c8d-272e-5e69-ac19-3ad088b67eca",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WEST-SOUTH-BAY-A"
+          }
+        ],
+        "name": "West South bay A",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "ro"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:9913a99b-8404-5317-b610-6369aab844cc"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WEST-SOUTH-BAY-A&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:6d6e0b75-b841-5f3f-a634-fe1c2c6b7b88",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WEST-SURGE"
+          }
+        ],
+        "name": "West surge",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "area"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:47c80d88-9cb9-5fca-94f5-9a598f6d09d8"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WEST-SURGE&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:207a1ffa-28c5-59f6-87af-60c96843b48c",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "CLINIC"
+          }
+        ],
+        "name": "Day clinic",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "wa"
+            }
+          ]
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|CLINIC&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:0e614e39-8096-529a-b355-ccc2a7c2503a",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WN-A01"
+          }
+        ],
+        "name": "West North bed A1",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:cb202eca-2b18-5917-abf2-eb8e4fb39f0c"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WN-A01&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:5c919c44-325a-5768-af90-243af89c443b",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WN-A02"
+          }
+        ],
+        "name": "West North bed A2",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:cb202eca-2b18-5917-abf2-eb8e4fb39f0c"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WN-A02&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:f9dcd801-423c-57cc-a1d3-c5ae5cbdfa21",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WN-A03"
+          }
+        ],
+        "name": "West North bed A3",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:cb202eca-2b18-5917-abf2-eb8e4fb39f0c"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WN-A03&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:d3b9735c-0339-5025-8455-f94efba745df",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WN-A04"
+          }
+        ],
+        "name": "West North bed A4",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:cb202eca-2b18-5917-abf2-eb8e4fb39f0c"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WN-A04&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:180c4e91-07d6-53db-90a6-b99d541417b5",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WN-A05"
+          }
+        ],
+        "name": "West North bed A5",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:cb202eca-2b18-5917-abf2-eb8e4fb39f0c"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WN-A05&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:733f2abd-8578-5d5a-aa5a-fd96f359d6f9",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WS-A01"
+          }
+        ],
+        "name": "West South bed A1",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:d0dd8c8d-272e-5e69-ac19-3ad088b67eca"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WS-A01&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:a66ce0d8-73eb-5c34-b2b2-8de2113eefa9",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WS-A02"
+          }
+        ],
+        "name": "West South bed A2",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:d0dd8c8d-272e-5e69-ac19-3ad088b67eca"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WS-A02&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:dbe51c6d-07e9-5141-9482-63356ea89532",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WS-A03"
+          }
+        ],
+        "name": "West South bed A3",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:d0dd8c8d-272e-5e69-ac19-3ad088b67eca"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WS-A03&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:65988f5b-c3a9-5888-bbd2-34c7f92f3004",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "WX-01"
+          }
+        ],
+        "name": "Surge bed 1",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:6d6e0b75-b841-5f3f-a634-fe1c2c6b7b88"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|WX-01&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:78dfe0c1-2e84-5d0d-92e5-cabc1661be37",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/bed-board",
+            "value": "CLINIC-1"
+          }
+        ],
+        "name": "Clinic chair 1",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "urn:uuid:207a1ffa-28c5-59f6-87af-60c96843b48c"
+        },
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location",
+        "ifNoneExist": "identifier=https://example.org/site-b/bed-board|CLINIC-1&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:a600d6f3-7fa6-5ec3-8754-d71e29f00db6",
+      "resource": {
+        "resourceType": "Encounter",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/encounter",
+            "value": "recent"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-b/patient",
+            "value": "P01"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T07:30:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:0e614e39-8096-529a-b355-ccc2a7c2503a"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T08:00:00Z"
+            }
+          }
+        ],
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Encounter",
+        "ifNoneExist": "identifier=https://example.org/site-b/encounter|recent&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:f5cf8524-8543-55fd-9597-4fd2ec3e7288",
+      "resource": {
+        "resourceType": "Encounter",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/encounter",
+            "value": "same-area-move"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-b/patient",
+            "value": "P02"
+          }
+        },
+        "period": {
+          "start": "2026-10-22T16:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:180c4e91-07d6-53db-90a6-b99d541417b5"
+            },
+            "status": "completed",
+            "period": {
+              "start": "2026-10-22T16:00:00Z",
+              "end": "2026-10-23T09:00:00Z"
+            }
+          },
+          {
+            "location": {
+              "reference": "urn:uuid:5c919c44-325a-5768-af90-243af89c443b"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T09:00:00Z"
+            }
+          }
+        ],
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Encounter",
+        "ifNoneExist": "identifier=https://example.org/site-b/encounter|same-area-move&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:645a0b1d-fdc9-5324-9409-4cc95c914391",
+      "resource": {
+        "resourceType": "Encounter",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/encounter",
+            "value": "boundary"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-b/patient",
+            "value": "P03"
+          }
+        },
+        "period": {
+          "start": "2026-10-22T23:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:f9dcd801-423c-57cc-a1d3-c5ae5cbdfa21"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T00:00:00Z"
+            }
+          }
+        ],
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Encounter",
+        "ifNoneExist": "identifier=https://example.org/site-b/encounter|boundary&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:d184d7bd-d348-50fd-afd4-cf9362665c01",
+      "resource": {
+        "resourceType": "Encounter",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/encounter",
+            "value": "missing-time"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-b/patient",
+            "value": "P04"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T03:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:d3b9735c-0339-5025-8455-f94efba745df"
+            },
+            "status": "active"
+          }
+        ],
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Encounter",
+        "ifNoneExist": "identifier=https://example.org/site-b/encounter|missing-time&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:bf187af8-06ba-5496-8eb8-2092dcef0010",
+      "resource": {
+        "resourceType": "Encounter",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/encounter",
+            "value": "cross-area-move"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-b/patient",
+            "value": "P05"
+          }
+        },
+        "period": {
+          "start": "2026-10-22T20:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:0e614e39-8096-529a-b355-ccc2a7c2503a"
+            },
+            "status": "completed",
+            "period": {
+              "start": "2026-10-22T20:00:00Z",
+              "end": "2026-10-23T07:00:00Z"
+            }
+          },
+          {
+            "location": {
+              "reference": "urn:uuid:733f2abd-8578-5d5a-aa5a-fd96f359d6f9"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T07:00:00Z"
+            }
+          }
+        ],
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Encounter",
+        "ifNoneExist": "identifier=https://example.org/site-b/encounter|cross-area-move&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:efb731da-2b02-5301-9afc-b8bdf42a59d3",
+      "resource": {
+        "resourceType": "Encounter",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/encounter",
+            "value": "older-south"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-b/patient",
+            "value": "P06"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T03:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:a66ce0d8-73eb-5c34-b2b2-8de2113eefa9"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T04:00:00Z"
+            }
+          }
+        ],
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Encounter",
+        "ifNoneExist": "identifier=https://example.org/site-b/encounter|older-south&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:0abc19e4-976d-5e30-980a-cb3e569c6126",
+      "resource": {
+        "resourceType": "Encounter",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/encounter",
+            "value": "left-early"
+          }
+        ],
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-b/patient",
+            "value": "P07"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T00:30:00Z",
+          "end": "2026-10-23T05:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:5c919c44-325a-5768-af90-243af89c443b"
+            },
+            "status": "completed",
+            "period": {
+              "start": "2026-10-23T01:00:00Z",
+              "end": "2026-10-23T05:00:00Z"
+            }
+          }
+        ],
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Encounter",
+        "ifNoneExist": "identifier=https://example.org/site-b/encounter|left-early&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:67b695f1-64df-56d6-91fd-31efc18f9eb6",
+      "resource": {
+        "resourceType": "Encounter",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/encounter",
+            "value": "overflow"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-b/patient",
+            "value": "P08"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T09:30:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:65988f5b-c3a9-5888-bbd2-34c7f92f3004"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T10:00:00Z"
+            }
+          }
+        ],
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Encounter",
+        "ifNoneExist": "identifier=https://example.org/site-b/encounter|overflow&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:48d9d166-09b1-5514-bf0b-fadd07af8f79",
+      "resource": {
+        "resourceType": "Encounter",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/encounter",
+            "value": "not-yet-arrived"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-b/patient",
+            "value": "P09"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T13:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:dbe51c6d-07e9-5141-9482-63356ea89532"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T13:00:00Z"
+            }
+          }
+        ],
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Encounter",
+        "ifNoneExist": "identifier=https://example.org/site-b/encounter|not-yet-arrived&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:412ecae4-d3f4-5057-b0a1-7f5a041a00f1",
+      "resource": {
+        "resourceType": "Encounter",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/encounter",
+            "value": "outside-ward"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-b/patient",
+            "value": "P10"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T02:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:78dfe0c1-2e84-5d0d-92e5-cabc1661be37"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T02:00:00Z"
+            }
+          }
+        ],
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Encounter",
+        "ifNoneExist": "identifier=https://example.org/site-b/encounter|outside-ward&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:f357d62c-e28d-51c6-adb7-76705e1146fc",
+      "resource": {
+        "resourceType": "Observation",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/observation",
+            "value": "obs-recent"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-b/flowsheet",
+              "code": "DEPENDENCY",
+              "display": "NEWS2 total (flowsheet)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "urn:uuid:a600d6f3-7fa6-5ec3-8754-d71e29f00db6"
+        },
+        "effectiveDateTime": "2026-10-23T10:00:00Z",
+        "valueInteger": 7,
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Observation",
+        "ifNoneExist": "identifier=https://example.org/site-b/observation|obs-recent&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:cf811733-e9dc-5d7e-bb3a-ab1fd34924ae",
+      "resource": {
+        "resourceType": "Observation",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/observation",
+            "value": "obs-move-old"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-b/flowsheet",
+              "code": "DEPENDENCY",
+              "display": "NEWS2 total (flowsheet)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "urn:uuid:f5cf8524-8543-55fd-9597-4fd2ec3e7288"
+        },
+        "effectiveDateTime": "2026-10-22T22:00:00Z",
+        "valueInteger": 8,
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Observation",
+        "ifNoneExist": "identifier=https://example.org/site-b/observation|obs-move-old&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:063bc082-9842-5c56-8a02-667976fe716f",
+      "resource": {
+        "resourceType": "Observation",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/observation",
+            "value": "obs-move"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-b/flowsheet",
+              "code": "DEPENDENCY",
+              "display": "NEWS2 total (flowsheet)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "urn:uuid:f5cf8524-8543-55fd-9597-4fd2ec3e7288"
+        },
+        "effectiveDateTime": "2026-10-23T11:00:00Z",
+        "valueInteger": 3,
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Observation",
+        "ifNoneExist": "identifier=https://example.org/site-b/observation|obs-move&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:e08e7fdb-c491-5c0f-9bb8-af65bf66ef1b",
+      "resource": {
+        "resourceType": "Observation",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/observation",
+            "value": "obs-boundary"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-b/flowsheet",
+              "code": "DEPENDENCY",
+              "display": "NEWS2 total (flowsheet)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "urn:uuid:645a0b1d-fdc9-5324-9409-4cc95c914391"
+        },
+        "effectiveDateTime": "2026-10-23T01:00:00Z",
+        "valueInteger": 9,
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Observation",
+        "ifNoneExist": "identifier=https://example.org/site-b/observation|obs-boundary&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:3b5cb307-6875-53d1-86a8-0996f2d0a19a",
+      "resource": {
+        "resourceType": "Observation",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/observation",
+            "value": "obs-cross-stale"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-b/flowsheet",
+              "code": "DEPENDENCY",
+              "display": "NEWS2 total (flowsheet)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "urn:uuid:bf187af8-06ba-5496-8eb8-2092dcef0010"
+        },
+        "effectiveDateTime": "2026-10-22T23:00:00Z",
+        "valueInteger": 7,
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Observation",
+        "ifNoneExist": "identifier=https://example.org/site-b/observation|obs-cross-stale&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:eb1f3dea-261f-55e0-956b-fb02fe4d626a",
+      "resource": {
+        "resourceType": "Observation",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/observation",
+            "value": "obs-south"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-b/flowsheet",
+              "code": "DEPENDENCY",
+              "display": "NEWS2 total (flowsheet)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "urn:uuid:efb731da-2b02-5301-9afc-b8bdf42a59d3"
+        },
+        "effectiveDateTime": "2026-10-23T09:00:00Z",
+        "valueInteger": 2,
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Observation",
+        "ifNoneExist": "identifier=https://example.org/site-b/observation|obs-south&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:61c7a07c-291c-5d56-bcda-8982cccd62cb",
+      "resource": {
+        "resourceType": "Observation",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/observation",
+            "value": "obs-south-later"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-b/flowsheet",
+              "code": "DEPENDENCY",
+              "display": "NEWS2 total (flowsheet)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "urn:uuid:efb731da-2b02-5301-9afc-b8bdf42a59d3"
+        },
+        "effectiveDateTime": "2026-10-23T12:30:00Z",
+        "valueInteger": 8,
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Observation",
+        "ifNoneExist": "identifier=https://example.org/site-b/observation|obs-south-later&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:0ad4bd75-25cb-5d16-aeec-1c01f0ecae90",
+      "resource": {
+        "resourceType": "Observation",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/observation",
+            "value": "obs-left"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-b/flowsheet",
+              "code": "DEPENDENCY",
+              "display": "NEWS2 total (flowsheet)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "urn:uuid:0abc19e4-976d-5e30-980a-cb3e569c6126"
+        },
+        "effectiveDateTime": "2026-10-23T02:00:00Z",
+        "valueInteger": 8,
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Observation",
+        "ifNoneExist": "identifier=https://example.org/site-b/observation|obs-left&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:8543f9a0-1e68-521e-bfd5-65953c51e484",
+      "resource": {
+        "resourceType": "Observation",
+        "identifier": [
+          {
+            "system": "https://example.org/site-b/observation",
+            "value": "obs-overflow"
+          }
+        ],
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "https://example.org/site-b/flowsheet",
+              "code": "DEPENDENCY",
+              "display": "NEWS2 total (flowsheet)"
+            }
+          ]
+        },
+        "encounter": {
+          "reference": "urn:uuid:67b695f1-64df-56d6-91fd-31efc18f9eb6"
+        },
+        "effectiveDateTime": "2026-10-23T10:30:00Z",
+        "valueInteger": 10,
+        "meta": {
+          "tag": [
+            {
+              "system": "https://example.org/healthchain-demo",
+              "code": "ward-monitoring-site-b"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Observation",
+        "ifNoneExist": "identifier=https://example.org/site-b/observation|obs-overflow&_tag=https://example.org/healthchain-demo|ward-monitoring-site-b"
+      }
+    }
+  ]
+}
