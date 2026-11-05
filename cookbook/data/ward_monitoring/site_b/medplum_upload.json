@@ -1160,7 +1160,7 @@
             {
               "system": "https://example.org/site-b/flowsheet",
               "code": "DEPENDENCY",
-              "display": "Dependency level (synthetic)"
+              "display": "NEWS2 total (flowsheet)"
             }
           ]
         },
@@ -1168,7 +1168,7 @@
           "reference": "urn:uuid:a600d6f3-7fa6-5ec3-8754-d71e29f00db6"
         },
         "effectiveDateTime": "2026-10-23T10:00:00Z",
-        "valueInteger": 3,
+        "valueInteger": 7,
         "meta": {
           "tag": [
             {
@@ -1200,7 +1200,7 @@
             {
               "system": "https://example.org/site-b/flowsheet",
               "code": "DEPENDENCY",
-              "display": "Dependency level (synthetic)"
+              "display": "NEWS2 total (flowsheet)"
             }
           ]
         },
@@ -1208,7 +1208,7 @@
           "reference": "urn:uuid:f5cf8524-8543-55fd-9597-4fd2ec3e7288"
         },
         "effectiveDateTime": "2026-10-22T22:00:00Z",
-        "valueInteger": 4,
+        "valueInteger": 8,
         "meta": {
           "tag": [
             {
@@ -1240,7 +1240,7 @@
             {
               "system": "https://example.org/site-b/flowsheet",
               "code": "DEPENDENCY",
-              "display": "Dependency level (synthetic)"
+              "display": "NEWS2 total (flowsheet)"
             }
           ]
         },
@@ -1248,7 +1248,7 @@
           "reference": "urn:uuid:f5cf8524-8543-55fd-9597-4fd2ec3e7288"
         },
         "effectiveDateTime": "2026-10-23T11:00:00Z",
-        "valueInteger": 2,
+        "valueInteger": 3,
         "meta": {
           "tag": [
             {
@@ -1280,7 +1280,7 @@
             {
               "system": "https://example.org/site-b/flowsheet",
               "code": "DEPENDENCY",
-              "display": "Dependency level (synthetic)"
+              "display": "NEWS2 total (flowsheet)"
             }
           ]
         },
@@ -1288,7 +1288,7 @@
           "reference": "urn:uuid:645a0b1d-fdc9-5324-9409-4cc95c914391"
         },
         "effectiveDateTime": "2026-10-23T01:00:00Z",
-        "valueInteger": 4,
+        "valueInteger": 9,
         "meta": {
           "tag": [
             {
@@ -1320,7 +1320,7 @@
             {
               "system": "https://example.org/site-b/flowsheet",
               "code": "DEPENDENCY",
-              "display": "Dependency level (synthetic)"
+              "display": "NEWS2 total (flowsheet)"
             }
           ]
         },
@@ -1328,7 +1328,7 @@
           "reference": "urn:uuid:bf187af8-06ba-5496-8eb8-2092dcef0010"
         },
         "effectiveDateTime": "2026-10-22T23:00:00Z",
-        "valueInteger": 3,
+        "valueInteger": 7,
         "meta": {
           "tag": [
             {
@@ -1360,7 +1360,7 @@
             {
               "system": "https://example.org/site-b/flowsheet",
               "code": "DEPENDENCY",
-              "display": "Dependency level (synthetic)"
+              "display": "NEWS2 total (flowsheet)"
             }
           ]
         },
@@ -1368,7 +1368,7 @@
           "reference": "urn:uuid:efb731da-2b02-5301-9afc-b8bdf42a59d3"
         },
         "effectiveDateTime": "2026-10-23T09:00:00Z",
-        "valueInteger": 1,
+        "valueInteger": 2,
         "meta": {
           "tag": [
             {
@@ -1400,7 +1400,7 @@
             {
               "system": "https://example.org/site-b/flowsheet",
               "code": "DEPENDENCY",
-              "display": "Dependency level (synthetic)"
+              "display": "NEWS2 total (flowsheet)"
             }
           ]
         },
@@ -1408,7 +1408,7 @@
           "reference": "urn:uuid:efb731da-2b02-5301-9afc-b8bdf42a59d3"
         },
         "effectiveDateTime": "2026-10-23T12:30:00Z",
-        "valueInteger": 4,
+        "valueInteger": 8,
         "meta": {
           "tag": [
             {
@@ -1440,7 +1440,7 @@
             {
               "system": "https://example.org/site-b/flowsheet",
               "code": "DEPENDENCY",
-              "display": "Dependency level (synthetic)"
+              "display": "NEWS2 total (flowsheet)"
             }
           ]
         },
@@ -1448,7 +1448,7 @@
           "reference": "urn:uuid:0abc19e4-976d-5e30-980a-cb3e569c6126"
         },
         "effectiveDateTime": "2026-10-23T02:00:00Z",
-        "valueInteger": 4,
+        "valueInteger": 8,
         "meta": {
           "tag": [
             {
@@ -1480,7 +1480,7 @@
             {
               "system": "https://example.org/site-b/flowsheet",
               "code": "DEPENDENCY",
-              "display": "Dependency level (synthetic)"
+              "display": "NEWS2 total (flowsheet)"
             }
           ]
         },
@@ -1488,7 +1488,7 @@
           "reference": "urn:uuid:67b695f1-64df-56d6-91fd-31efc18f9eb6"
         },
         "effectiveDateTime": "2026-10-23T10:30:00Z",
-        "valueInteger": 4,
+        "valueInteger": 10,
         "meta": {
           "tag": [
             {

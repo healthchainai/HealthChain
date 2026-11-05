@@ -54,18 +54,19 @@ class StubGateway:
 
 @pytest.mark.parametrize("site", ["a", "b"])
 @pytest.mark.parametrize(
-    "admissions,expected",
+    "admissions,window_hours,expected",
     [
-        ("still-present", "expected_still_present.json"),
-        ("all-arrivals", "expected_all_arrivals.json"),
+        ("still-present", 12, "expected_still_present.json"),
+        ("all-arrivals", 12, "expected_all_arrivals.json"),
+        ("still-present", 8, "expected_window_8h.json"),
     ],
 )
 def test_both_sites_match_hand_derived_results(
-    site: str, admissions: str, expected: str
+    site: str, admissions: str, window_hours: int, expected: str
 ) -> None:
-    assert run(site=site, admissions=admissions) == json.loads(
-        (DATA_DIR / expected).read_text()
-    )
+    assert run(
+        site=site, admissions=admissions, window_hours=window_hours
+    ) == json.loads((DATA_DIR / expected).read_text())
 
 
 def test_gateway_input_matches_file_input() -> None:
@@ -118,8 +119,8 @@ def test_encounter_after_reference_time_is_excluded() -> None:
 def test_acuity_ignores_stale_and_future_scores() -> None:
     data, config = site_inputs()
     scores = latest_scores(data, config, AS_OF)
-    assert scores["same-area-move"] == 2  # 22:00 the day before is too old
-    assert scores["older-south"] == 1  # 12:30 is after the reference time
+    assert scores["same-area-move"] == 3  # 22:00 the day before is too old
+    assert scores["older-south"] == 2  # 12:30 is after the reference time
     assert "cross-area-move" not in scores
     assert "missing-time" not in scores
 

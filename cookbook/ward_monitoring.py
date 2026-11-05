@@ -3,7 +3,7 @@
 Ward Monitoring on Live FHIR Data
 
 Research measures of capacity strain (how full each ward area is, how many people
-arrived recently, how many are high acuity) are usually built on a research
+arrived recently, how many have a high NEWS2 score) are usually built on a research
 database. This recipe computes them from FHIR instead: it reads Encounter,
 Location and Observation resources from files or a live FHIR API, maps each
 site's local codes to research variables, and serves a per-area summary.
@@ -21,6 +21,7 @@ Requirements:
 Run:
     python cookbook/ward_monitoring.py                      # site A, offline
     python cookbook/ward_monitoring.py --admissions all-arrivals
+    python cookbook/ward_monitoring.py --window-hours 8     # revised window
     python cookbook/ward_monitoring.py --site b             # different site, same logic
     python cookbook/ward_monitoring.py --as-of 2026-10-23T04:00:00Z
 

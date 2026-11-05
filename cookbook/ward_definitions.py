@@ -8,10 +8,8 @@ far back counts as recent, and when a clinical score counts as high. The recipe
 and calls these definitions without knowing what they contain.
 
 A revision is a change to this file only. Each definition has its own frozen
-expected output in data/ward_monitoring/, and the tests check both, so old and new
-definitions can be compared on the same data.
-
-R2-R3 mark open research decisions; the values below are placeholders.
+expected output in data/ward_monitoring/, and the tests check them all, so old
+and new definitions can be compared on the same data.
 """
 
 from dataclasses import dataclass
@@ -30,14 +28,15 @@ class AreaVisit:
     present: bool  # in this area at the reference time
 
 
-# R2: how far back counts as "recent"? Both ends of the window are included.
+# How far back counts as "recent": one 12-hour shift. Both ends are included.
+# Example revision: a move to 8-hour shifts sets this to 8 (--window-hours 8).
 WINDOW_HOURS = 12
 
 
 def admissions_still_present(
     visits: list[AreaVisit], cutoff: datetime, as_of: datetime
 ) -> int:
-    """R2 option A: entries to the area in the window, among people still there."""
+    """Option A: entries to the area in the window, among people still there."""
     return sum(
         v.present and v.entered_at is not None and cutoff <= v.entered_at <= as_of
         for v in visits
@@ -47,7 +46,7 @@ def admissions_still_present(
 def admissions_all_arrivals(
     visits: list[AreaVisit], cutoff: datetime, as_of: datetime
 ) -> int:
-    """R2 option B: every entry to the area in the window, including people who left."""
+    """Option B: every entry to the area in the window, including people who left."""
     return sum(
         v.entered_at is not None and cutoff <= v.entered_at <= as_of for v in visits
     )
@@ -58,7 +57,7 @@ ADMISSION_DEFINITIONS: dict[str, Callable[..., int]] = {
     "all-arrivals": admissions_all_arrivals,
 }
 
-# R3: is a synthetic score a fair stand-in, and what counts as high?
+# Acuity is the NEWS2 total score; 7 or more counts as high.
 # The variable's FHIR code is site-specific, so it lives in each site's config.
-ACUITY_HIGH = 3  # placeholder: a score of 3 or more on a synthetic 1-4 scale
+ACUITY_HIGH = 7
 ACUITY_MAX_AGE_HOURS = 12  # freshness rule: older scores count as unknown

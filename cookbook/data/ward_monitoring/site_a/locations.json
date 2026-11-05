@@ -14,7 +14,7 @@
             "value": "W7"
           }
         ],
-        "name": "Ward 7",
+        "name": "ICU",
         "physicalType": {
           "coding": [
             {
@@ -36,7 +36,7 @@
             "value": "W7-N"
           }
         ],
-        "name": "Ward 7 North",
+        "name": "ICU North",
         "physicalType": {
           "coding": [
             {
@@ -61,7 +61,7 @@
             "value": "W7-S"
           }
         ],
-        "name": "Ward 7 South",
+        "name": "ICU South",
         "physicalType": {
           "coding": [
             {
@@ -86,7 +86,7 @@
             "value": "W7-E"
           }
         ],
-        "name": "Ward 7 Escalation",
+        "name": "ICU Escalation",
         "physicalType": {
           "coding": [
             {

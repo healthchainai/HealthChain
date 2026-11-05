@@ -12,7 +12,7 @@
             "value": "W7"
           }
         ],
-        "name": "Ward 7",
+        "name": "ICU",
         "physicalType": {
           "coding": [
             {
@@ -46,7 +46,7 @@
             "value": "W7-N"
           }
         ],
-        "name": "Ward 7 North",
+        "name": "ICU North",
         "physicalType": {
           "coding": [
             {
@@ -83,7 +83,7 @@
             "value": "W7-S"
           }
         ],
-        "name": "Ward 7 South",
+        "name": "ICU South",
         "physicalType": {
           "coding": [
             {
@@ -120,7 +120,7 @@
             "value": "W7-E"
           }
         ],
-        "name": "Ward 7 Escalation",
+        "name": "ICU Escalation",
         "physicalType": {
           "coding": [
             {
@@ -1086,7 +1086,7 @@
             {
               "system": "https://example.org/site-a/observation",
               "code": "ACU",
-              "display": "Acuity score (synthetic)"
+              "display": "NEWS2 total score"
             }
           ]
         },
@@ -1094,7 +1094,7 @@
           "reference": "urn:uuid:8c944a87-8b0b-53d9-b89b-228eb191552a"
         },
         "effectiveDateTime": "2026-10-23T10:00:00Z",
-        "valueInteger": 3,
+        "valueInteger": 7,
         "meta": {
           "tag": [
             {
@@ -1126,7 +1126,7 @@
             {
               "system": "https://example.org/site-a/observation",
               "code": "ACU",
-              "display": "Acuity score (synthetic)"
+              "display": "NEWS2 total score"
             }
           ]
         },
@@ -1134,7 +1134,7 @@
           "reference": "urn:uuid:f6439ea3-da34-502a-9faa-89bd8a16bf96"
         },
         "effectiveDateTime": "2026-10-22T22:00:00Z",
-        "valueInteger": 4,
+        "valueInteger": 8,
         "meta": {
           "tag": [
             {
@@ -1166,7 +1166,7 @@
             {
               "system": "https://example.org/site-a/observation",
               "code": "ACU",
-              "display": "Acuity score (synthetic)"
+              "display": "NEWS2 total score"
             }
           ]
         },
@@ -1174,7 +1174,7 @@
           "reference": "urn:uuid:f6439ea3-da34-502a-9faa-89bd8a16bf96"
         },
         "effectiveDateTime": "2026-10-23T11:00:00Z",
-        "valueInteger": 2,
+        "valueInteger": 3,
         "meta": {
           "tag": [
             {
@@ -1206,7 +1206,7 @@
             {
               "system": "https://example.org/site-a/observation",
               "code": "ACU",
-              "display": "Acuity score (synthetic)"
+              "display": "NEWS2 total score"
             }
           ]
         },
@@ -1214,7 +1214,7 @@
           "reference": "urn:uuid:7900e22c-cad0-5762-8ba0-ac86dfd9949c"
         },
         "effectiveDateTime": "2026-10-23T01:00:00Z",
-        "valueInteger": 4,
+        "valueInteger": 9,
         "meta": {
           "tag": [
             {
@@ -1246,7 +1246,7 @@
             {
               "system": "https://example.org/site-a/observation",
               "code": "ACU",
-              "display": "Acuity score (synthetic)"
+              "display": "NEWS2 total score"
             }
           ]
         },
@@ -1254,7 +1254,7 @@
           "reference": "urn:uuid:a89dce39-5183-5c91-85ae-23f62376d4a6"
         },
         "effectiveDateTime": "2026-10-22T23:00:00Z",
-        "valueInteger": 3,
+        "valueInteger": 7,
         "meta": {
           "tag": [
             {
@@ -1286,7 +1286,7 @@
             {
               "system": "https://example.org/site-a/observation",
               "code": "ACU",
-              "display": "Acuity score (synthetic)"
+              "display": "NEWS2 total score"
             }
           ]
         },
@@ -1294,7 +1294,7 @@
           "reference": "urn:uuid:2ed6b5b5-0ee6-5d10-b41a-58433ad1040a"
         },
         "effectiveDateTime": "2026-10-23T09:00:00Z",
-        "valueInteger": 1,
+        "valueInteger": 2,
         "meta": {
           "tag": [
             {
@@ -1326,7 +1326,7 @@
             {
               "system": "https://example.org/site-a/observation",
               "code": "ACU",
-              "display": "Acuity score (synthetic)"
+              "display": "NEWS2 total score"
             }
           ]
         },
@@ -1334,7 +1334,7 @@
           "reference": "urn:uuid:2ed6b5b5-0ee6-5d10-b41a-58433ad1040a"
         },
         "effectiveDateTime": "2026-10-23T12:30:00Z",
-        "valueInteger": 4,
+        "valueInteger": 8,
         "meta": {
           "tag": [
             {
@@ -1366,7 +1366,7 @@
             {
               "system": "https://example.org/site-a/observation",
               "code": "ACU",
-              "display": "Acuity score (synthetic)"
+              "display": "NEWS2 total score"
             }
           ]
         },
@@ -1374,7 +1374,7 @@
           "reference": "urn:uuid:cbe7469d-eafc-5b4a-b8c7-0180166b204d"
         },
         "effectiveDateTime": "2026-10-23T02:00:00Z",
-        "valueInteger": 4,
+        "valueInteger": 8,
         "meta": {
           "tag": [
             {
@@ -1406,7 +1406,7 @@
             {
               "system": "https://example.org/site-a/observation",
               "code": "ACU",
-              "display": "Acuity score (synthetic)"
+              "display": "NEWS2 total score"
             }
           ]
         },
@@ -1414,7 +1414,7 @@
           "reference": "urn:uuid:ad704997-9497-5b82-abaa-d6eb343e3a78"
         },
         "effectiveDateTime": "2026-10-23T10:30:00Z",
-        "valueInteger": 4,
+        "valueInteger": 10,
         "meta": {
           "tag": [
             {
