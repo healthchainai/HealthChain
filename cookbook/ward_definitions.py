@@ -58,7 +58,7 @@ ADMISSION_DEFINITIONS: dict[str, Callable[..., int]] = {
     "all-arrivals": admissions_all_arrivals,
 }
 
-# R3: which clinical variable sits alongside occupancy, and what counts as high?
+# R3: is a synthetic score a fair stand-in, and what counts as high?
 # The variable's FHIR code is site-specific, so it lives in each site's config.
 ACUITY_HIGH = 3  # placeholder: a score of 3 or more on a synthetic 1-4 scale
 ACUITY_MAX_AGE_HOURS = 12  # freshness rule: older scores count as unknown

@@ -2,7 +2,7 @@
 """
 Ward Monitoring on Live FHIR Data
 
-Research measures of ward strain (how full each ward area is, how many people
+Research measures of capacity strain (how full each ward area is, how many people
 arrived recently, how many are high acuity) are usually built on a research
 database. This recipe computes them from FHIR instead: it reads Encounter,
 Location and Observation resources from files or a live FHIR API, maps each

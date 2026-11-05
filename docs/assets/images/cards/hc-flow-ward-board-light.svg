@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" role="img" aria-label="Synthetic Ward 7 at 12:00. North, 5 beds: bed 1 new, score 3; bed 2 moved within North, score 2; bed 3 new, score 4; bed 4 entry time unknown, no recent score; bed 5 empty. South, 3 beds: bed 1 new, no recent score; bed 2 new, score 1; bed 3 empty. Escalation, 1 bed: bed 1 new, score 4. Scores of 3 or more are high acuity.">
+  <rect x="0" y="0" width="880" height="560" rx="16" fill="#faf8f7"/>
+  <text x="20" y="48" font-size="16" letter-spacing="2" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">WARD 7 · 23 OCT · 12:00 (SYNTHETIC)</text>
+  <rect x="846" y="30" width="10" height="10" fill="#e59875"/>
+  <rect x="834" y="42" width="10" height="10" fill="#f0b49a"/>
+  <rect x="846" y="54" width="10" height="10" fill="#e59875"/>
+  <rect x="20" y="76" width="266" height="404" rx="12" fill="#faf8f7" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="38" y="108" font-size="18" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">North</text>
+  <text x="268" y="108" font-size="14" text-anchor="end" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">5 beds</text>
+  <rect x="34" y="124" width="238" height="52" rx="8" fill="#fdf0e8" stroke="#e59875" stroke-width="2"/>
+  <text x="48" y="156" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">1</text>
+  <rect x="72" y="138" width="44" height="24" rx="12" fill="none" stroke="#5f5866" stroke-width="1.25"/>
+  <text x="82" y="155" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">new</text>
+  <text x="258" y="156" font-size="14" text-anchor="end" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#bf6b4a">score 3</text>
+  <rect x="34" y="186" width="238" height="52" rx="8" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="48" y="218" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">2</text>
+  <rect x="72" y="200" width="60" height="24" rx="12" fill="none" stroke="#5f5866" stroke-width="1.25"/>
+  <text x="82" y="217" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">moved</text>
+  <text x="258" y="218" font-size="14" text-anchor="end" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">score 2</text>
+  <rect x="34" y="248" width="238" height="52" rx="8" fill="#fdf0e8" stroke="#e59875" stroke-width="2"/>
+  <text x="48" y="280" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">3</text>
+  <rect x="72" y="262" width="44" height="24" rx="12" fill="none" stroke="#5f5866" stroke-width="1.25"/>
+  <text x="82" y="279" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">new</text>
+  <text x="258" y="280" font-size="14" text-anchor="end" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#bf6b4a">score 4</text>
+  <rect x="34" y="310" width="238" height="52" rx="8" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="48" y="342" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">4</text>
+  <rect x="72" y="324" width="76" height="24" rx="12" fill="none" stroke="#5f5866" stroke-width="1.25"/>
+  <text x="82" y="341" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">entry ?</text>
+  <text x="258" y="342" font-size="14" text-anchor="end" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">no score</text>
+  <rect x="34" y="372" width="238" height="52" rx="8" fill="none" stroke="#c9c2cd" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="48" y="404" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">5  empty</text>
+  <text x="38" y="460" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">4/5 beds · 2 new · 2 high</text>
+  <rect x="306" y="76" width="266" height="404" rx="12" fill="#faf8f7" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="324" y="108" font-size="18" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">South</text>
+  <text x="554" y="108" font-size="14" text-anchor="end" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">3 beds</text>
+  <rect x="320" y="124" width="238" height="52" rx="8" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="334" y="156" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">1</text>
+  <rect x="358" y="138" width="44" height="24" rx="12" fill="none" stroke="#5f5866" stroke-width="1.25"/>
+  <text x="368" y="155" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">new</text>
+  <text x="544" y="156" font-size="14" text-anchor="end" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">no score</text>
+  <rect x="320" y="186" width="238" height="52" rx="8" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="334" y="218" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">2</text>
+  <rect x="358" y="200" width="44" height="24" rx="12" fill="none" stroke="#5f5866" stroke-width="1.25"/>
+  <text x="368" y="217" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">new</text>
+  <text x="544" y="218" font-size="14" text-anchor="end" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">score 1</text>
+  <rect x="320" y="248" width="238" height="52" rx="8" fill="none" stroke="#c9c2cd" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="334" y="280" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">3  empty</text>
+  <text x="324" y="460" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">2/3 beds · 2 new · 0 high</text>
+  <rect x="592" y="76" width="266" height="404" rx="12" fill="#faf8f7" stroke="#c9c2cd" stroke-width="1.5"/>
+  <text x="610" y="108" font-size="18" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">Escalation</text>
+  <text x="840" y="108" font-size="14" text-anchor="end" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">1 bed</text>
+  <rect x="606" y="124" width="238" height="52" rx="8" fill="#fdf0e8" stroke="#e59875" stroke-width="2"/>
+  <text x="620" y="156" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">1</text>
+  <rect x="644" y="138" width="44" height="24" rx="12" fill="none" stroke="#5f5866" stroke-width="1.25"/>
+  <text x="654" y="155" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">new</text>
+  <text x="830" y="156" font-size="14" text-anchor="end" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#bf6b4a">score 4</text>
+  <text x="610" y="460" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">1/1 bed · 1 new · 1 high</text>
+  <text x="20" y="516" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">new = entered the area in the last 12h · entry ? = no recorded entry time</text>
+  <text x="20" y="538" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">salmon = high acuity (score 3+) · no score = none in the last 12h</text>
+</svg>

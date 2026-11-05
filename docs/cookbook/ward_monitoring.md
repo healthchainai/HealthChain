@@ -33,14 +33,15 @@ This example is a generalised ward-monitoring workflow, built with synthetic dat
 !!! question "Research input boxes"
 
     Boxes like this mark open research decisions. The code runs with clearly
-    labelled placeholders until they are agreed. R2–R4 are placeholders in
-    `ward_definitions.py`; R1 and R5 are about the research context and use.
+    labelled placeholders until they are agreed. R2–R3 are placeholders in
+    `ward_definitions.py`; R1 is about the research context and use.
 
 !!! question "Research input R1: research context"
 
-    **Decide:** which research question motivates monitoring wards repeatedly,
-    how often the measures are needed, why they need variables from several
-    domains and definitions that can change.
+    **Decide:** how to describe the research context publicly: how often wards
+    need monitoring and why, why the measures need variables from several
+    domains and definitions that can change, which public citations
+    support it, and what the research team will use the workflow for.
     **Placeholder now:** this introduction and its two citations.
 
 Full working example: [cookbook/ward_monitoring.py](https://github.com/healthchainai/HealthChain/tree/main/cookbook/ward_monitoring.py) (FHIR access and mapping) and [cookbook/ward_definitions.py](https://github.com/healthchainai/HealthChain/tree/main/cookbook/ward_definitions.py) (research definitions)
@@ -49,7 +50,22 @@ Full working example: [cookbook/ward_monitoring.py](https://github.com/healthcha
 
 ## Quick Start
 
-From a checkout of the HealthChain repository:
+**The example ward.** A made-up hospital ward, Ward 7, at noon (UTC) on 23 October 2026:
+
+- **Three areas:** North (5 beds), South (3 beds) and one Escalation bed opened when the ward is full.
+- **A day of movement:** patients have arrived, moved between beds and gone home.
+- **An acuity score** for how unwell each patient is (synthetic; 3 or more is high).
+
+![Synthetic Ward 7 at 12:00. North, 5 beds: bed 1 new, score 3; bed 2 moved within North, score 2; bed 3 new, score 4; bed 4 entry time unknown, no recent score; bed 5 empty. South, 3 beds: bed 1 new, no recent score; bed 2 new, score 1; bed 3 empty. Escalation, 1 bed: bed 1 new, score 4. Scores of 3 or more are high acuity.](../assets/images/cards/hc-flow-ward-board-light.svg#only-light)
+![Synthetic Ward 7 at 12:00. North, 5 beds: bed 1 new, score 3; bed 2 moved within North, score 2; bed 3 new, score 4; bed 4 entry time unknown, no recent score; bed 5 empty. South, 3 beds: bed 1 new, no recent score; bed 2 new, score 1; bed 3 empty. Escalation, 1 bed: bed 1 new, score 4. Scores of 3 or more are high acuity.](../assets/images/cards/hc-flow-ward-board-dark.svg#only-dark)
+
+**What the workflow does.** It reads the ward as FHIR data and summarises each area:
+
+- **Occupied beds:** how full the area is.
+- **Admissions:** patients who entered the area in the last 12 hours.
+- **High acuity:** patients whose latest score is 3 or more.
+
+**Run it.** All the data is included. From a checkout of the HealthChain repository:
 
 ```bash
 pip install healthchain
@@ -59,7 +75,7 @@ python cookbook/ward_monitoring.py --site b               # same result
 python cookbook/ward_monitoring.py --as-of 2026-10-23T04:00:00Z
 ```
 
-All data is synthetic and included. It was pulled at **23 October 2026, 12:00 UTC** (each Bundle's `timestamp`), which is the default reference time. The first command prints one row per ward area:
+The first command summarises the board above, one row per area:
 
 | Area       | Occupied beds | Capacity | Admissions (12h) | Unknown entry times | High acuity | Acuity unknown |
 | ---------- | ------------- | -------- | ---------------- | ------------------- | ----------- | -------------- |
@@ -67,7 +83,13 @@ All data is synthetic and included. It was pulled at **23 October 2026, 12:00 UT
 | South      | 2             | 3        | 2                | 0                   | 0           | 1              |
 | Escalation | 1             | 1        | 1                | 0                   | 1           | 0              |
 
-Admissions are arrivals into the area in the last 12 hours. Acuity is a synthetic score for how unwell a patient is; high is 3 or more, and "unknown" means no recent score. Each case behind these numbers is listed in the [fixture notes](https://github.com/healthchainai/HealthChain/tree/main/cookbook/data/ward_monitoring/README.md).
+The other commands each change one thing:
+
+- **`--admissions all-arrivals`:** a different definition of admissions.
+- **`--site b`:** a second site's data format, with the same result.
+- **`--as-of`:** an earlier reference time. Noon is when the data was pulled (each Bundle's `timestamp`), so it is the default.
+
+Every case on the board is listed in the [fixture notes](https://github.com/healthchainai/HealthChain/tree/main/cookbook/data/ward_monitoring/README.md).
 
 ---
 
@@ -220,7 +242,7 @@ same-area-move W7-N 2026-10-22T16:00:00+00:00 True
 
 !!! question "Research input R3: the clinical variable"
 
-    **Decide:** which clinical variables sit alongside occupancy; how each is summarised per area (the number above a threshold, an average, or whether it's in use at all); and how old a value can be before it counts as unknown (its freshness rule).
+    **Decide:** whether this synthetic score is a fair stand-in for the clinical variables that sit alongside occupancy, or a published score can be named; which published work supports patient acuity as part of capacity strain; and what a missing or out-of-date score should mean.
     **Placeholder now:** one synthetic 1–4 acuity score, counted per area when 3 or more; values older than 12 hours count as unknown.
 
 ### Step 4: Define the measures
@@ -274,9 +296,9 @@ One North patient has no recorded arrival time in the area. They count towards o
 
 !!! question "Research input R2: what counts"
 
-    **Decide:** the unit of occupancy (beds, encounters or patients); whether an admission means people still present (A) or all arrivals (B); the window length; whether a bed move within an area counts as a new admission; and whether a hospital-admission time may stand in for a missing area-entry time.
+    **Decide:** the unit of occupancy (beds, encounters or patients); whether an admission means people still present (A) or all arrivals (B); the window length; whether a move between beds or areas counts as a new admission; and which of these changes [Revise a definition](#revise-a-definition) should show, and why.
 
-    **Placeholder now:** beds, option A, 12 hours, bed moves within an area don't count, no stand-in.
+    **Placeholder now:** beds, option A, 12 hours, bed moves within an area don't count.
 
 ### Step 5: Serve it to a dashboard
 
@@ -365,12 +387,6 @@ The difference is one patient who arrived in North at 01:00 and left at 05:00: "
 
 Each definition keeps its own frozen expected output (`expected_still_present.json`, `expected_all_arrivals.json`), and the tests check both. A revision comes with a before-and-after on the same data, rather than overwriting the old result.
 
-!!! question "Research input R4: why compare these"
-
-    **Decide:** what question the revision answers, or which other small revision would be more useful.
-
-    **Placeholder now:** "still present" against "all arrivals" on the same snapshot.
-
 ### Run on another site
 
 _Research need: variables from several domains, each recorded in its own way._ Another hospital, or another ward, records the same facts differently. Site B is the same synthetic ward written in a different local style, and only its config changes:
@@ -416,10 +432,6 @@ The research definitions never touch FHIR. Moving them from saved files to a liv
 | Timely, repeated assessment    | `FHIRGateway` queries current data instead of waiting for an extract; measures recompute at any reference time; scores have a freshness rule; an endpoint recomputes on request                                          |
 | Variables from several domains | Patient flow (`Encounter`, `Location`) and a clinical variable (`Observation`) are joined with `resolve_reference`; each site's codes are mapped in config, so adding a domain means adding a resource type and its code |
 | Definitions that change        | Definitions live in their own file, apart from HealthChain's loading, validation and reference resolution; a revision changes that file only and is checked against its own frozen output                                |
-
-!!! question "Research input R5: research use"
-
-    **Decide:** where this workflow fits in the research, what it helps the team develop or compare, and the wording and credits to publish.
 
 !!! tip "Next Steps"
 
