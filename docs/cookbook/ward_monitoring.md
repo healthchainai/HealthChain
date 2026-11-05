@@ -2,13 +2,23 @@
 
 **Level:** Intermediate
 
-Hospital wards come under strain when demand outpaces the beds and staff available. Research on ward capacity strain links it to measures that routine electronic health record (EHR) data already holds: how many patients are on the ward, how many arrived recently, and how unwell they are ([Kerlin et al., 2014](https://doi.org/10.1513/AnnalsATS.201306-141OC); [Kohn et al., 2018](https://pmc.ncbi.nlm.nih.gov/articles/PMC6206345/)).
+Ward strain is a concept used in healthcare research to describe how busy a hospital ward is. Specifically, ward strain describes the extent to which an overwhelmed hospital ward is no longer able to safely deliver care. Through qualitative research, such as interviews with ward staff and hospital managers, the factors which cause ward strain have become increasingly well understood. Typical factors that cause increasing ward strain include: number of patients on a ward, new patients being admitted to the ward, average illness severity of patients across the ward, number of staff, and staff workload ([Page et al., 2024](https://doi.org/10.1136/bmjqs-2023-016686)). Retrospective evidence shows that patients admitted to hospital areas with high ward strain have an increased risk of death ([Gabler et al., 2013](https://doi.org/10.1164/rccm.201304-0622OC)); however, technological solutions for live monitoring of ward strain have been lacking, limiting the ability of hospitals to intervene in real time.
 
-Measures like these are usually developed on a hospital's research database or a one-off data extract. Using them in day-to-day care means reading the same facts from the hospital's live systems, increasingly through [FHIR](https://hl7.org/fhir/), the standard API for health data, and getting the results to the people who act on them. The research doesn't stop at that point, so the software has to keep three things working:
+The individual metrics required to measure ward strain (e.g. newly admitted patients, patient illness severity measures) are already held within widely used electronic health record (EHR) databases. However, these EHRs are primarily designed for keeping records for individual patients, and do not include any interfaces or dashboards specifically designed to allow clinicians (e.g. ward nurses or doctors) or managers to monitor ward strain.
 
-- **Timely, repeated assessment:** the measures are recomputed from current data as the ward changes.
-- **Variables from several domains:** patient movements and clinical measurements, which each hospital, and sometimes each ward, records in its own way.
-- **Definitions that change:** what counts as an admission, or a high score, is refined as the research develops.
+Recently, healthcare researchers have started to attempt quantitative measurement of ward strain by combining these individual metrics and averaging them across a hospital ward ([Kohn et al., 2018](https://doi.org/10.1007/s11606-018-4564-x)). Measurements like these are usually developed on a hospital's research database or with a one-off data extract. These research efforts have not yet progressed into a system that can be used in daily practice by healthcare workers. To begin to use them in day-to-day care will mean reading the same facts from the hospital's live systems, increasingly through [FHIR](https://hl7.org/fhir/), the standard API for health data, and getting the results to the people who act on them. One major challenge is that the underlying data is constantly changing, so the software has to keep three things working:
+
+1. **Timely, repeated assessment:** the metrics must be recomputed from current data as the ward changes.
+
+    _For example, hour by hour, which patients are on the ward can change, as can the information used to calculate their illness severity (such as heart rate and blood pressure)._
+
+2. **Variables from several domains:** the required individual metrics may be recorded in different databases in different hospitals, or recorded in different ways by different wards.
+
+    _For example, an intensive care unit may record its patients' illness severity scores in a different EHR to the one used by the general hospital wards._
+
+3. **Definitions that change:** users will demand metrics which can evolve as healthcare research progresses or ways of working change.
+
+    _For example, NEWS2 (National Early Warning Score 2) is a standard illness severity (acuity) metric used across England and Wales, but its definition changed when hospitals moved from NEWS to NEWS2, and will likely change again as new severity scores are developed. Or staff working patterns evolve from 12-hour shifts to 8-hour shifts, and users request a "patient admissions per shift" metric that counts admissions in an 8-hour window rather than the previous 12 hours._
 
 This example is a generalised ward-monitoring workflow, built with synthetic data. HealthChain reads, checks and serves the FHIR data; the research definitions stay in one small Python file you can revise without touching any of that.
 
@@ -30,47 +40,37 @@ This example is a generalised ward-monitoring workflow, built with synthetic dat
 | Returns typed R4B resources and resolves references (`resolve_reference`)   | Which locations form each area, and which code carries each variable |
 | Serves results over HTTP (`HealthChainAPI`)                                 | The measures: windows, admission rules, thresholds                   |
 
-!!! question "Research input boxes"
-
-    Boxes like this mark open research decisions. The code runs with clearly
-    labelled placeholders until they are agreed. R2–R3 are placeholders in
-    `ward_definitions.py`; R1 is about the research context and use.
-
-!!! question "Research input R1: research context"
-
-    **Decide:** how to describe the research context publicly: how often wards
-    need monitoring and why, why the measures need variables from several
-    domains and definitions that can change, which public citations
-    support it, and what the research team will use the workflow for.
-    **Placeholder now:** this introduction and its two citations.
-
 Full working example: [cookbook/ward_monitoring.py](https://github.com/healthchainai/HealthChain/tree/main/cookbook/ward_monitoring.py) (FHIR access and mapping) and [cookbook/ward_definitions.py](https://github.com/healthchainai/HealthChain/tree/main/cookbook/ward_definitions.py) (research definitions)
 
 ---
 
 ## Quick Start
 
-**The example ward.** A made-up hospital ward, Ward 7, at noon (UTC) on 23 October 2026:
+The following is based on a fictional example scenario based on a real hospital's Intensive Care Unit (ICU). The ICU contains three areas: North (12 beds), South (18 beds) and one escalation bay (6 beds) which can be used when the ICU is at full capacity.
 
-- **Three areas:** North (5 beds), South (3 beds) and one Escalation bed opened when the ward is full.
-- **A day of movement:** patients have arrived, moved between beds and gone home.
-- **An acuity score** for how unwell each patient is (synthetic; 3 or more is high).
+The Nurse in Charge of the ICU will assess several factors at the beginning of the shift, and at several points throughout the day:
 
-![Synthetic Ward 7 at 12:00. North, 5 beds: bed 1 new, score 3; bed 2 moved within North, score 2; bed 3 new, score 4; bed 4 entry time unknown, no recent score; bed 5 empty. South, 3 beds: bed 1 new, no recent score; bed 2 new, score 1; bed 3 empty. Escalation, 1 bed: bed 1 new, score 4. Scores of 3 or more are high acuity.](../assets/images/cards/hc-flow-ward-board-light.svg#only-light)
-![Synthetic Ward 7 at 12:00. North, 5 beds: bed 1 new, score 3; bed 2 moved within North, score 2; bed 3 new, score 4; bed 4 entry time unknown, no recent score; bed 5 empty. South, 3 beds: bed 1 new, no recent score; bed 2 new, score 1; bed 3 empty. Escalation, 1 bed: bed 1 new, score 4. Scores of 3 or more are high acuity.](../assets/images/cards/hc-flow-ward-board-dark.svg#only-dark)
+- **Bed occupancy:** how many patients are currently on the ICU and how many beds are available for new admissions, including assessing whether the escalation beds may be required on this shift.
+- **Patient acuity (illness severity):** how unwell are the patients currently admitted? In ICU, patients will typically be assigned a "level" based on the number of life support machines or interventions used (e.g. "level 2", "level 3"). On general NHS hospital wards, the more complex NEWS2 score is calculated instead. NEWS2 is derived from the patient's vital observations: heart rate, blood pressure, oxygen levels, breathing rate, temperature, and level of consciousness ([Royal College of Physicians, 2017](https://www.rcp.ac.uk/improving-care/resources/national-early-warning-score-news-2/)). A higher NEWS2 score indicates a more unwell patient. NEWS2 is used for the purposes of this example.
+- **Patient flow:** the number of new patients being admitted to the ward, patients who need to be moved to different beds, and patients who are due to be discharged or stepped down to the ward.
+
+To keep the tables short, the example board below is a cut-down version of the ICU at noon (UTC) on 23 October 2026: North 5 beds, South 3, Escalation 1.
+
+![Synthetic ICU at 12:00. North, 5 beds: bed 1 new, NEWS2 7; bed 2 moved within North, NEWS2 3; bed 3 new, NEWS2 9; bed 4 entry time unknown, no recent score; bed 5 empty. South, 3 beds: bed 1 new, no recent score; bed 2 new, NEWS2 2; bed 3 empty. Escalation, 1 bed: bed 1 new, NEWS2 10. NEWS2 of 7 or more is high acuity.](../assets/images/cards/hc-flow-ward-board-light.svg#only-light)
+![Synthetic ICU at 12:00. North, 5 beds: bed 1 new, NEWS2 7; bed 2 moved within North, NEWS2 3; bed 3 new, NEWS2 9; bed 4 entry time unknown, no recent score; bed 5 empty. South, 3 beds: bed 1 new, no recent score; bed 2 new, NEWS2 2; bed 3 empty. Escalation, 1 bed: bed 1 new, NEWS2 10. NEWS2 of 7 or more is high acuity.](../assets/images/cards/hc-flow-ward-board-dark.svg#only-dark)
 
 **What the workflow does.** It reads the ward as FHIR data and summarises each area:
 
-- **Occupied beds:** how full the area is.
-- **Admissions:** patients who entered the area in the last 12 hours.
-- **High acuity:** patients whose latest score is 3 or more.
+- **Occupied beds:** how many patients are currently on the ward.
+- **Admissions:** patients who have moved onto the ward in the last 12 hours.
+- **High acuity:** patients whose latest NEWS2 score is 7 or more.
 
 **Run it.** All the data is included. From a checkout of the HealthChain repository:
 
 ```bash
 pip install healthchain
 python cookbook/ward_monitoring.py                       # site A
-python cookbook/ward_monitoring.py --admissions all-arrivals
+python cookbook/ward_monitoring.py --window-hours 8
 python cookbook/ward_monitoring.py --site b               # same result
 python cookbook/ward_monitoring.py --as-of 2026-10-23T04:00:00Z
 ```
@@ -85,7 +85,7 @@ The first command summarises the board above, one row per area:
 
 The other commands each change one thing:
 
-- **`--admissions all-arrivals`:** a different definition of admissions.
+- **`--window-hours 8`:** a different definition of admissions: an 8-hour shift instead of 12.
 - **`--site b`:** a second site's data format, with the same result.
 - **`--as-of`:** an earlier reference time. Noon is when the data was pulled (each Bundle's `timestamp`), so it is the default.
 
@@ -214,7 +214,7 @@ FHIR records say "bed `W7-N-1`" or "code `ACU`"; the research talks about "North
 To find a bed's area, we can walk up the location tree with `resolve_reference` (each `Location.partOf` points to its parent) until it reaches a configured area. The same function links each score to its stay through `Observation.encounter`, so patient movements and clinical measurements join without hand-written ID lookups:
 
 ```text
-Location  W7          Ward 7
+Location  W7          ICU
   └─ W7-N             North      ← configured area: stop here
        └─ W7-N-1      bed 1
             ↑ Encounter.location        (a stay in bed 1)
@@ -240,33 +240,36 @@ recent W7-N 2026-10-23T08:00:00+00:00 True
 same-area-move W7-N 2026-10-22T16:00:00+00:00 True
 ```
 
-!!! question "Research input R3: the clinical variable"
-
-    **Decide:** whether this synthetic score is a fair stand-in for the clinical variables that sit alongside occupancy, or a published score can be named; which published work supports patient acuity as part of capacity strain; and what a missing or out-of-date score should mean.
-    **Placeholder now:** one synthetic 1–4 acuity score, counted per area when 3 or more; values older than 12 hours count as unknown.
-
 ### Step 4: Define the measures
 
-Everything the research team is likely to revise lives in `ward_definitions.py`: how far back counts as "recent", what counts as an admission, and when a score counts as high. Each definition is plain Python over the area visits, and nothing in the file knows about FHIR:
+Everything the research team is likely to revise lives in `ward_definitions.py`: how far back counts as "recent", what counts as an admission, and when a score counts as high. Each definition is plain Python over the area visits, and nothing in the file knows about FHIR.
+
+The current definitions:
+
+- **Window:** 12 hours (the length of the shift for the ward/ICU nurses and doctors).
+- **Admissions, option A (still present):** entries to the area in the window, among people still there.
+- **Admissions, option B (all arrivals):** every entry to the area in the window, including people who have since left.
+- **High patient acuity:** a NEWS2 score of 7 or more.
+- **Freshness:** scores older than 12 hours count as unknown.
 
 ```python
-WINDOW_HOURS = 12  # R2: how far back counts as "recent"? Both ends included.
+WINDOW_HOURS = 12  # one shift; both ends included
 
 def admissions_still_present(visits, cutoff, as_of):
-    """R2 option A: entries to the area in the window, among people still there."""
+    """Option A: entries to the area in the window, among people still there."""
     return sum(
         v.present and v.entered_at is not None and cutoff <= v.entered_at <= as_of
         for v in visits
     )
 
 def admissions_all_arrivals(visits, cutoff, as_of):
-    """R2 option B: every entry to the area in the window, including people who left."""
+    """Option B: every entry to the area in the window, including people who left."""
     return sum(
         v.entered_at is not None and cutoff <= v.entered_at <= as_of for v in visits
     )
 
-ACUITY_HIGH = 3            # R3 placeholder
-ACUITY_MAX_AGE_HOURS = 12  # R3 placeholder
+ACUITY_HIGH = 7            # NEWS2 of 7 or more is high
+ACUITY_MAX_AGE_HOURS = 12  # older scores count as unknown
 ```
 
 `summarise` applies the definitions to every configured area:
@@ -293,12 +296,6 @@ print(json.dumps(result["areas"][0], indent=2))
 ```
 
 One North patient has no recorded arrival time in the area. They count towards occupancy and appear under `unknown_entry_times`, but never as an admission: the gap stays visible instead of being guessed.
-
-!!! question "Research input R2: what counts"
-
-    **Decide:** the unit of occupancy (beds, encounters or patients); whether an admission means people still present (A) or all arrivals (B); the window length; whether a move between beds or areas counts as a new admission; and which of these changes [Revise a definition](#revise-a-definition) should show, and why.
-
-    **Placeholder now:** beds, option A, 12 hours, bed moves within an area don't count.
 
 ### Step 5: Serve it to a dashboard
 
@@ -348,12 +345,12 @@ for hour in ("00", "04", "08", "12"):
 12 4 2 2
 ```
 
-| Time  | Beds | Admissions | High acuity | What happened in North                                                                       |
-| ----- | ---- | ---------- | ----------- | -------------------------------------------------------------------------------------------- |
-| 00:00 | 3    | 3          | 2           | Three patients, all arrived in the last 12 hours                                             |
-| 04:00 | 5    | 4          | 4           | Two more arrive; one has no recorded arrival time, so isn't counted as an admission          |
-| 08:00 | 4    | 2          | 2           | One goes home, one moves to South, one arrives; an earlier arrival is now outside the window |
-| 12:00 | 4    | 2          | 2           | No movement                                                                                  |
+| Time  | Beds | Admissions | High acuity | What happened in North                                                                                              |
+| ----- | ---- | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------- |
+| 00:00 | 3    | 3          | 2           | Three patients, all arrived in the last 12 hours                                                                    |
+| 04:00 | 5    | 4          | 4           | Two more arrive; one has no recorded arrival time, so isn't counted as an admission                                 |
+| 08:00 | 4    | 2          | 2           | One moves to a general hospital ward, one moves to South, one arrives; an earlier arrival is now outside the window |
+| 12:00 | 4    | 2          | 2           | No movement                                                                                                         |
 
 Two rules keep the repeated numbers honest:
 
@@ -364,28 +361,28 @@ Against a live server, each run is a fresh query, and the dashboard endpoint fro
 
 ### Revise a definition
 
-_Research need: definitions that change._ Suppose the team asks whether "admissions" should count everyone who arrived in the window, or only those still on the ward. Both versions are in `ward_definitions.py`; pass the one you want:
+_Research need: definitions that change._ Suppose the ICU moves from 12-hour to 8-hour shifts, and the team wants "admissions" to mean admissions per shift. In `ward_definitions.py` that is one line, `WINDOW_HOURS = 8`. To compare both versions on the same data, pass `window_hours`:
 
 ```python
-for definition in ("still-present", "all-arrivals"):
-    north = summarise(data, config, admissions=definition)["areas"][0]
-    print(definition, north["admissions"])
+for hours in (12, 8):
+    north = summarise(data, config, window_hours=hours)["areas"][0]
+    print(hours, north["admissions"])
 ```
 
 ```text
-still-present 2
-all-arrivals 3
+12 2
+8 1
 ```
 
-The difference is one patient who arrived in North at 01:00 and left at 05:00: "all-arrivals" counts them, "still-present" doesn't. Nothing else moves:
+The difference is one patient who arrived in North at exactly 00:00: inside a 12-hour window, outside an 8-hour one (04:00–12:00). A South patient who arrived at 04:00 sits on the new boundary and still counts, because both ends are included. Nothing else moves:
 
-|                   | This revision                                                                                      |
-| ----------------- | -------------------------------------------------------------------------------------------------- |
-| Changed           | Which admission function is used (`ward_definitions.py`)                                           |
-| Reused unchanged  | FHIR query or file loading, validation, reference resolution, location and code mappings, fixtures |
-| Output difference | North admissions 2 → 3; every other value identical                                                |
+|                   | This revision                                                                                        |
+| ----------------- | ---------------------------------------------------------------------------------------------------- |
+| Changed           | `WINDOW_HOURS` in `ward_definitions.py`: 12 → 8                                                      |
+| Reused unchanged  | FHIR query or file loading, validation, reference resolution, location and code mappings, test data |
+| Output difference | North admissions 2 → 1; every other value identical                                                  |
 
-Each definition keeps its own frozen expected output (`expected_still_present.json`, `expected_all_arrivals.json`), and the tests check both. A revision comes with a before-and-after on the same data, rather than overwriting the old result.
+Each definition keeps its own frozen expected output (`expected_still_present.json`, `expected_window_8h.json`), and the tests check both. A revision comes with a before-and-after on the same data, rather than overwriting the old result. The two admission rules from Step 4 work the same way: `--admissions all-arrivals` has its own expected output too.
 
 ### Run on another site
 
@@ -418,7 +415,7 @@ Every run above used the same research code. This is what changed each time:
 | ------------------------------------ | ----------------------------------------------------- | ---------------------- | ----------------------------------- |
 | Saved files → live FHIR API (Step 1) | Data source                                           | No                     | Identical summary                   |
 | Earlier reference times              | `as_of`                                               | No                     | The ward as it was; scores go stale |
-| Still present → all arrivals         | One definition in `ward_definitions.py`               | That definition only   | North admissions 2 → 3              |
+| 12h → 8h window                      | One definition in `ward_definitions.py`               | That definition only   | North admissions 2 → 1              |
 | Site A → site B                      | Site config: identifiers, hierarchy, code, status fix | No                     | Identical summary                   |
 
 ---
@@ -438,4 +435,10 @@ The research definitions never touch FHIR. Moving them from saved files to a liv
     - Point `--source medplum` at your own sandbox and compare its output with the offline run.
     - Add a site: copy `site_a/config.json` and change the identifiers, codes and capacities.
     - Add a domain: search one more resource type, add its code to the site config, and count it in `ward_definitions.py`.
-    - Comment on the open research inputs in [issue #273](https://github.com/healthchainai/HealthChain/issues/273).
+
+## References
+
+- Gabler, N. B. _et al._ (2013) "Mortality among patients admitted to strained intensive care units", _American Journal of Respiratory and Critical Care Medicine_, 188(7), pp. 800–806. [doi:10.1164/rccm.201304-0622OC](https://doi.org/10.1164/rccm.201304-0622OC)
+- Kohn, R. _et al._ (2018) "Ward Capacity Strain: A Novel Predictor of 30-Day Hospital Readmissions", _Journal of General Internal Medicine_, 33(11), pp. 1851–1853. [doi:10.1007/s11606-018-4564-x](https://doi.org/10.1007/s11606-018-4564-x)
+- Page, B. _et al._ (2024) "Health services under pressure: a scoping review and development of a taxonomy of adaptive strategies", _BMJ Quality and Safety_, 33(11), pp. 738–747. [doi:10.1136/bmjqs-2023-016686](https://doi.org/10.1136/bmjqs-2023-016686)
+- Royal College of Physicians (2017) _National Early Warning Score (NEWS) 2: Standardising the assessment of acute-illness severity in the NHS_. Updated report of a working party. [rcp.ac.uk](https://www.rcp.ac.uk/improving-care/resources/national-early-warning-score-news-2/)
