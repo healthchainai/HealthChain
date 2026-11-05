@@ -1,0 +1,15 @@
+{#-
+  Custom logo: the brand "Plug" mark with a light/dark variant pair so the
+  prongs stay visible against both the light (default) and dark (slate) headers.
+  CSS in stylesheets/extra.css toggles which variant shows per color scheme.
+-#}
+<img
+  src="{{ 'assets/brand/marks/plug.svg' | url }}"
+  alt="{{ config.site_name }}"
+  class="hc-logo hc-logo--light"
+>
+<img
+  src="{{ 'assets/brand/marks/plug-reverse.svg' | url }}"
+  alt="{{ config.site_name }}"
+  class="hc-logo hc-logo--dark"
+>
