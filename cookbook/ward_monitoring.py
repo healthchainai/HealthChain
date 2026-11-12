@@ -15,19 +15,22 @@ never touch FHIR.
 
 All data is synthetic. The default run needs no credentials or network.
 
-Requirements:
-- pip install healthchain
+Requirements (from the repository root):
+- uv sync   (or: pip install .)
 
-Run:
+Run (prints the summary, then serves it; try it at http://127.0.0.1:8000/docs):
     python cookbook/ward_monitoring.py                      # site A, offline
-    python cookbook/ward_monitoring.py --admissions all-arrivals
-    python cookbook/ward_monitoring.py --window-hours 8     # revised window
-    python cookbook/ward_monitoring.py --site b             # different site, same logic
-    python cookbook/ward_monitoring.py --as-of 2026-10-23T04:00:00Z
+
+Print the JSON once instead of serving:
+    python cookbook/ward_monitoring.py --json
+    python cookbook/ward_monitoring.py --json --admissions all-arrivals
+    python cookbook/ward_monitoring.py --json --window-hours 8     # revised window
+    python cookbook/ward_monitoring.py --json --site b             # different site, same logic
+    python cookbook/ward_monitoring.py --json --as-of 2026-10-23T04:00:00Z
 
 Live FHIR API (needs MEDPLUM_* in .env; see the FHIR sandbox setup guide):
     healthchain seed medplum cookbook/data/ward_monitoring/site_a/medplum_upload.json
-    python cookbook/ward_monitoring.py --source medplum --as-of 2026-10-23T12:00:00Z
+    python cookbook/ward_monitoring.py --json --source medplum --as-of 2026-10-23T12:00:00Z
 """
 
 import argparse
@@ -35,9 +38,10 @@ import json
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import NamedTuple
+from typing import Literal, NamedTuple
 
 from dotenv import load_dotenv
+from fastapi import HTTPException, Query
 from pydantic import BaseModel, Field, PositiveInt
 
 from healthchain.fhir import (
@@ -49,7 +53,7 @@ from healthchain.fhir import (
 )
 from fhir.resources.R4B.encounter import EncounterLocation
 from healthchain.fhir.r4b import Bundle, Encounter, Location, Observation
-from healthchain.gateway import FHIRGateway
+from healthchain.gateway import FHIRGateway, HealthChainAPI
 from healthchain.gateway.clients import FHIRAuthConfig
 
 try:  # run as a script: python cookbook/ward_monitoring.py
@@ -118,7 +122,7 @@ def timestamp(value: datetime | str) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
-# --- Step 1-2: Get the FHIR data and check it ----------------------------------
+# --- Step 1-2: Read and check the FHIR data ------------------------------------
 
 
 def from_files(site_dir: Path, config: SiteConfig) -> SiteData:
@@ -156,7 +160,7 @@ def from_gateway(gateway: FHIRGateway, source: str, config: SiteConfig) -> SiteD
     return SiteData(fetch(Encounter), fetch(Location), fetch(Observation), pulled_at)
 
 
-# --- Step 3: Map FHIR to research inputs ---------------------------------------
+# --- Step 3: Map to research variables -----------------------------------------
 
 
 def area_for_location(
@@ -249,7 +253,7 @@ def latest_scores(
     return {encounter: score for encounter, (_, score) in latest.items()}
 
 
-# --- Step 4: Summarise ---------------------------------------------------------
+# --- Step 4: Compute the measures ----------------------------------------------
 
 
 def summarise(
@@ -311,7 +315,7 @@ def summarise(
     }
 
 
-# --- Step 5: Serve it ----------------------------------------------------------
+# --- Step 5: Serve the summary -------------------------------------------------
 
 
 def run(
@@ -334,6 +338,64 @@ def run(
     return summarise(data, config, admissions, window_hours, as_of)
 
 
+# --- Serve: the summary over HTTP for a dashboard ------------------------------
+
+
+def create_app(
+    site: Literal["a", "b"] = "a",
+    admissions: str = "still-present",
+    window_hours: int = WINDOW_HOURS,
+    source: str = "files",
+    as_of: str | None = None,
+) -> HealthChainAPI:
+    """Serve the per-area summary at GET /ward-summary; each request reruns `run`."""
+    app = HealthChainAPI(title="Ward summary")
+
+    @app.get("/ward-summary")
+    def ward_summary(
+        site: Literal["a", "b"] = site,
+        admissions: Literal[tuple(ADMISSION_DEFINITIONS)] = admissions,
+        window_hours: int = Query(default=window_hours, gt=0),
+        as_of: str | None = as_of,
+    ) -> dict:
+        try:
+            return run(site, admissions, window_hours, source, as_of)
+        except ValueError as error:  # e.g. a reference time after the data pull
+            raise HTTPException(status_code=422, detail=str(error)) from error
+
+    return app
+
+
+def format_table(result: dict) -> str:
+    """The summary as a plain-text table, one row per area."""
+    header = (
+        "Area",
+        "Occupied beds",
+        "Capacity",
+        f"Admissions ({result['window_hours']}h)",
+        "Unknown entry times",
+        "High acuity",
+        "Acuity unknown",
+    )
+    rows = [header] + [
+        (
+            a["area"],
+            a["occupied_beds"],
+            a["bed_capacity"],
+            a["admissions"],
+            a["unknown_entry_times"],
+            a["high_acuity"],
+            a["acuity_unknown"],
+        )
+        for a in result["areas"]
+    ]
+    widths = [max(len(str(row[i])) for row in rows) for i in range(len(header))]
+    lines = [
+        "  ".join(str(v).ljust(w) for v, w in zip(row, widths)).rstrip() for row in rows
+    ]
+    return f"Ward summary at {result['as_of']}\n" + "\n".join(lines)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Synthetic ward summary from FHIR")
     parser.add_argument("--site", choices=["a", "b"], default="a")
@@ -343,6 +405,15 @@ if __name__ == "__main__":
     parser.add_argument("--window-hours", type=int, default=WINDOW_HOURS)
     parser.add_argument("--source", choices=["files", "medplum"], default="files")
     parser.add_argument("--as-of", help="Reference time, e.g. 2026-10-23T04:00:00Z")
+    parser.add_argument(
+        "--json", action="store_true", help="Print the JSON summary and exit"
+    )
+    parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
-    result = run(args.site, args.admissions, args.window_hours, args.source, args.as_of)
-    print(json.dumps(result, indent=2))
+    options = (args.site, args.admissions, args.window_hours, args.source, args.as_of)
+    if args.json:
+        print(json.dumps(run(*options), indent=2))
+    else:
+        print(format_table(run(*options)))
+        print(f"\nTry it: http://127.0.0.1:{args.port}/docs  (Ctrl+C to stop)\n")
+        create_app(*options).run(host="127.0.0.1", port=args.port)

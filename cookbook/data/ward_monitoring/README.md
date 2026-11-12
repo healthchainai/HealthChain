@@ -97,3 +97,137 @@ occupied, 1 admission, 1 high.
 
 The fixtures were generated once by a script and then checked against these
 tables. They are illustrative inputs, not clinical results.
+
+## Checking the results
+
+From the repository root, with HealthChain installed in the active environment:
+
+```bash
+python -m pip install pytest
+python -m pytest tests/cookbook/test_ward_monitoring.py -q
+```
+
+The expected result at this revision is **32 passed**. The tests compare both
+sites with all three expected-output files and check earlier reference times,
+stale scores, invalid input, reference errors and duplicate occupied beds.
+Keep the supplied definitions unchanged when checking these baseline results;
+use explicit window and admission-rule arguments to compare alternatives.
+
+The gateway test uses an in-memory stub. For a hosted-server comparison, follow
+the [live comparison below](#live-comparison-and-cleanup).
+
+For a versioned reproduction, check out the release tag or commit being
+evaluated before installing HealthChain with `python -m pip install .`. Use
+the documentation and fixtures from the same revision. Record the commands,
+results and any local edits alongside:
+
+```bash
+git rev-parse HEAD
+python --version
+python -m pip freeze
+```
+
+## Scope of the checks
+
+Matching these outputs demonstrates reuse across the supplied variations, not
+clinical validity of a ward-strain model or compatibility with every hospital.
+HealthChain's resource validation checks structure and required primitive-code
+bindings; it does not cover profile conformance, FHIRPath constraints, clinical
+correctness or all terminology bindings. The recipe checks some reference and
+occupancy errors separately.
+
+Historical calculations depend on the records supplied. Missing movements and
+measurements cannot be reconstructed, and open-ended location periods rely on
+recorded status. A site's query must include the history required by the chosen
+measure: the all-arrivals rule, for example, needs stays that have already ended.
+
+## Live comparison and cleanup
+
+First follow the cookbook's [live-source step](../../../docs/cookbook/ward_monitoring.md#use-a-live-fhir-source)
+to configure Medplum and seed site A. Run the following snippets in one Python
+session from the repository root, with the same environment activated.
+
+### Upload behaviour
+
+The seed command reports `Uploaded (no Patient resources found)`: these fixtures
+use synthetic identifiers on encounters and contain no Patient resources.
+The transaction links resources and marks them with the tag
+`https://example.org/healthchain-demo|ward-monitoring-site-a`. Conditional creates
+avoid duplicating existing fixture records. They do not update those records
+when fixture contents change; remove the old demo records before uploading a
+changed fixture set.
+
+### Compare the complete output
+
+```python
+import json
+from healthchain.gateway import FHIRGateway
+from healthchain.gateway.clients import FHIRAuthConfig
+from cookbook.ward_monitoring import DATA_DIR, from_gateway, load_config, summarise
+
+gateway = FHIRGateway()
+gateway.add_source(
+    "medplum", FHIRAuthConfig.from_env("MEDPLUM").to_connection_string()
+)
+config = load_config(DATA_DIR / "site_a")
+live_data = from_gateway(gateway, "medplum", config)
+expected = json.loads((DATA_DIR / "expected_still_present.json").read_text())
+actual = summarise(live_data, config, as_of="2026-10-23T12:00:00Z")
+assert actual == expected
+print("Live summary matches the frozen offline output")
+```
+
+The command-line equivalent is:
+
+```bash
+python cookbook/ward_monitoring.py --json --source medplum --as-of 2026-10-23T12:00:00Z
+```
+
+The explicit reference time compares the same synthetic events as the offline
+run. Omitting it evaluates records at the current time, so admissions and score
+freshness can differ.
+
+`from_gateway` searches for all three resource types using the configured tag,
+validates each resource, and refuses results with a next page. The three searches
+are separate requests, not an atomic snapshot of a changing server. Server-assigned
+IDs can differ from the saved files; areas are mapped by `Location.identifier`,
+and references within the upload transaction link the resulting records.
+
+### Remove the demo records
+
+Stop the HTTP app with **Ctrl+C** if it is running. In the Python session above,
+retrieve the tagged site A records and inspect the deletion targets:
+
+```python
+from healthchain.fhir.r4b import Bundle
+
+demo = from_gateway(gateway, "medplum", config)
+targets = [
+    f"{entry.resource.__resource_type__}/{entry.resource.id}"
+    for bundle in (demo.observations, demo.encounters, demo.locations)
+    for entry in bundle.entry or []
+]
+print("\n".join(targets))
+```
+
+The next snippet deletes those targets from the configured Medplum project.
+Run it when you no longer need the seeded example:
+
+```python
+if targets:
+    deletion = Bundle(
+        type="transaction",
+        entry=[{"request": {"method": "DELETE", "url": url}} for url in targets],
+    )
+    gateway.transaction(deletion, source="medplum")
+
+remaining = from_gateway(gateway, "medplum", config)
+assert all(not bundle.entry for bundle in (
+    remaining.encounters, remaining.locations, remaining.observations
+))
+print("No site A demo records remain in search results")
+```
+
+This removes the records from ordinary searches, not from server history.
+Seeding again recreates the example. Restore `source="files"` in the local app
+before using the offline walkthrough again.

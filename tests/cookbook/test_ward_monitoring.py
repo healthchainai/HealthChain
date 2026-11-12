@@ -2,12 +2,14 @@ import json
 from datetime import datetime
 
 import pytest
+from fastapi.testclient import TestClient
 
 from cookbook.ward_monitoring import (
     DATA_DIR,
     SiteData,
     area_for_location,
     area_visits,
+    create_app,
     from_files,
     from_gateway,
     latest_scores,
@@ -67,6 +69,29 @@ def test_both_sites_match_hand_derived_results(
     assert run(
         site=site, admissions=admissions, window_hours=window_hours
     ) == json.loads((DATA_DIR / expected).read_text())
+
+
+@pytest.mark.parametrize(
+    "params,expected",
+    [
+        ({}, "expected_still_present.json"),
+        ({"admissions": "all-arrivals"}, "expected_all_arrivals.json"),
+        ({"window_hours": 8}, "expected_window_8h.json"),
+    ],
+)
+def test_summary_endpoint_matches_hand_derived_results(
+    params: dict, expected: str
+) -> None:
+    response = TestClient(create_app()).get("/ward-summary", params=params)
+    assert response.status_code == 200
+    assert response.json() == json.loads((DATA_DIR / expected).read_text())
+
+
+def test_summary_endpoint_rejects_reference_time_after_data_pull() -> None:
+    response = TestClient(create_app()).get(
+        "/ward-summary", params={"as_of": "2026-10-24T00:00:00Z"}
+    )
+    assert response.status_code == 422
 
 
 def test_gateway_input_matches_file_input() -> None:
