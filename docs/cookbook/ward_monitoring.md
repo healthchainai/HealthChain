@@ -362,7 +362,7 @@ Now that the validated records are handed over in research terms, the measures c
 - **Window:** 12 hours (the length of the shift for the ward/ICU nurses).
 - **Admissions, option A (still present, default):** entries to the area in the window, among people still there.
 - **Admissions, option B (all arrivals):** every entry to the area in the window, including people who have since left.
-- **High patient acuity:** a NEWS2 score of 7 or more.
+- **High patient acuity:** a NEWS2 score of 7 or more. The RCP's escalation pathway ties NEWS2 to action: 5 or more calls for an urgent response, and 7 or more for an emergency response. This example counts the emergency threshold as high acuity.
 - **Freshness:** scores older than 12 hours count as unknown.
 
 The thresholds are constants at the top of the file:
@@ -459,20 +459,20 @@ Every check is now a fresh query to the server, describing the ward as it is at 
 | 08:00 | 4             | 2          | 2           | One moves to a general hospital ward, one moves to South, one arrives; an earlier arrival is now outside the window |
 | 12:00 | 4             | 2          | 2           | No movement                                                                                                         |
 
-Definitions change too. They live in `ward_definitions.py`, and the ones this example expects to revise are also request parameters, so a new version can be tried on the same live data without digging through the code. This example has two:
+Definitions change too. They live in `ward_definitions.py`, and the ones this example expects to revise are also request parameters, so a new version can be tried on the same live data without digging through the code. This example has three:
 
 - **`window_hours`:** how far back counts as recent. The default of 12 hours matches one ICU shift. If the ICU moved to 8-hour shifts, the team would want admissions counted per shift.
+- **`acuity_high`:** the NEWS2 score that counts as high acuity. The default of 7 is today's emergency threshold. New evidence could move it, or a team could count from the urgent threshold of 5 instead.
 - **`admissions`:** which patients count as admissions. Option A, the default, counts only patients still in the area. Option B counts everyone who arrived in the window, which may be more realistic because every admission creates work, even when the patient doesn't stay long.
 
-The query, validation and site mappings stay fixed, so any difference comes from the definition alone. At 12:00, the 8-hour window drops the patient who arrived at exactly 00:00, and option B adds the patient who was in North from 01:00 to 05:00:
+The query, validation and site mappings stay fixed, so any difference comes from the definition alone. At 12:00, the 8-hour window drops the patient who arrived at exactly 00:00, a cutoff of 5 adds the patient in North bed 2 (NEWS2 6), and option B adds the patient who was in North from 01:00 to 05:00:
 
-| Definition                         | Parameter                 | North admissions |
-| ---------------------------------- | ------------------------- | ---------------- |
-| Current (12-hour window, option A) | defaults                  | 2                |
-| 8-hour shift                       | `window_hours=8`          | 1                |
-| Option B, all arrivals             | `admissions=all-arrivals` | 3                |
-
-The NEWS2 cutoff of 7 would be a natural third parameter, since new evidence could move it.
+| Definition                         | Parameter                 | North admissions | North high acuity |
+| ---------------------------------- | ------------------------- | ---------------- | ----------------- |
+| Current (12-hour window, 7+, A)    | defaults                  | 2                | 2                 |
+| 8-hour shift                       | `window_hours=8`          | 1                | 2                 |
+| NEWS2 cutoff of 5                  | `acuity_high=5`           | 2                | 3                 |
+| Option B, all arrivals             | `admissions=all-arrivals` | 3                | 2                 |
 
 ---
 
