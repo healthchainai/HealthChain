@@ -198,6 +198,17 @@
   font-weight: 500;
 }
 
+/* Linked inline code: the rules above would otherwise paint it as plain code */
+.md-typeset a > code {
+  color: var(--hc-link-color);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.md-typeset a:hover > code {
+  color: var(--hc-link-hover-color);
+}
+
 .md-typeset pre {
   margin-left: .5rem;
   margin-right: .5rem;
@@ -545,4 +556,10 @@ code {
   width: auto;
   vertical-align: -0.07rem;
   margin: 0 0.05rem;
+}
+
+/* Long code samples scroll inside a fixed height (``` { .json .scroll-code }) */
+.md-typeset .scroll-code pre > code {
+  max-height: 20rem;
+  overflow-y: auto;
 }
