@@ -1,0 +1,37 @@
+{
+  "as_of": "2026-10-23T12:00:00+00:00",
+  "window_hours": 12,
+  "admissions_definition": "all-arrivals",
+  "areas": [
+    {
+      "area": "North",
+      "occupied_beds": 4,
+      "bed_capacity": 5,
+      "occupancy_percent": 80.0,
+      "admissions": 3,
+      "unknown_entry_times": 1,
+      "high_acuity": 2,
+      "acuity_unknown": 1
+    },
+    {
+      "area": "South",
+      "occupied_beds": 2,
+      "bed_capacity": 3,
+      "occupancy_percent": 66.7,
+      "admissions": 2,
+      "unknown_entry_times": 0,
+      "high_acuity": 0,
+      "acuity_unknown": 1
+    },
+    {
+      "area": "Escalation",
+      "occupied_beds": 1,
+      "bed_capacity": 1,
+      "occupancy_percent": 100.0,
+      "admissions": 1,
+      "unknown_entry_times": 0,
+      "high_acuity": 1,
+      "acuity_unknown": 0
+    }
+  ]
+}
