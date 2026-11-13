@@ -1,0 +1,13 @@
+{% extends "main.html" %}
+
+{% block content %}
+<div class="hc-404">
+  <div class="hc-404__mark" aria-hidden="true">
+    <img src="{{ 'assets/brand/marks/plug.svg' | url }}" alt="" class="hc-mark--light">
+    <img src="{{ 'assets/brand/marks/plug-reverse.svg' | url }}" alt="" class="hc-mark--dark">
+  </div>
+  <h1 class="hc-404__title">This page got disconnected</h1>
+  <p class="hc-404__text">The link may be broken, or the page may have moved. Let's plug you back in.</p>
+  <a class="hc-404__home" href="{{ nav.homepage.url | url }}">Back to HealthChain home &rarr;</a>
+</div>
+{% endblock %}

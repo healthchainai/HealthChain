@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" role="img" aria-label="FHIRToolkit exposes typed FHIR tools to Claude over MCP and to LangChain agents via as_langchain, with tool calls returning typed validated results">
+  <rect x="0" y="0" width="880" height="560" rx="16" fill="#2b2532"/>
+  <text x="34" y="52" font-size="19" letter-spacing="2" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#8585e0">ONE TOOLKIT</text>
+  <text x="560" y="52" font-size="19" letter-spacing="2" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">ANY AGENT</text>
+
+  <rect x="34" y="86" width="380" height="380" rx="12" fill="#2e2e4a" stroke="#8585e0" stroke-width="2.5"/>
+  <text x="58" y="132" font-size="22" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#8585e0">FHIRToolkit(bundle)</text>
+  <rect x="60"  y="160" width="172" height="46" rx="23" fill="#241f2a" stroke="#4d4556" stroke-width="1.75"/>
+  <text x="76" y="190" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">build_resource</text>
+  <rect x="244" y="160" width="156" height="46" rx="23" fill="#241f2a" stroke="#4d4556" stroke-width="1.75"/>
+  <text x="260" y="190" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">validate_res…</text>
+  <rect x="60"  y="220" width="172" height="46" rx="23" fill="#241f2a" stroke="#4d4556" stroke-width="1.75"/>
+  <text x="76" y="250" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">get_resources</text>
+  <rect x="244" y="220" width="156" height="46" rx="23" fill="#241f2a" stroke="#4d4556" stroke-width="1.75"/>
+  <text x="260" y="250" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">coded_entries</text>
+  <rect x="60"  y="280" width="172" height="46" rx="23" fill="#241f2a" stroke="#4d4556" stroke-width="1.75"/>
+  <text x="76" y="310" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">resolve_ref</text>
+  <rect x="244" y="280" width="156" height="46" rx="23" fill="#241f2a" stroke="#4d4556" stroke-width="1.75"/>
+  <text x="260" y="310" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">lookup_code</text>
+  <text x="58" y="372" font-size="17" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">typed args in</text>
+  <text x="58" y="400" font-size="17" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">validated FHIR out</text>
+  <rect x="386" y="98"  width="10" height="10" fill="#8585e0"/>
+  <rect x="374" y="110" width="10" height="10" fill="#8585e0" opacity="0.6"/>
+  <rect x="386" y="122" width="10" height="10" fill="#8585e0" opacity="0.35"/>
+
+  <path d="M414 190 C490 190 500 160 566 160" stroke="#8585e0" stroke-width="1.75" fill="none" marker-end="url(#dc1)"/>
+  <text x="446" y="146" font-size="17" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#8585e0">.as_mcp()</text>
+  <rect x="570" y="118" width="278" height="86" rx="10" fill="#241f2a" stroke="#4d4556" stroke-width="1.75"/>
+  <text x="592" y="154" font-size="19" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">Claude · MCP clients</text>
+  <text x="592" y="184" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">$ healthchain mcp</text>
+
+  <path d="M414 360 C490 360 500 396 566 396" stroke="#8585e0" stroke-width="1.75" fill="none" marker-end="url(#dc1)"/>
+  <text x="430" y="336" font-size="17" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#8585e0">.as_langchain()</text>
+  <rect x="570" y="352" width="278" height="86" rx="10" fill="#241f2a" stroke="#4d4556" stroke-width="1.75"/>
+  <text x="592" y="388" font-size="19" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">LangChain · LangGraph</text>
+  <text x="592" y="418" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">StructuredTool list</text>
+
+  <path d="M700 204 L700 352" stroke="#a89fb0" stroke-width="1.75" stroke-dasharray="6 6" fill="none" marker-end="url(#dc2)" marker-start="url(#dc2)"/>
+  <text x="714" y="268" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">tool calls ⇄</text>
+  <text x="714" y="294" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">typed results</text>
+
+  <defs>
+    <marker id="dc1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#8585e0"/>
+    </marker>
+    <marker id="dc2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#a89fb0"/>
+    </marker>
+  </defs>
+</svg>
