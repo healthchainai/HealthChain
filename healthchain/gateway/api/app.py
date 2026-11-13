@@ -301,6 +301,22 @@ class HealthChainAPI(FastAPI):
 
         _config = AppConfig.load()
 
+        # Effective order, outermost first: CORS -> AuditLog -> APIKey.
+        # Starlette runs the last-added middleware outermost, so add in reverse:
+        # CORS answers preflights before auth and adds headers to 401s, and
+        # AuditLog wraps auth so rejected (401) requests are logged.
+        if _config and _config.security.auth == "api-key":
+            from healthchain.gateway.api.middleware import APIKeyMiddleware
+
+            self.add_middleware(APIKeyMiddleware)
+
+        if _config and _config.compliance.audit_log:
+            from healthchain.gateway.api.middleware import AuditLogMiddleware
+
+            self.add_middleware(
+                AuditLogMiddleware, audit_log_path=_config.compliance.audit_log
+            )
+
         if enable_cors:
             origins = _config.security.allowed_origins if _config else ["*"]
             self.add_middleware(
@@ -310,18 +326,6 @@ class HealthChainAPI(FastAPI):
                 allow_methods=["*"],
                 allow_headers=["*"],
             )
-
-        if _config and _config.compliance.audit_log:
-            from healthchain.gateway.api.middleware import AuditLogMiddleware
-
-            self.add_middleware(
-                AuditLogMiddleware, audit_log_path=_config.compliance.audit_log
-            )
-
-        if _config and _config.security.auth == "api-key":
-            from healthchain.gateway.api.middleware import APIKeyMiddleware
-
-            self.add_middleware(APIKeyMiddleware)
 
         # Add global exception handler
         self.add_exception_handler(Exception, self._exception_handler)

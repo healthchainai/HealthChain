@@ -81,7 +81,7 @@ site:
 | `audit_log` | path | `null` | Path to write audit log entries — one JSON line per request |
 
 !!! note "Audit logging"
-    When `audit_log` is set, every request is appended as a JSONL entry containing `timestamp`, `method`, `path`, `status_code`, `duration_ms`, `request_id`, and `user`. The log directory is created automatically if missing. When `api-key` auth is also enabled, `user` records the authenticated identity.
+    When `audit_log` is set, every request is appended as a JSONL entry containing `timestamp`, `method`, `path`, `status_code`, `duration_ms`, `request_id`, and `user`. The log directory is created automatically if missing. When `api-key` auth is also enabled, `user` records the authenticated identity. CORS preflight requests (`OPTIONS` with `Access-Control-Request-Method`) are answered by the CORS middleware before auth and are not logged.
 
 ---
 

@@ -1,12 +1,18 @@
 """Tests for the HealthChainAPI class."""
 
+import json
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi import Depends, HTTPException
 from fastapi.testclient import TestClient
 from fastapi.exceptions import RequestValidationError
 
-from healthchain.config.appconfig import AppConfig, GovernanceConfig
+from healthchain.config.appconfig import (
+    AppConfig,
+    ComplianceConfig,
+    GovernanceConfig,
+    SecurityConfig,
+)
 from healthchain.gateway.api.app import HealthChainAPI, _print_startup_banner
 from healthchain.gateway.api.dependencies import (
     get_event_dispatcher,
@@ -333,3 +339,72 @@ def test_sandbox_raises_on_startup_timeout(cds_app):
         with pytest.raises(RuntimeError, match="did not become ready"):
             with cds_app.sandbox("test-hook", startup_timeout=0.1):
                 pass
+
+
+ORIGIN = "https://app.example.org"
+PREFLIGHT_HEADERS = {
+    "Origin": ORIGIN,
+    "Access-Control-Request-Method": "GET",
+    "Access-Control-Request-Headers": "x-api-key",
+}
+
+
+@pytest.fixture
+def secured_client(tmp_path, monkeypatch):
+    """Real HealthChainAPI with CORS, API-key auth and audit logging all enabled."""
+    monkeypatch.setenv("HEALTHCHAIN_API_KEY", "secret")
+    config = AppConfig(
+        security=SecurityConfig(auth="api-key", allowed_origins=[ORIGIN]),
+        compliance=ComplianceConfig(audit_log=str(tmp_path / "audit.jsonl")),
+    )
+    with patch.object(AppConfig, "load", return_value=config):
+        app = HealthChainAPI()
+    return TestClient(app)
+
+
+def test_cors_preflight_is_answered_before_api_key_auth(secured_client):
+    """A credential-less preflight from an allowed origin is granted, not 401'd (#280)."""
+    response = secured_client.options("/metadata", headers=PREFLIGHT_HEADERS)
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == ORIGIN
+    assert "GET" in response.headers["access-control-allow-methods"]
+    assert "x-api-key" in response.headers["access-control-allow-headers"].lower()
+
+
+def test_api_key_rejection_carries_cors_headers(secured_client):
+    """A 401 from API-key auth is readable by browser code from an allowed origin (#280)."""
+    response = secured_client.get("/metadata", headers={"Origin": ORIGIN})
+
+    assert response.status_code == 401
+    assert response.headers["access-control-allow-origin"] == ORIGIN
+
+
+def test_cors_and_auth_still_enforced_for_options(secured_client):
+    """Disallowed-origin preflights are not granted; non-preflight OPTIONS still needs a key."""
+    denied = secured_client.options(
+        "/metadata", headers={**PREFLIGHT_HEADERS, "Origin": "https://evil.example"}
+    )
+    assert "access-control-allow-origin" not in denied.headers
+
+    assert secured_client.options("/metadata").status_code == 401
+
+
+def test_audit_log_records_requests_rejected_by_api_key_auth(secured_client, tmp_path):
+    """Audit log records 401s from auth and authenticated requests, not preflights (#279)."""
+    assert (
+        secured_client.options("/metadata", headers=PREFLIGHT_HEADERS).status_code
+        == 200
+    )
+    assert secured_client.get("/metadata").status_code == 401
+    assert (
+        secured_client.get("/metadata", headers={"X-API-Key": "secret"}).status_code
+        == 200
+    )
+
+    log_path = tmp_path / "audit.jsonl"
+    entries = [json.loads(line) for line in log_path.read_text().splitlines()]
+    assert [(e["method"], e["status_code"], e["user"]) for e in entries] == [
+        ("GET", 401, None),
+        ("GET", 200, "api-key"),
+    ]
