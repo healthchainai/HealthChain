@@ -482,11 +482,11 @@ The query, validation and site mappings stay fixed, so any difference comes from
 
 Ward strain measures are usually built on a research database or a one-off extract, so they can't follow the ward as it changes, move to another hospital, or keep up with revised definitions. This example runs one on live FHIR data instead. HealthChain holds the boundary on both sides: records come in through `FHIRGateway` and validation, and results go out through `HealthChainAPI`. The research team owns only what sits between them, a site config for each hospital and `ward_definitions.py`, and each need is met without changing the boundary:
 
-| Research need                                 | What changed                                          | Research code changed? | HealthChain's part                                                                                        |
-| --------------------------------------------- | ----------------------------------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------- |
-| Timely, repeated assessment                   | Reference time (`as_of`); saved files → live FHIR API | No                     | `FHIRGateway` queries current data, validated on every pull; `HealthChainAPI` recomputes on every request |
-| Variables recorded differently across systems | Site A → site B config                                | No                     | Validation surfaces each site's non-standard data; `resolve_reference` joins stays, beds and scores       |
-| Definitions that change                       | `window_hours` and `admissions` parameters            | No                     | Query, validation and mappings stay fixed, so old and new results compare on the same records             |
+| Research need                                 | What changed                                              | Research code changed? | HealthChain's part                                                                                        |
+| --------------------------------------------- | --------------------------------------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------- |
+| Timely, repeated assessment                   | Reference time (`as_of`); saved files → live FHIR API     | No                     | `FHIRGateway` queries current data, validated on every pull; `HealthChainAPI` recomputes on every request |
+| Variables recorded differently across systems | Site A → site B config                                    | No                     | Validation surfaces each site's non-standard data; `resolve_reference` joins stays, beds and scores       |
+| Definitions that change                       | `window_hours`, `acuity_high` and `admissions` parameters | No                     | Query, validation and mappings stay fixed, so old and new results compare on the same records             |
 
 ## References
 
