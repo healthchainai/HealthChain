@@ -1248,7 +1248,7 @@
           "reference": "urn:uuid:f5cf8524-8543-55fd-9597-4fd2ec3e7288"
         },
         "effectiveDateTime": "2026-10-23T11:00:00Z",
-        "valueInteger": 3,
+        "valueInteger": 6,
         "meta": {
           "tag": [
             {

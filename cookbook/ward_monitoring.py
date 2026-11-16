@@ -2,30 +2,20 @@
 """
 Ward Monitoring on Live FHIR Data
 
-Research measures of capacity strain (how full each ward area is, how many people
-arrived recently, how many have a high NEWS2 score) are usually built on a research
-database. This recipe computes them from FHIR instead: it reads Encounter,
-Location and Observation resources from files or a live FHIR API, maps each
-site's local codes to research variables, and serves a per-area summary.
+Computes per-area ward measures (occupied beds, recent admissions, high NEWS2
+scores) from FHIR Encounter, Location and Observation resources, read from
+files or a live FHIR API, and serves the summary over HTTP.
 
 HealthChain reads and checks the FHIR data (FHIRGateway, load_bundle,
 validate_resource, resolve_reference) and serves the result (HealthChainAPI).
-The research definitions live in ward_definitions.py, next to this file, and
-never touch FHIR.
+Each site's local codes live in its config.json; the research definitions live
+in ward_definitions.py and never touch FHIR. All data is synthetic.
 
-All data is synthetic. The default run needs no credentials or network.
-
-Requirements (from the repository root):
-- uv sync   (or: pip install .)
-
-Run (prints the summary, then serves it; try it at http://127.0.0.1:8000/docs):
-    python cookbook/ward_monitoring.py                      # site A, offline
-
-Print the JSON once instead of serving:
-    python cookbook/ward_monitoring.py --json
+Run from the repository root after `uv sync` (or `pip install .`):
+    python cookbook/ward_monitoring.py              # print, then serve at :8000/docs
+    python cookbook/ward_monitoring.py --json       # print the JSON once
+    python cookbook/ward_monitoring.py --json --site b --window-hours 8 --acuity-high 5
     python cookbook/ward_monitoring.py --json --admissions all-arrivals
-    python cookbook/ward_monitoring.py --json --window-hours 8     # revised window
-    python cookbook/ward_monitoring.py --json --site b             # different site, same logic
     python cookbook/ward_monitoring.py --json --as-of 2026-10-23T04:00:00Z
 
 Live FHIR API (needs MEDPLUM_* in .env; see the FHIR sandbox setup guide):
@@ -51,7 +41,6 @@ from healthchain.fhir import (
     resolve_reference,
     validate_resource,
 )
-from fhir.resources.R4B.encounter import EncounterLocation
 from healthchain.fhir.r4b import Bundle, Encounter, Location, Observation
 from healthchain.gateway import FHIRGateway, HealthChainAPI
 from healthchain.gateway.clients import FHIRAuthConfig
@@ -78,7 +67,7 @@ load_dotenv()
 DATA_DIR = Path(__file__).parent / "data" / "ward_monitoring"
 
 
-# --- Site configuration: the local mappings ------------------------------------
+# --- Site config: one hospital's local names -----------------------------------
 
 
 class Area(BaseModel):
@@ -96,8 +85,8 @@ class SiteConfig(BaseModel):
     search_params: dict[str, str]  # how to query this site's FHIR API
     location_system: str  # Location.identifier system that names areas
     areas: dict[str, Area] = Field(min_length=1)  # keyed by identifier value
-    acuity_code: Code  # this site's Observation code for the clinical variable
-    location_status_map: dict[str, str] = {}  # fixes for a non-standard file export
+    acuity_code: Code  # this site's Observation code for the NEWS2 score
+    location_status_map: dict[str, str] = {}  # fixes for a non-standard export
 
 
 class SiteData(NamedTuple):
@@ -112,17 +101,15 @@ def load_config(site_dir: Path) -> SiteConfig:
 
 
 def timestamp(value: datetime | str) -> datetime:
-    parsed = (
-        datetime.fromisoformat(value.replace("Z", "+00:00"))
-        if isinstance(value, str)
-        else value
-    )
-    if parsed.tzinfo is None or parsed.utcoffset() is None:
+    """A UTC datetime; refuses date-only or naive values, which can't be ordered."""
+    if isinstance(value, str):
+        value = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if value.tzinfo is None or value.utcoffset() is None:
         raise ValueError("Use complete, timezone-aware timestamps")
-    return parsed.astimezone(timezone.utc)
+    return value.astimezone(timezone.utc)
 
 
-# --- Step 1-2: Read and check the FHIR data ------------------------------------
+# --- Steps 1-2: Read and check the FHIR data -----------------------------------
 
 
 def from_files(site_dir: Path, config: SiteConfig) -> SiteData:
@@ -167,9 +154,7 @@ def area_for_location(
     location: Location, locations: Bundle, config: SiteConfig
 ) -> str | None:
     """Walk Location.partOf up to the first configured area, or None if outside."""
-    seen: set[str] = set()
-    while location.id not in seen:
-        seen.add(location.id)
+    while True:
         for identifier in location.identifier or []:
             if (
                 identifier.system == config.location_system
@@ -182,7 +167,6 @@ def area_for_location(
         if parent is None:
             raise ValueError(f"Unresolved Location reference: {location.partOf}")
         location = parent
-    raise ValueError("Cycle in Location hierarchy")
 
 
 def area_visits(
@@ -197,14 +181,14 @@ def area_visits(
         if timestamp(encounter.period.start) > as_of:
             return []
 
-    def bounds(item: EncounterLocation) -> tuple[datetime | None, datetime | None]:
-        p = item.period
-        start = timestamp(p.start) if p and p.start else None
-        end = timestamp(p.end) if p and p.end else None
+    def times(item) -> tuple[datetime | None, datetime | None]:
+        period = item.period
+        start = timestamp(period.start) if period and period.start else None
+        end = timestamp(period.end) if period and period.end else None
         return start, end
 
     history = sorted(
-        ((*bounds(item), item) for item in encounter.location or []),
+        ((*times(item), item) for item in encounter.location or []),
         key=lambda row: (row[0] is None, row[0] or as_of),
     )
     visits: list[AreaVisit] = []
@@ -226,23 +210,20 @@ def area_visits(
             else:
                 visits.append(AreaVisit(encounter.id, area, bed.id, start, present))
         last_area, last_end = area, end
-    if sum(v.present for v in visits) > 1:
-        raise ValueError("Encounter has multiple active locations")
     return visits
 
 
 def latest_scores(
     data: SiteData, config: SiteConfig, as_of: datetime
 ) -> dict[str, int]:
-    """Latest clinical-variable score per encounter within the allowed age."""
+    """Latest NEWS2 score per encounter, no older than the freshness rule allows."""
     cutoff = as_of - timedelta(hours=ACUITY_MAX_AGE_HOURS)
+    code = (config.acuity_code.system, config.acuity_code.code)
     latest: dict[str, tuple[datetime, int]] = {}
     for obs in get_resources(data.observations, Observation):
-        coded = any(
-            c.system == config.acuity_code.system and c.code == config.acuity_code.code
-            for c in obs.code.coding or []
-        )
-        if not coded or obs.valueInteger is None or obs.effectiveDateTime is None:
+        if code not in {(c.system, c.code) for c in obs.code.coding or []}:
+            continue
+        if obs.valueInteger is None or obs.effectiveDateTime is None:
             continue
         when = timestamp(obs.effectiveDateTime)
         encounter = resolve_reference(data.encounters, obs.encounter)
@@ -262,12 +243,15 @@ def summarise(
     admissions: str = "still-present",
     window_hours: int = WINDOW_HOURS,
     as_of: datetime | str | None = None,
+    acuity_high: int = ACUITY_HIGH,
 ) -> dict:
     as_of = timestamp(as_of or data.pulled_at)
     if as_of > data.pulled_at:
         raise ValueError("as_of is after the data was pulled")
     if window_hours <= 0:
         raise ValueError("window_hours must be positive")
+    if not 0 <= acuity_high <= 20:
+        raise ValueError("acuity_high must be a NEWS2 score from 0 to 20")
     known = {
         identifier.value
         for location in get_resources(data.locations, Location)
@@ -302,7 +286,7 @@ def summarise(
                 "admissions": count_admissions(in_area, cutoff, as_of),
                 "unknown_entry_times": sum(v.entered_at is None for v in present),
                 "high_acuity": sum(
-                    scores.get(v.encounter, 0) >= ACUITY_HIGH for v in present
+                    scores.get(v.encounter, -1) >= acuity_high for v in present
                 ),
                 "acuity_unknown": sum(v.encounter not in scores for v in present),
             }
@@ -311,11 +295,9 @@ def summarise(
         "as_of": as_of.isoformat(),
         "window_hours": window_hours,
         "admissions_definition": admissions,
+        "acuity_high": acuity_high,
         "areas": rows,
     }
-
-
-# --- Step 5: Serve the summary -------------------------------------------------
 
 
 def run(
@@ -324,7 +306,9 @@ def run(
     window_hours: int = WINDOW_HOURS,
     source: str = "files",
     as_of: datetime | str | None = None,
+    acuity_high: int = ACUITY_HIGH,
 ) -> dict:
+    """The whole workflow: read one site's records and summarise them."""
     site_dir = DATA_DIR / f"site_{site}"
     config = load_config(site_dir)
     if source == "files":
@@ -335,10 +319,10 @@ def run(
             source, FHIRAuthConfig.from_env(source.upper()).to_connection_string()
         )
         data = from_gateway(gateway, source, config)
-    return summarise(data, config, admissions, window_hours, as_of)
+    return summarise(data, config, admissions, window_hours, as_of, acuity_high)
 
 
-# --- Serve: the summary over HTTP for a dashboard ------------------------------
+# --- Step 5: Serve the summary -------------------------------------------------
 
 
 def create_app(
@@ -347,6 +331,7 @@ def create_app(
     window_hours: int = WINDOW_HOURS,
     source: str = "files",
     as_of: str | None = None,
+    acuity_high: int = ACUITY_HIGH,
 ) -> HealthChainAPI:
     """Serve the per-area summary at GET /ward-summary; each request reruns `run`."""
     app = HealthChainAPI(title="Ward summary")
@@ -357,9 +342,10 @@ def create_app(
         admissions: Literal[tuple(ADMISSION_DEFINITIONS)] = admissions,
         window_hours: int = Query(default=window_hours, gt=0),
         as_of: str | None = as_of,
+        acuity_high: int = Query(default=acuity_high, ge=0, le=20),
     ) -> dict:
         try:
-            return run(site, admissions, window_hours, source, as_of)
+            return run(site, admissions, window_hours, source, as_of, acuity_high)
         except ValueError as error:  # e.g. a reference time after the data pull
             raise HTTPException(status_code=422, detail=str(error)) from error
 
@@ -368,30 +354,20 @@ def create_app(
 
 def format_table(result: dict) -> str:
     """The summary as a plain-text table, one row per area."""
-    header = (
-        "Area",
-        "Occupied beds",
-        "Capacity",
-        f"Admissions ({result['window_hours']}h)",
-        "Unknown entry times",
-        "High acuity",
-        "Acuity unknown",
-    )
-    rows = [header] + [
-        (
-            a["area"],
-            a["occupied_beds"],
-            a["bed_capacity"],
-            a["admissions"],
-            a["unknown_entry_times"],
-            a["high_acuity"],
-            a["acuity_unknown"],
-        )
-        for a in result["areas"]
-    ]
-    widths = [max(len(str(row[i])) for row in rows) for i in range(len(header))]
+    columns = {
+        "area": "Area",
+        "occupied_beds": "Occupied beds",
+        "bed_capacity": "Capacity",
+        "admissions": f"Admissions ({result['window_hours']}h)",
+        "unknown_entry_times": "Unknown entry times",
+        "high_acuity": "High acuity",
+        "acuity_unknown": "Acuity unknown",
+    }
+    rows = [list(columns.values())]
+    rows += [[str(area[key]) for key in columns] for area in result["areas"]]
+    widths = [max(len(row[i]) for row in rows) for i in range(len(columns))]
     lines = [
-        "  ".join(str(v).ljust(w) for v, w in zip(row, widths)).rstrip() for row in rows
+        "  ".join(v.ljust(w) for v, w in zip(row, widths)).rstrip() for row in rows
     ]
     return f"Ward summary at {result['as_of']}\n" + "\n".join(lines)
 
@@ -406,14 +382,15 @@ if __name__ == "__main__":
     parser.add_argument("--source", choices=["files", "medplum"], default="files")
     parser.add_argument("--as-of", help="Reference time, e.g. 2026-10-23T04:00:00Z")
     parser.add_argument(
-        "--json", action="store_true", help="Print the JSON summary and exit"
+        "--acuity-high", type=int, default=ACUITY_HIGH, help="NEWS2 high cutoff, 0-20"
     )
+    parser.add_argument("--json", action="store_true", help="Print JSON and exit")
     parser.add_argument("--port", type=int, default=8000)
-    args = parser.parse_args()
-    options = (args.site, args.admissions, args.window_hours, args.source, args.as_of)
-    if args.json:
-        print(json.dumps(run(*options), indent=2))
+    options = vars(parser.parse_args())
+    as_json, port = options.pop("json"), options.pop("port")
+    if as_json:
+        print(json.dumps(run(**options), indent=2))
     else:
-        print(format_table(run(*options)))
-        print(f"\nTry it: http://127.0.0.1:{args.port}/docs  (Ctrl+C to stop)\n")
-        create_app(*options).run(host="127.0.0.1", port=args.port)
+        print(format_table(run(**options)))
+        print(f"\nTry it: http://127.0.0.1:{port}/docs  (Ctrl+C to stop)\n")
+        create_app(**options).run(host="127.0.0.1", port=port)

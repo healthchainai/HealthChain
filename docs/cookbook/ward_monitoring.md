@@ -26,8 +26,8 @@ The Nurse in Charge of the ICU will assess several factors at the beginning of t
 
 The board below shows the ICU as the Nurse in Charge might see it at noon (UTC) on 23 October 2026. To keep the example's tables short, it is cut down to North 5 beds, South 3, Escalation 1.
 
-![Synthetic ICU at 12:00, drawn as a floor plan. North, 5 beds: bed 1 new, NEWS2 7; bed 2 moved within North, NEWS2 3; bed 3 new, NEWS2 9; bed 4 entry time unknown, no recent score; bed 5 empty. South, 3 beds: bed 1 new, no recent score; bed 2 new, NEWS2 2; bed 3 empty. Escalation, 1 bed: bed 1 new, NEWS2 10. NEWS2 of 7 or more is high acuity.](../assets/images/cards/hc-flow-ward-board-light.svg#only-light)
-![Synthetic ICU at 12:00, drawn as a floor plan. North, 5 beds: bed 1 new, NEWS2 7; bed 2 moved within North, NEWS2 3; bed 3 new, NEWS2 9; bed 4 entry time unknown, no recent score; bed 5 empty. South, 3 beds: bed 1 new, no recent score; bed 2 new, NEWS2 2; bed 3 empty. Escalation, 1 bed: bed 1 new, NEWS2 10. NEWS2 of 7 or more is high acuity.](../assets/images/cards/hc-flow-ward-board-dark.svg#only-dark)
+![Synthetic ICU at 12:00, drawn as a floor plan. North, 5 beds: bed 1 new, NEWS2 7; bed 2 moved within North, NEWS2 6; bed 3 new, NEWS2 9; bed 4 entry time unknown, no recent score; bed 5 empty. South, 3 beds: bed 1 new, no recent score; bed 2 new, NEWS2 2; bed 3 empty. Escalation, 1 bed: bed 1 new, NEWS2 10. NEWS2 of 7 or more is high acuity.](../assets/images/cards/hc-flow-ward-board-light.svg#only-light)
+![Synthetic ICU at 12:00, drawn as a floor plan. North, 5 beds: bed 1 new, NEWS2 7; bed 2 moved within North, NEWS2 6; bed 3 new, NEWS2 9; bed 4 entry time unknown, no recent score; bed 5 empty. South, 3 beds: bed 1 new, no recent score; bed 2 new, NEWS2 2; bed 3 empty. Escalation, 1 bed: bed 1 new, NEWS2 10. NEWS2 of 7 or more is high acuity.](../assets/images/cards/hc-flow-ward-board-dark.svg#only-dark)
 
 ### Workflow
 
@@ -98,13 +98,14 @@ The command also prints the summary at startup. By default it shows the board ab
 | South      | 2             | 3        | 2                | 0                   | 0           | 1              |
 | Escalation | 1             | 1        | 1                | 0                   | 1           | 0              |
 
-The endpoint takes four parameters:
+The endpoint takes five parameters:
 
 | Parameter      | Default         | What it changes                                   |
 | -------------- | --------------- | ------------------------------------------------- |
 | `as_of`        | data pull time  | Reference time of the check (not after the pull)  |
 | `window_hours` | `12`            | Admissions window, e.g. `8` for an 8-hour shift   |
 | `admissions`   | `still-present` | Admission rule: `still-present` or `all-arrivals` |
+| `acuity_high`  | `7`             | NEWS2 score that counts as high acuity, 0–20      |
 | `site`         | `a`             | Site format: `a` or `b`, same ICU and same result |
 
 To try them, open <http://127.0.0.1:8000/docs>, choose **GET /ward-summary**, then **Try it out**. For example, set `as_of` to `2026-10-23T04:00:00Z` to see the ICU at 04:00.
@@ -383,7 +384,7 @@ A dashboard inside a hospital needs more than an HTTP route. The service must re
 
 ```python
 def create_app(site="a", admissions="still-present", window_hours=WINDOW_HOURS,
-               source="files", as_of=None) -> HealthChainAPI:
+               source="files", as_of=None, acuity_high=ACUITY_HIGH) -> HealthChainAPI:
     app = HealthChainAPI(title="Ward summary")
 
     @app.get("/ward-summary")
@@ -392,8 +393,9 @@ def create_app(site="a", admissions="still-present", window_hours=WINDOW_HOURS,
         admissions: Literal[tuple(ADMISSION_DEFINITIONS)] = admissions,
         window_hours: int = Query(default=window_hours, gt=0),
         as_of: str | None = as_of,
+        acuity_high: int = Query(default=acuity_high, ge=0, le=20),
     ) -> dict:
-        return run(site, admissions, window_hours, source, as_of)
+        return run(site, admissions, window_hours, source, as_of, acuity_high)
 
     return app
 ```

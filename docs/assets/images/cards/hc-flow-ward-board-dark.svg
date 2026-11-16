@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" role="img" aria-label="Synthetic ICU at 12:00, drawn as a floor plan. North, 5 beds: bed 1 new, NEWS2 7; bed 2 moved within North, NEWS2 3; bed 3 new, NEWS2 9; bed 4 entry time unknown, no recent score; bed 5 empty. South, 3 beds: bed 1 new, no recent score; bed 2 new, NEWS2 2; bed 3 empty. Escalation, 1 bed: bed 1 new, NEWS2 10. NEWS2 of 7 or more is high acuity.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" role="img" aria-label="Synthetic ICU at 12:00, drawn as a floor plan. North, 5 beds: bed 1 new, NEWS2 7; bed 2 moved within North, NEWS2 6; bed 3 new, NEWS2 9; bed 4 entry time unknown, no recent score; bed 5 empty. South, 3 beds: bed 1 new, no recent score; bed 2 new, NEWS2 2; bed 3 empty. Escalation, 1 bed: bed 1 new, NEWS2 10. NEWS2 of 7 or more is high acuity.">
   <rect x="0" y="0" width="880" height="560" rx="16" fill="#2b2532"/>
   <text x="20" y="50" font-size="16" letter-spacing="2" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">ICU · 23 OCT · 12:00 (SYNTHETIC)</text>
   <rect x="844" y="26" width="10" height="10" fill="#e59875"/>
@@ -20,7 +20,7 @@
   <text x="160" y="204" font-size="18" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">2</text>
   <rect x="160" y="214" width="55" height="22" rx="11" fill="none" stroke="#a89fb0" stroke-width="1.25"/>
   <text x="169" y="229" font-size="12" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">moved</text>
-  <text x="160" y="258" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">NEWS2 3</text>
+  <text x="160" y="258" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">NEWS2 6</text>
   <rect x="260" y="150" width="100" height="124" rx="8" fill="#3d2f28" stroke="#e59875" stroke-width="2"/>
   <rect x="278" y="159" width="64" height="16" rx="7" fill="#e59875" stroke="#e59875" stroke-width="1" fill-opacity="0.45"/>
   <path d="M261 184 L359 184" stroke="#e59875" stroke-width="1.25" fill="none"/>

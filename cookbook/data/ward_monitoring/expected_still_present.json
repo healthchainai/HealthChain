@@ -2,6 +2,7 @@
   "as_of": "2026-10-23T12:00:00+00:00",
   "window_hours": 12,
   "admissions_definition": "still-present",
+  "acuity_high": 7,
   "areas": [
     {
       "area": "North",
