@@ -1,6 +1,10 @@
-# Turn a Research Database Extract into a Validated FHIR API
+---
+authors: [jenniferjiangkells]
+date: 2026-07-11
+level: Beginner
+---
 
-**Level:** Beginner
+# Turn a Research Database Extract into a Validated FHIR API
 
 You have an extract from a research database — rows of patients, diagnoses, and lab values pulled from a data warehouse. To use it beyond one-off analysis (dashboards, downstream apps, multi-site studies), it needs to become validated FHIR behind a real API. This example turns extract rows into typed FHIR resources, catches the dirty data before it ships, and loads it all into a FHIR server you can query like any EHR.
 

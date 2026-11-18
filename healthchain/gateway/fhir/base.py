@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 from fhir.resources.R4B.capabilitystatement import CapabilityStatement
 from fhir.resources.resource import Resource
 
-from healthchain.gateway.clients.fhir.base import FHIRServerInterface
+from healthchain.gateway.clients.fhir.base import FHIRAuthConfig, FHIRServerInterface
 from healthchain.gateway.base import BaseGateway
 
 
@@ -75,7 +75,7 @@ class BaseFHIRGateway(BaseGateway):
         # Add initial sources if provided
         if self._initial_sources:
             for name, source in self._initial_sources.items():
-                if isinstance(source, str):
+                if isinstance(source, (str, FHIRAuthConfig)):
                     self.connection_manager.add_source(name, source)
                 else:
                     self.connection_manager.sources[name] = source
@@ -466,13 +466,13 @@ class BaseFHIRGateway(BaseGateway):
         """
         gateway = cls()
         for name, source in config.sources.items():
-            auth_config = source.to_fhir_auth_config()
-            gateway.add_source(name, auth_config.to_connection_string())
+            gateway.add_source(name, source.to_fhir_auth_config())
         return gateway
 
-    def add_source(self, name: str, connection_string: str) -> None:
+    def add_source(self, name: str, connection_string: str | FHIRAuthConfig) -> None:
         """
         Add a FHIR data source using connection string with OAuth2.0 flow.
+        A FHIRAuthConfig is also accepted in place of the string.
 
         Format: fhir://hostname:port/path?param1=value1&param2=value2
 

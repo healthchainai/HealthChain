@@ -12,7 +12,11 @@ from healthchain.fhir.r4b import Patient
 
 app = HealthChainAPI(title="Multi-EHR Patient Data")
 fhir = FHIRGateway()
-fhir.add_source("epic", "fhir://fhir.epic.com/r4?client_id=epic_client_id")
+fhir.add_source(
+    "epic",
+    "fhir://fhir.epic.com/r4?client_id=epic_client_id&client_secret=epic_secret"
+    "&token_url=https://fhir.epic.com/oauth2/token",
+)
 
 @fhir.aggregate(Patient)
 def enrich_patient_data(id: str, source: str) -> Patient:
@@ -26,7 +30,7 @@ app.register_gateway(fhir)
 Real signatures (verified with `inspect.signature`):
 
 - `FHIRGateway.__init__(self, **kwargs)` — keyword args only, nothing positional required.
-- `add_source(self, name: str, connection_string: str) -> None` — `connection_string` is `fhir://host/path?client_id=...&client_secret=...&token_url=...&scope=...`. Build it by hand, or from `FHIRAuthConfig` (below).
+- `add_source(self, name: str, connection_string: str | FHIRAuthConfig) -> None` — `connection_string` is `fhir://host/path?client_id=...&client_secret=...&token_url=...&scope=...` (`fhir://` means https; `http://` and `https://` are kept as given; no auth params for a public server). It is parsed and validated here, so incomplete auth raises `FHIRConnectionError` immediately. Build it by hand, or pass a `FHIRAuthConfig` (below).
 - `search(self, resource_type, params=None, source=None, add_provenance=False, provenance_tag=None, follow_pagination=False, max_pages=None) -> Bundle`
 
 Real credentials belong in environment variables via `FHIRAuthConfig`, not typed into the connection string:
@@ -39,7 +43,7 @@ from healthchain.gateway.clients import FHIRAuthConfig
 # EPIC_TOKEN_URL, and optional EPIC_SCOPE / EPIC_AUDIENCE / EPIC_TIMEOUT / EPIC_VERIFY_SSL /
 # EPIC_USE_JWT_ASSERTION / EPIC_KEY_ID.
 auth = FHIRAuthConfig.from_env("EPIC")
-fhir.add_source("epic", auth.to_connection_string())
+fhir.add_source("epic", auth)
 ```
 
 `FHIRAuthConfig` is imported from `healthchain.gateway.clients`, not `healthchain.gateway` itself. `from_env(env_prefix: str) -> FHIRAuthConfig` and `to_connection_string(self) -> str` are the two methods that matter; the class is a Pydantic model so `FHIRAuthConfig(base_url=..., client_id=..., ...)` also works directly. Skipped above only because it needs real `EPIC_*` environment variables to construct without a validation error — the pattern itself needs no other explanation.

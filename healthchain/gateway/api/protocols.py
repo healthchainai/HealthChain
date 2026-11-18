@@ -23,6 +23,8 @@ from healthchain.gateway.events.dispatcher import EHREvent, EHREventType
 if TYPE_CHECKING:
     from fastapi import FastAPI, APIRouter
 
+    from healthchain.gateway.clients.fhir.base import FHIRAuthConfig
+
 
 class EventDispatcherProtocol(Protocol):
     """Protocol defining the interface for event dispatchers."""
@@ -134,7 +136,9 @@ class HealthChainAPIProtocol(Protocol):
 class FHIRConnectionManagerProtocol(Protocol):
     """Protocol for FHIR connection management."""
 
-    def add_source(self, name: str, connection_string: str) -> None:
+    def add_source(
+        self, name: str, connection_string: Union[str, "FHIRAuthConfig"]
+    ) -> None:
         """Add a FHIR data source."""
         ...
 

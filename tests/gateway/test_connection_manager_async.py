@@ -7,6 +7,8 @@ This module tests centralized connection management for FHIR sources:
 - Client pooling and retrieval
 """
 
+import json
+
 import pytest
 from unittest.mock import Mock, AsyncMock
 
@@ -54,10 +56,6 @@ async def test_connection_manager_client_retrieval_and_default_selection(
     # Test default source selection (should use first available)
     client_default = await connection_manager.get_client()
     assert client_default == mock_fhir_client
+    # Pool key is the first source's config
     call_args = connection_manager.client_pool.get_client.call_args
-    from urllib.parse import urlparse
-
-    parsed_url = urlparse(call_args[0][0])
-    assert (
-        parsed_url.hostname == "first.com"
-    )  # Should use first source's connection string
+    assert json.loads(call_args[0][0])["base_url"] == "https://first.com/fhir"

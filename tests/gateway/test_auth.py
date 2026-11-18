@@ -353,18 +353,22 @@ def test_sync_vs_async_token_manager_distinction():
     assert inspect.iscoroutinefunction(async_manager.get_access_token)
 
 
-def test_public_endpoint_mode_behaviors():
+@pytest.mark.parametrize(
+    "connection_string,expected_base_url",
+    [
+        (
+            "fhir://fhir-open.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d",
+            "https://fhir-open.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d",
+        ),
+        ("https://hapi.fhir.org/baseR4", "https://hapi.fhir.org/baseR4"),
+        ("http://localhost:8080/fhir", "http://localhost:8080/fhir"),
+    ],
+)
+def test_public_endpoint_mode_behaviors(connection_string, expected_base_url):
     """Public endpoint: parse config, no auth required, no token, no Authorization header."""
-    connection_string = (
-        "fhir://fhir-open.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d"
-    )
-
     config = parse_fhir_auth_connection_string(connection_string)
 
-    assert (
-        config.base_url
-        == "https://fhir-open.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d"
-    )
+    assert config.base_url == expected_base_url
     assert config.requires_auth is False
 
     client = FHIRClient(auth_config=config)
@@ -419,6 +423,16 @@ def test_parse_connection_string_with_auth():
             },
             "requires client_secret_path",
         ),
+        (
+            {"base_url": "https://epic.com/api/FHIR/R4", "client_secret": "secret"},
+            "client_id is required",
+        ),
+        (
+            {"base_url": "https://epic.com/api/FHIR/R4", "use_jwt_assertion": True},
+            "client_id is required",
+        ),
+        ({"base_url": "ftp://host"}, "base_url must use http or https"),
+        ({"base_url": "https://"}, "base_url is missing a hostname"),
     ],
 )
 def test_fhir_auth_config_validation_rules(config_kwargs, error):
@@ -427,24 +441,41 @@ def test_fhir_auth_config_validation_rules(config_kwargs, error):
         FHIRAuthConfig(**config_kwargs)
 
 
-def test_to_connection_string_roundtrip():
+@pytest.mark.parametrize(
+    "config_kwargs,expected_prefix",
+    [
+        (
+            {
+                "base_url": "https://epic.com/api/FHIR/R4",
+                "client_id": "app",
+                "client_secret": "secret",
+                "token_url": "https://epic.com/token",
+                "scope": "system/*.read",
+                "timeout": 45,
+                "verify_ssl": False,
+            },
+            "fhir://",
+        ),
+        (
+            {
+                "base_url": "http://localhost:8080/fhir",
+                "client_id": "app",
+                "client_secret": "secret",
+                "token_url": "http://localhost:8080/token",
+            },
+            "http://",
+        ),
+        ({"base_url": "http://localhost:8080/fhir"}, "http://"),
+    ],
+)
+def test_to_connection_string_roundtrip(config_kwargs, expected_prefix):
     """FHIRAuthConfig serializes to and parses from connection string consistently."""
-    cfg = FHIRAuthConfig(
-        base_url="https://epic.com/api/FHIR/R4",
-        client_id="app",
-        client_secret="secret",
-        token_url="https://epic.com/token",
-        scope="system/*.read",
-        timeout=45,
-        verify_ssl=False,
-    )
+    cfg = FHIRAuthConfig(**config_kwargs)
     conn = cfg.to_connection_string()
+    assert conn.startswith(expected_prefix)
+    assert "None" not in conn
     parsed = parse_fhir_auth_connection_string(conn)
-    assert parsed.base_url == cfg.base_url
-    assert parsed.client_id == cfg.client_id
-    assert parsed.token_url == cfg.token_url
-    assert parsed.timeout == 45
-    assert parsed.verify_ssl is False
+    assert parsed.model_dump() == cfg.model_dump()
 
 
 def test_from_env_missing_vars_raises(monkeypatch):

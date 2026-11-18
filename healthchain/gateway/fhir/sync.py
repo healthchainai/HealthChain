@@ -247,7 +247,8 @@ class FHIRGateway(BaseFHIRGateway):
             source: Source name to search in (uses first available if None)
             add_provenance: If True, automatically add provenance metadata to resources
             provenance_tag: Optional tag code for provenance (e.g., "aggregated", "transformed")
-            follow_pagination: If True, automatically fetch all pages
+            follow_pagination: If True, fetch all pages by following the server's
+                `next` links as-is; links to another host are refused
             max_pages: Maximum number of pages to fetch (None for unlimited)
 
         Returns:
@@ -286,17 +287,12 @@ class FHIRGateway(BaseFHIRGateway):
                 if not next_link or (max_pages and page_count >= max_pages):
                     break
 
-                # Extract the relative URL from the next link
-                # next_url = next_link.url.split("/")[-2:]  # Get resource_type/_search part
-                next_params = dict(
-                    pair.split("=") for pair in next_link.url.split("?")[1].split("&")
-                )
-
+                # Paging links are opaque: fetch the server's URL as-is
                 bundle = self._execute_with_client(
-                    "search",
+                    "fetch_page",
                     source=source,
                     resource_type=resource_type,
-                    client_args=(resource_type, next_params),
+                    client_args=(next_link.url,),
                 )
 
                 if bundle.entry:

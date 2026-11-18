@@ -48,6 +48,22 @@ If `HEALTHCHAIN_API_KEY` is not set when the service starts, a warning is logged
 
 ---
 
+## CORS
+
+CORS only affects browsers. Set `security.allowed_origins` when a browser app on a different origin (a SMART app, web dashboard, or browser-based app) calls the gateway. Server-to-server callers (EHR backends, scripts, agents) are not affected.
+
+```yaml
+security:
+  allowed_origins:
+    - https://dashboard.example.org
+```
+
+The default `["*"]` allows any origin, which suits local development. In production, list your front-end origins explicitly.
+
+Before a cross-origin request that carries an API key, the browser sends an `OPTIONS` preflight without credentials. HealthChain answers it before auth, so preflights never receive a `401` and are not written to the audit log.
+
+---
+
 ## Audit logging
 
 Set `compliance.audit_log` to a file path to enable per-request audit logging:
@@ -71,7 +87,7 @@ The log directory is created automatically if it does not exist. Each request ap
 }
 ```
 
-`request_id` uses the `X-Request-ID` header if present, otherwise a UUID is generated. `user` is populated when `api-key` auth is enabled, and `null` otherwise.
+`request_id` uses the `X-Request-ID` header if present, otherwise a UUID is generated. `user` is `"api-key"` for requests that pass `api-key` auth, and `null` otherwise. Requests rejected by auth are logged too, with `status_code: 401` and `user: null`. CORS preflight requests are not logged (see [CORS](#cors)).
 
 Log writes are non-blocking — IO errors are swallowed so a full disk or permission issue does not take down the service.
 
