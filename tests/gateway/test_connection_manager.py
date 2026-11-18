@@ -78,7 +78,7 @@ def test_connection_manager_cleanup_all_sources(connection_manager):
 
     # Mock the client creation to return our mock clients
     def mock_create_client(auth_config):
-        if "source1.com" in auth_config.base_url:
+        if auth_config.base_url == "https://source1.com/fhir":
             return mock_client1
         else:
             return mock_client2
