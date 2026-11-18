@@ -34,7 +34,13 @@ class StubGateway:
             Observation: data.observations,
         }
 
-    def search(self, resource_type: type, params: dict, source: str) -> Bundle:
+    def search(
+        self,
+        resource_type: type,
+        params: dict,
+        source: str,
+        follow_pagination: bool = False,
+    ) -> Bundle:
         return self.bundles[resource_type].model_copy(deep=True)
 
 

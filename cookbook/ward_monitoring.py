@@ -133,10 +133,9 @@ def from_gateway(gateway: FHIRGateway, source: str, config: SiteConfig) -> SiteD
     """Query the same resources from a FHIR API and validate them."""
 
     def fetch(resource_type: type) -> Bundle:
-        params = {**config.search_params, "_count": "100"}
-        bundle = gateway.search(resource_type, params, source=source)
-        if any(link.relation == "next" for link in bundle.link or []):
-            raise ValueError(f"{resource_type.__name__} search returned >1 page")
+        bundle = gateway.search(
+            resource_type, config.search_params, source=source, follow_pagination=True
+        )
         for entry in bundle.entry or []:
             report = validate_resource(entry.resource)
             if not report.valid:

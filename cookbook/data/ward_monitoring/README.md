@@ -139,7 +139,7 @@ python cookbook/ward_monitoring.py --json --source medplum --as-of 2026-10-23T12
 The explicit reference time evaluates the same synthetic events as the offline
 run; without it, admissions and score freshness are judged at the current time.
 `from_gateway` searches each resource type by the site tag, validates every
-resource and refuses results with a next page. The three searches are separate
+resource and follows every result page. The three searches are separate
 requests, not an atomic snapshot. Server-assigned IDs differ from the saved
 files; areas are matched by `Location.identifier`.
 

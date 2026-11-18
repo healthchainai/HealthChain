@@ -1,3 +1,9 @@
+---
+authors: [jenniferjiangkells, cwoodmansey, radhikakumar13]
+date: 2026-10-28
+level: Intermediate
+---
+
 # Ward Monitoring on Live FHIR Data
 
 ## Research Context
