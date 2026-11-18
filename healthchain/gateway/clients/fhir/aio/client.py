@@ -127,6 +127,28 @@ class AsyncFHIRClient(FHIRServerInterface):
 
         return Bundle(**data)
 
+    async def fetch_page(self, url: str) -> Bundle:
+        """
+        Fetch a server-provided page URL (e.g. a Bundle `next` link) as-is.
+
+        Args:
+            url: Absolute or base-relative page link from the server
+
+        Returns:
+            Bundle for that page
+
+        Raises:
+            FHIRClientError: If the link points outside the configured base URL
+        """
+        page_url = self._resolve_page_url(url)
+        logger.debug(f"Sending GET request to {page_url}")
+
+        headers = await self._get_headers()
+        response = await self.client.get(page_url, headers=headers)
+        data = self._handle_response(response)
+
+        return Bundle(**data)
+
     async def create(self, resource: Resource) -> Resource:
         """
         Create a new resource.

@@ -277,6 +277,34 @@ class FHIRServerInterface(ABC):
                 url += "?" + urlencode(clean_params)
         return url
 
+    def _resolve_page_url(self, url: str) -> httpx.URL:
+        """Resolve a server-provided page link and refuse it if it leaves the base origin.
+
+        The link is used as-is (FHIR paging links are opaque). Absolute links must
+        share scheme, host and effective port with the base URL and carry no
+        credentials, so the access token is never sent to another host.
+        """
+        refused = FHIRClientError(
+            "Refusing to follow a page link outside the configured base URL. "
+            "If the server is behind a proxy or in Docker, check its base-URL "
+            "setting (HAPI: server_address)."
+        )
+        try:
+            page = httpx.URL(urljoin(self.base_url, url))
+            base = httpx.URL(self.base_url)
+        except (httpx.InvalidURL, ValueError):
+            # The parse error can echo parts of the link, so don't chain it
+            raise refused from None
+
+        if (
+            page.scheme != base.scheme
+            or page.host != base.host
+            or page.port != base.port
+            or page.userinfo
+        ):
+            raise refused
+        return page
+
     def _handle_response(self, response: httpx.Response) -> dict:
         """Handle HTTP response and convert to dict."""
         try:
@@ -358,6 +386,11 @@ class FHIRServerInterface(ABC):
         params: Optional[Dict[str, Any]] = None,
     ) -> Bundle:
         """Search for resources."""
+        pass
+
+    @abstractmethod
+    def fetch_page(self, url: str) -> Bundle:
+        """Fetch a server-provided page URL (e.g. a Bundle `next` link)."""
         pass
 
     @abstractmethod
