@@ -81,7 +81,7 @@ Start from the templates — copy and fill them in:
 Each cookbook has three parts:
 
 1. **A runnable Python script** in `cookbook/` — e.g. `cookbook/my_use_case.py`. Pre-bake any data or setup so it works out of the box. Put sample or synthetic data in `cookbook/data/`.
-2. **A documentation page** in `docs/cookbook/` — e.g. `docs/cookbook/my_use_case.md`. The narrative page on the docs site, walking through what the script does and why.
+2. **A documentation page** in `docs/cookbook/` — e.g. `docs/cookbook/my_use_case.md`. The narrative page on the docs site, walking through what the script does and why. List the GitHub handles of everyone who wrote it, domain experts included, in the page's `authors` frontmatter, with `date` and `level`; the docs site shows them as a byline under the title.
 3. **Two registration steps** so it appears on the docs site:
 
    **Add a line to `mkdocs.yml`** under the existing Cookbook section (around line 27):

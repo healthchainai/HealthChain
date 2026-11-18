@@ -14,7 +14,9 @@ To get started, comment on [issue #208](https://github.com/healthchainai/HealthC
 
 ## Contributors
 
-_No cookbook contributions yet — be the first! See [issue #208](https://github.com/healthchainai/HealthChain/issues/208) to get started._
+| Contributor | Cookbook | Merged |
+| ----------- | -------- | ------ |
+| [@asaraog](https://github.com/asaraog) | [Prior Authorization: Chart Pull to Coded Packet](https://healthchainai.github.io/HealthChain/cookbook/prior_auth_packet/) ([#268](https://github.com/healthchainai/HealthChain/pull/268)) | Oct 2026 |
 
 ---
 

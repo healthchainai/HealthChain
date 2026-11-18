@@ -1,0 +1,55 @@
+{#-
+  Material's partials/content.html, plus a byline under the page title when
+  the page frontmatter lists `authors` (GitHub handles) and optionally `date`
+  and `level` (Beginner, Intermediate or Advanced).
+-#}
+{% include "partials/tags.html" %}
+{% include "partials/actions.html" %}
+{% set authors = page.meta.authors if page.meta else none %}
+{% if authors %}
+  {% set published = page.meta.date %}
+  {% set byline %}
+    <div class="hc-byline">
+      <div class="hc-byline__avatars">
+        {% for handle in authors %}
+          <a href="https://github.com/{{ handle }}" aria-hidden="true" tabindex="-1">
+            <img src="https://github.com/{{ handle }}.png?size=80" alt="" width="40" height="40" loading="lazy"></a>
+        {% endfor %}
+      </div>
+      <div class="hc-byline__meta">
+        <div class="hc-byline__names">
+          {%- for handle in authors -%}
+            <a href="https://github.com/{{ handle }}">@{{ handle }}</a>{{ ", " if not loop.last }}
+          {%- endfor -%}
+        </div>
+        <div class="hc-byline__details">
+          {% if published %}
+            <time datetime="{{ published }}">
+              {%- if published.strftime is defined -%}
+                {{ published.day }} {{ published.strftime("%b %Y") }}
+              {%- else -%}
+                {{ published }}
+              {%- endif -%}
+            </time>
+          {% endif %}
+          {% if page.meta.level %}
+            <span class="tag tag-{{ page.meta.level | lower }}">{{ page.meta.level }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endset %}
+{% endif %}
+{% if "<h1" not in page.content %}
+  <h1>{{ page.title | d(config.site_name, true)}}</h1>
+  {{ byline if authors }}
+  {{ page.content }}
+{% elif authors %}
+  {% set title, body = page.content.split("</h1>", 1) %}
+  {{ title }}</h1>{{ byline }}{{ body }}
+{% else %}
+  {{ page.content }}
+{% endif %}
+{% include "partials/source-file.html" %}
+{% include "partials/feedback.html" %}
+{% include "partials/comments.html" %}

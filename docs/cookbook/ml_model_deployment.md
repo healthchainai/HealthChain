@@ -1,6 +1,10 @@
-# Deploy ML Models: Predictions to FHIR RiskAssessments
+---
+authors: [jenniferjiangkells]
+date: 2025-10-01
+level: Intermediate
+---
 
-**Level:** Intermediate
+# Deploy ML Models: Predictions to FHIR RiskAssessments
 
 You have a model that outputs risk scores. To make those scores useful inside an EHR — visible to clinicians, dashboards, and quality measures — they have to become FHIR [RiskAssessment](https://www.hl7.org/fhir/riskassessment.html) resources. This tutorial shows the bridge: take the predictions your model already produced and emit spec-valid FHIR, one resource per patient, then optionally write them back to a live FHIR server.
 
@@ -125,4 +129,4 @@ The written resources are visible in the [Medplum console](https://app.medplum.c
 
     - **Real-time alerts**: To surface a score at the point of care instead of persisting it, return it as a CDS Hooks card — see the [CDS Hooks reference](../reference/gateway/cdshooks.md).
     - **Add more FHIR sources**: The gateway supports multiple sources — see the [FHIR Sandbox Setup guide](./setup_fhir_sandboxes.md).
-    - **Go to production**: Scaffold a project with `healthchain new` and run with `healthchain serve` — see [From cookbook to service](./index.md#from-cookbook-to-service).
+    - **Turn it into a service**: Scaffold a project with `healthchain new` and run with `healthchain serve` — see [From cookbook to service](./index.md#from-cookbook-to-service).
