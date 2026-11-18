@@ -1,6 +1,10 @@
-# FHIR-Grounded Patient Q&A
+---
+authors: [jenniferjiangkells]
+date: 2026-04-20
+level: Beginner
+---
 
-**Level:** Beginner
+# FHIR-Grounded Patient Q&A
 
 This example shows you how to build a Q&A service that answers patient questions using their live clinical data as context. The service fetches FHIR resources from a connected EHR, formats them into a structured prompt context using a HealthChain pipeline, and passes both to an LLM to generate a grounded, personalised response.
 
@@ -307,4 +311,4 @@ A FHIR-grounded patient Q&A service that:
     - **Swap the LLM**: Replace `ChatAnthropic` with a HuggingFace model (`ChatHuggingFace` + `HuggingFaceEndpoint`) or any other LangChain-compatible provider — the pipeline and gateway are unchanged
     - **Connect to a real FHIR source**: Replace Medplum with an Epic or Cerner sandbox — see [Setup FHIR Sandboxes](./setup_fhir_sandboxes.md) for instructions
     - **Add conversation history**: Extend `PatientQuestion` with a `history` field and pass it into the LangChain prompt for multi-turn Q&A
-    - **Go to production**: Scaffold a project with `healthchain new` and run with `healthchain serve` — see [From cookbook to service](./index.md#from-cookbook-to-service). Moving to `healthchain.yaml` is where config-driven compliance support (audit logging, certificates, deployment metadata) will live as those features mature.
+    - **Turn it into a service**: Scaffold a project with `healthchain new` and run with `healthchain serve` — see [From cookbook to service](./index.md#from-cookbook-to-service). Moving to `healthchain.yaml` is where config-driven compliance support (audit logging, certificates, deployment metadata) will live as those features mature.

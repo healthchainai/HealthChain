@@ -1,6 +1,10 @@
-# Prior Authorization: From FHIR Chart Pull to a Coded Request Packet
+---
+authors: [asaraog]
+date: 2026-10-08
+level: Intermediate
+---
 
-**Level:** Intermediate
+# Prior Authorization: From FHIR Chart Pull to a Coded Request Packet
 
 A treating office asks for an MRI. The request lands in the EHR as free text — `"MRI lumbar spine without contrast"`, diagnosis `"lumbar radiculopathy, right L5 distribution"` — and the payer will not read free text. Somebody has to pull the chart, code the diagnosis and the requested service, check the request against the utilization-review criteria, and send back a packet that cites both. Today that somebody is usually a person with a browser and a code book.
 
@@ -10,7 +14,7 @@ Full working example: [cookbook/prior_auth_packet.py](https://github.com/healthc
 
 ---
 
-## Clinical context
+## Clinical Context
 
 Prior authorization is where a lot of care stalls. The request itself is usually uncontroversial — an MRI after eight weeks of failed physical therapy is textbook — but it gets denied or delayed because the packet is incomplete: an unspecified diagnosis code, no documented conservative-care duration, no objective findings cited. The clinical decision was fine; the paperwork lost.
 
@@ -232,4 +236,4 @@ A production version swaps three parts and keeps the shape: a full terminology s
     - Point it at your own catalog — `LocalCodeLookup(catalog=...)` takes any list of codings, so a site formulary or an order catalog works unchanged
     - Emit a Da Vinci PAS `Claim` alongside the `Task` if your payer accepts the profile
     - Return the determination as a CDS Hooks card so the request is checked while the order is still being written — see the [CDS Hooks gateway](../reference/gateway/cdshooks.md)
-    - Go to production: scaffold with `healthchain new` and run with `healthchain serve`
+    - **Turn it into a service**: Scaffold a project with `healthchain new` and run with `healthchain serve` — see [From cookbook to service](./index.md#from-cookbook-to-service).

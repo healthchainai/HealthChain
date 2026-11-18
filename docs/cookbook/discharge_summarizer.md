@@ -1,6 +1,10 @@
-# Build a CDS Hooks Service for Discharge Summarization
+---
+authors: [jenniferjiangkells]
+date: 2025-08-13
+level: Beginner
+---
 
-**Level:** Beginner
+# Build a CDS Hooks Service for Discharge Summarization
 
 This example shows you how to build a CDS service that integrates with EHR systems. We'll automatically summarize discharge notes and return actionable recommendations using the [CDS Hooks standard](https://cds-hooks.org/).
 
@@ -219,4 +223,4 @@ A CDS Hooks service for discharge workflows that integrates seamlessly with EHR 
     - **Add validation**: Implement checks for required discharge elements (medications, follow-ups, equipment).
     - **Multi-card support**: Expand to generate separate cards for different discharge aspects (medication reconciliation, transportation, follow-up scheduling).
     - **Integrate with workflows**: Deploy to Epic App Orchard or Cerner Code Console for production EHR integration.
-    - **Go to production**: Scaffold a project with `healthchain new` and run with `healthchain serve` — see [From cookbook to service](./index.md#from-cookbook-to-service).
+    - **Turn it into a service**: Scaffold a project with `healthchain new` and run with `healthchain serve` — see [From cookbook to service](./index.md#from-cookbook-to-service).

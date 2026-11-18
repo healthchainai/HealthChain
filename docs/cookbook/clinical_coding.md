@@ -1,6 +1,10 @@
-# Build a NoteReader Service with FHIR Integration
+---
+authors: [jenniferjiangkells]
+date: 2025-08-13
+level: Advanced
+---
 
-**Level:** Advanced
+# Build a NoteReader Service with FHIR Integration
 
 Modernize Epic NoteReader's legacy SOAP interface by connecting it to a modern FHIR server, without disrupting existing CDI workflows. You'll extract SNOMED CT codes from clinical notes using NLP, write structured data to [Medplum](https://www.medplum.com/) for analytics, and return CDA responses to Epic.
 
@@ -447,4 +451,4 @@ A clinical coding service that bridges legacy CDA systems with modern FHIR infra
     - **Add validation**: Implement FHIR resource validation before sending to external servers.
     - **Expand to other workflows**: Adapt the pattern for lab results, medications, or radiology reports.
     - **Build on it**: Use the extracted conditions in the [Data Aggregation example](./multi_ehr_aggregation.md) to combine with other FHIR sources.
-    - **Go to production**: Scaffold a project with `healthchain new` and run with `healthchain serve` — see [From cookbook to service](./index.md#from-cookbook-to-service).
+    - **Turn it into a service**: Scaffold a project with `healthchain new` and run with `healthchain serve` — see [From cookbook to service](./index.md#from-cookbook-to-service).

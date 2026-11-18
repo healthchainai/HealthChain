@@ -1,6 +1,10 @@
-# Multi-Source Patient Data Aggregation
+---
+authors: [jenniferjiangkells]
+date: 2025-10-01
+level: Intermediate
+---
 
-**Level:** Intermediate
+# Multi-Source Patient Data Aggregation
 
 This example shows you how to aggregate patient data from multiple FHIR sources and track data provenance: essential for building AI applications that train on diverse data, query multiple EHR vendors in RAG systems, or construct unified patient timelines from fragmented health records.
 
@@ -416,4 +420,4 @@ A production-ready data aggregation service with:
     - **Expand resource types**: Change `Condition` to `MedicationStatement`, `Observation`, or `Procedure` to aggregate different data.
     - **Add processing**: Extend the pipeline with terminology mapping, entity extraction, or quality checks.
     - **Build on it**: Use aggregated data in the [Clinical Coding tutorial](./clinical_coding.md) or feed it to your LLM application.
-    - **Go to production**: Scaffold a project with `healthchain new` and run with `healthchain serve` — see [From cookbook to service](./index.md#from-cookbook-to-service). Moving to `healthchain.yaml` is where config-driven compliance support (audit logging, data provenance, deployment metadata) will live as those features mature.
+    - **Turn it into a service**: Scaffold a project with `healthchain new` and run with `healthchain serve` — see [From cookbook to service](./index.md#from-cookbook-to-service). Moving to `healthchain.yaml` is where config-driven compliance support (audit logging, data provenance, deployment metadata) will live as those features mature.

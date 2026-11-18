@@ -546,3 +546,71 @@ code {
   vertical-align: -0.07rem;
   margin: 0 0.05rem;
 }
+
+/* ============================================
+   Cookbook byline (authors, date and level from page frontmatter,
+   rendered by overrides/partials/content.html). Substack-style:
+   stacked avatars, names over date, framed by thin rules.
+   ============================================ */
+/* The byline's own rules replace the title underline */
+.md-typeset h1:has(+ .hc-byline) {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.md-typeset .hc-byline {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.9rem 0 1.8rem;
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.md-typeset .hc-byline__avatars {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.md-typeset .hc-byline__avatars a + a {
+  margin-left: -0.5rem;
+}
+
+.md-typeset .hc-byline__avatars img {
+  display: block;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  border: 2px solid var(--md-default-bg-color);
+}
+
+.md-typeset .hc-byline__names {
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.md-typeset .hc-byline__names a {
+  color: var(--md-default-fg-color);
+}
+
+.md-typeset .hc-byline__names a:hover {
+  color: var(--hc-link-hover-color);
+}
+
+.md-typeset .hc-byline__details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.1rem;
+  font-size: 0.65rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .hc-byline .tag {
+  padding: 1px 8px;
+  font-size: 0.58rem;
+}
