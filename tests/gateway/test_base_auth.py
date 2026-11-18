@@ -235,6 +235,11 @@ def test_fhir_auth_config_to_oauth2_config_conversion():
             "fhir://example.com/fhir/R4?client_id=test&client_secret=secret&client_secret_path=/path&token_url=https://example.com/token",
             "Cannot provide both client_secret and client_secret_path",
         ),
+        # Partial auth is not silently treated as public
+        (
+            "fhir://example.com/fhir/R4?use_jwt_assertion=true",
+            "client_id is required",
+        ),
     ],
 )
 def test_connection_string_parsing_validation(connection_string, expected_error):

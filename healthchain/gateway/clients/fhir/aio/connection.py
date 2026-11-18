@@ -2,7 +2,7 @@ import httpx
 
 from typing import Dict
 
-from healthchain.gateway.clients.fhir.base import FHIRServerInterface
+from healthchain.gateway.clients.fhir.base import FHIRAuthConfig, FHIRServerInterface
 from healthchain.gateway.clients.pool import ClientPool
 from healthchain.gateway.clients.fhir.sync.connection import FHIRConnectionManager
 
@@ -74,43 +74,32 @@ class AsyncFHIRConnectionManager(FHIRConnectionManager):
             FHIRServerInterface: An async FHIR client with pooled connections
 
         Raises:
-            ValueError: If source is unknown or no connection string found
+            ValueError: If source is unknown or has no connection config
         """
-        source_name = source or next(iter(self.sources.keys()))
-        if source_name not in self.sources:
-            raise ValueError(f"Unknown source: {source_name}")
+        auth_config = self._get_auth_config(source)
 
-        if source_name not in self._connection_strings:
-            raise ValueError(f"No connection string found for source: {source_name}")
-
-        connection_string = self._connection_strings[source_name]
-
+        # Key by config content, so replacing a source's config gets a new client
         return await self.client_pool.get_client(
-            connection_string, self._create_server_from_connection_string
+            auth_config.model_dump_json(),
+            lambda _key, limits=None: self._create_client(auth_config, limits=limits),
         )
 
-    def _create_server_from_connection_string(
-        self, connection_string: str, limits: httpx.Limits = None
+    def _create_client(
+        self, auth_config: FHIRAuthConfig, limits: httpx.Limits = None
     ) -> FHIRServerInterface:
         """
-        Create an async FHIR server instance from a connection string with connection pooling.
+        Create an async FHIR server instance with connection pooling.
 
         This is used by the client pool to create new server instances.
 
         Args:
-            connection_string: FHIR connection string
+            auth_config: FHIR connection and auth configuration
             limits: httpx connection limits for pooling
 
         Returns:
             FHIRServerInterface: A new async FHIR server instance with pooled connections
         """
         from healthchain.gateway.clients.fhir.aio.client import create_async_fhir_client
-        from healthchain.gateway.clients.fhir.base import (
-            parse_fhir_auth_connection_string,
-        )
-
-        # Parse connection string as OAuth2.0 configuration
-        auth_config = parse_fhir_auth_connection_string(connection_string)
 
         # Pass httpx limits for connection pooling
         return create_async_fhir_client(auth_config=auth_config, limits=limits)

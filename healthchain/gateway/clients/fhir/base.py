@@ -5,14 +5,14 @@ import httpx
 from abc import ABC, abstractmethod
 from functools import lru_cache
 from typing import Any, Dict, Optional, Type, Union
-from urllib.parse import urlencode, urljoin
+from urllib.parse import parse_qsl, urlencode, urljoin, urlparse
 
 from fhir.resources.R4B.bundle import Bundle
 from fhir.resources.R4B.capabilitystatement import CapabilityStatement
 from fhir.resources.resource import Resource
 
 from healthchain.gateway.clients.auth import OAuth2Config
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 logger = logging.getLogger(__name__)
@@ -49,6 +49,17 @@ class FHIRAuthConfig(BaseModel):
     use_jwt_assertion: bool = False  # Use JWT client assertion (Epic/SMART style)
     key_id: Optional[str] = None  # Key ID (kid) for JWT header - required for JWKS
 
+    @field_validator("base_url")
+    @classmethod
+    def _validate_base_url(cls, value: str) -> str:
+        """Require an http(s) endpoint with a hostname."""
+        parsed = urlparse(value)
+        if parsed.scheme not in ("http", "https"):
+            raise ValueError(f"base_url must use http or https, got: {value}")
+        if not parsed.hostname:
+            raise ValueError(f"base_url is missing a hostname: {value}")
+        return value
+
     @property
     def requires_auth(self) -> bool:
         """
@@ -57,7 +68,13 @@ class FHIRAuthConfig(BaseModel):
         Returns:
             True if any auth parameters are present, False for public endpoints
         """
-        return bool(self.client_id or self.token_url)
+        return bool(
+            self.client_id
+            or self.token_url
+            or self.client_secret
+            or self.client_secret_path
+            or self.use_jwt_assertion
+        )
 
     def model_post_init(self, __context) -> None:
         """Validate auth configuration if auth parameters are present."""
@@ -112,10 +129,10 @@ class FHIRAuthConfig(BaseModel):
             env_prefix: Environment variable prefix (e.g., "EPIC")
 
         Expected environment variables:
-            {env_prefix}_CLIENT_ID
-            {env_prefix}_CLIENT_SECRET (or {env_prefix}_CLIENT_SECRET_PATH)
-            {env_prefix}_TOKEN_URL
             {env_prefix}_BASE_URL
+            {env_prefix}_CLIENT_ID (optional, required for auth)
+            {env_prefix}_CLIENT_SECRET (or {env_prefix}_CLIENT_SECRET_PATH, required for auth)
+            {env_prefix}_TOKEN_URL (optional, required for auth)
             {env_prefix}_SCOPE (optional)
             {env_prefix}_AUDIENCE (optional)
             {env_prefix}_TIMEOUT (optional, default: 30)
@@ -153,17 +170,11 @@ class FHIRAuthConfig(BaseModel):
         token_url = os.getenv(f"{env_prefix}_TOKEN_URL")
         base_url = os.getenv(f"{env_prefix}_BASE_URL")
 
-        if not all([client_id, token_url, base_url]):
-            missing = [
-                var
-                for var, val in [
-                    (f"{env_prefix}_CLIENT_ID", client_id),
-                    (f"{env_prefix}_TOKEN_URL", token_url),
-                    (f"{env_prefix}_BASE_URL", base_url),
-                ]
-                if not val
-            ]
-            raise ValueError(f"Missing required environment variables: {missing}")
+        # Only the endpoint is required; model_post_init validates auth fields
+        if not base_url:
+            raise ValueError(
+                f"Missing required environment variables: ['{env_prefix}_BASE_URL']"
+            )
 
         # Read optional environment variables
         scope = os.getenv(f"{env_prefix}_SCOPE", "system/*.read system/*.write")
@@ -194,23 +205,21 @@ class FHIRAuthConfig(BaseModel):
         Convert FHIRAuthConfig to connection string format.
 
         Returns:
-            Connection string in fhir:// format
+            Connection string: fhir:// for https endpoints, http:// for http
 
         Example:
             config = FHIRAuthConfig(...)
             connection_string = config.to_connection_string()
             # Returns: "fhir://hostname/path?client_id=...&token_url=..."
         """
-        # Extract hostname and path from base_url
-        import urllib.parse
+        parsed_base = urlparse(self.base_url)
 
-        parsed_base = urllib.parse.urlparse(self.base_url)
-
-        # Build query parameters
-        params = {
-            "client_id": self.client_id,
-            "token_url": self.token_url,
-        }
+        # Build query parameters, omitting unset values
+        params = {}
+        if self.client_id:
+            params["client_id"] = self.client_id
+        if self.token_url:
+            params["token_url"] = self.token_url
 
         # Add secret (either client_secret or client_secret_path)
         if self.client_secret:
@@ -232,9 +241,10 @@ class FHIRAuthConfig(BaseModel):
         if self.key_id:
             params["key_id"] = self.key_id
 
-        # Build connection string
-        query_string = urllib.parse.urlencode(params)
-        return f"fhir://{parsed_base.netloc}{parsed_base.path}?{query_string}"
+        # fhir:// stands for https; plain http keeps its own scheme
+        scheme = "fhir" if parsed_base.scheme == "https" else parsed_base.scheme
+        query_string = f"?{urlencode(params)}" if params else ""
+        return f"{scheme}://{parsed_base.netloc}{parsed_base.path}{query_string}"
 
 
 class FHIRServerInterface(ABC):
@@ -369,6 +379,9 @@ def parse_fhir_auth_connection_string(connection_string: str) -> FHIRAuthConfig:
     - Authenticated: fhir://hostname/path?client_id=xxx&client_secret=xxx&token_url=xxx
     - Public: fhir://hostname/path (no auth parameters)
 
+    fhir:// resolves to https://. http:// and https:// keep their own scheme,
+    e.g. http://localhost:8080/fhir for a local test server.
+
     Args:
         connection_string: FHIR connection string with optional OAuth2 credentials
 
@@ -389,33 +402,19 @@ def parse_fhir_auth_connection_string(connection_string: str) -> FHIRAuthConfig:
             "fhir://fhir-open.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d"
         )
     """
-    import urllib.parse
-
-    if not connection_string.startswith("fhir://"):
-        raise ValueError("Connection string must start with fhir://")
-
-    parsed = urllib.parse.urlparse(connection_string)
-    params = dict(urllib.parse.parse_qsl(parsed.query))
-
-    # Build base URL
-    base_url = f"https://{parsed.netloc}{parsed.path}"
-
-    # Auto-detect if auth is needed based on parameter presence
-    has_client_id = "client_id" in params
-    has_token_url = "token_url" in params
-    has_secret = "client_secret" in params
-    has_secret_path = "client_secret_path" in params
-
-    # If no auth params at all, this is a public endpoint
-    if not any([has_client_id, has_token_url, has_secret, has_secret_path]):
-        return FHIRAuthConfig(
-            base_url=base_url,
-            timeout=int(params.get("timeout", 30)),
-            verify_ssl=params.get("verify_ssl", "true").lower() == "true",
+    parsed = urlparse(connection_string)
+    if parsed.scheme == "fhir":
+        scheme = "https"
+    elif parsed.scheme in ("http", "https"):
+        scheme = parsed.scheme
+    else:
+        raise ValueError(
+            "Connection string must start with fhir://, http:// or https://"
         )
 
-    # If any auth param is present, validate complete auth config
-    # FHIRAuthConfig.model_post_init will handle validation
+    params = dict(parse_qsl(parsed.query))
+
+    # FHIRAuthConfig decides whether auth is needed and validates it
     return FHIRAuthConfig(
         client_id=params.get("client_id"),
         client_secret=params.get("client_secret"),
@@ -423,7 +422,7 @@ def parse_fhir_auth_connection_string(connection_string: str) -> FHIRAuthConfig:
         token_url=params.get("token_url"),
         scope=params.get("scope", "system/*.read system/*.write"),
         audience=params.get("audience"),
-        base_url=base_url,
+        base_url=f"{scheme}://{parsed.netloc}{parsed.path}",
         timeout=int(params.get("timeout", 30)),
         verify_ssl=params.get("verify_ssl", "true").lower() == "true",
         use_jwt_assertion=params.get("use_jwt_assertion", "false").lower() == "true",

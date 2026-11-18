@@ -389,3 +389,30 @@ def test_search_with_pagination_and_provenance(fhir_gateway):
             assert entry.resource.meta is not None
             assert entry.resource.meta.source == "urn:healthchain:source:test_source"
             assert entry.resource.meta.tag[0].code == "aggregated"
+
+
+def test_from_config_public_http_source(monkeypatch):
+    """from_config builds a plain-http, no-auth client straight from env config."""
+    from healthchain.config.appconfig import AppConfig, SourceConfig
+
+    # from_env auto-loads .env; neutralize it so a local .env can't add auth vars
+    monkeypatch.setattr("dotenv.load_dotenv", lambda *args, **kwargs: None)
+    monkeypatch.setenv("LOCAL_BASE_URL", "http://localhost:8080/fhir")
+    for var in [
+        "CLIENT_ID",
+        "CLIENT_SECRET",
+        "CLIENT_SECRET_PATH",
+        "TOKEN_URL",
+        "USE_JWT_ASSERTION",
+    ]:
+        monkeypatch.delenv(f"LOCAL_{var}", raising=False)
+
+    gateway = FHIRGateway.from_config(
+        AppConfig(sources={"local": SourceConfig(env_prefix="LOCAL")})
+    )
+    client = gateway.connection_manager.get_client("local")
+    try:
+        assert client.base_url == "http://localhost:8080/fhir/"
+        assert client.token_manager is None
+    finally:
+        client.close()

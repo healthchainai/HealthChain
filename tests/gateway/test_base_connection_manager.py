@@ -5,9 +5,12 @@ This module tests shared connection string validation, source management, and er
 that should work identically across sync and async connection manager implementations.
 """
 
+import inspect
+
 import pytest
 from unittest.mock import Mock
 
+from healthchain.gateway.clients.fhir.base import FHIRAuthConfig
 from healthchain.gateway.clients.fhir.sync.connection import FHIRConnectionManager
 from healthchain.gateway.clients.fhir.aio.connection import AsyncFHIRConnectionManager
 from healthchain.gateway.fhir.errors import FHIRConnectionError
@@ -34,34 +37,34 @@ def mock_fhir_client():
 
 
 @pytest.mark.parametrize(
-    "connection_string,should_succeed",
+    "connection_string,expected_base_url",
     [
         # Valid connection strings
         (
             "fhir://epic.org/api/FHIR/R4?client_id=test&client_secret=secret&token_url=https://epic.org/token",
-            True,
+            "https://epic.org/api/FHIR/R4",
         ),
         (
             "fhir://localhost:8080/fhir?client_id=local&client_secret=pass&token_url=http://localhost/token",
-            True,
+            "https://localhost:8080/fhir",
         ),
+        ("http://localhost:8080/fhir", "http://localhost:8080/fhir"),
+        ("https://fhir.example.com/r4", "https://fhir.example.com/r4"),
         # Invalid connection strings
-        ("http://not-fhir.com/api", False),  # Wrong scheme
-        ("fhir://", False),  # Missing hostname
-        ("invalid-string", False),  # Not a URL
+        ("ftp://not-fhir.com/api", None),  # Wrong scheme
+        ("fhir://", None),  # Missing hostname
+        ("invalid-string", None),  # Not a URL
     ],
 )
 def test_connection_manager_source_validation_and_parsing(
-    connection_manager, connection_string, should_succeed
+    connection_manager, connection_string, expected_base_url
 ):
-    """Connection managers validate connection strings and parse hostnames correctly."""
-    if should_succeed:
+    """Connection managers parse connection strings once and store the config."""
+    if expected_base_url:
         connection_manager.add_source("test_source", connection_string)
-        assert "test_source" in connection_manager.sources
-        assert "test_source" in connection_manager._connection_strings
-        assert (
-            connection_manager._connection_strings["test_source"] == connection_string
-        )
+        config = connection_manager.sources["test_source"]
+        assert isinstance(config, FHIRAuthConfig)
+        assert config.base_url == expected_base_url
     else:
         with pytest.raises(
             FHIRConnectionError, match="Failed to parse connection string"
@@ -82,8 +85,6 @@ async def test_connection_manager_handles_invalid_source_gracefully(connection_m
     with pytest.raises(ValueError, match="Unknown source: invalid_source"):
         if hasattr(connection_manager, "get_client"):
             # Check if it's async by seeing if the method is a coroutine function
-            import inspect
-
             if inspect.iscoroutinefunction(connection_manager.get_client):
                 # For async version
                 await connection_manager.get_client("invalid_source")
@@ -93,126 +94,44 @@ async def test_connection_manager_handles_invalid_source_gracefully(connection_m
 
     # Verify the source was actually added correctly
     assert "valid_source" in connection_manager.sources
-    assert "valid_source" in connection_manager._connection_strings
 
 
-def test_connection_manager_source_storage_consistency(connection_manager):
-    """Connection managers consistently store sources and connection strings."""
-    test_sources = [
-        (
-            "source1",
-            "fhir://source1.com/fhir?client_id=test&client_secret=secret&token_url=https://source1.com/token",
-        ),
-        (
-            "source2",
-            "fhir://source2.com/fhir?client_id=test&client_secret=secret&token_url=https://source2.com/token",
-        ),
-        (
-            "source3",
-            "fhir://source3.com/fhir?client_id=test&client_secret=secret&token_url=https://source3.com/token",
-        ),
-    ]
+@pytest.mark.asyncio
+async def test_connection_manager_handles_duplicate_source_names(connection_manager):
+    """Connection managers overwrite duplicate source names and serve the new config."""
+    original_connection = "fhir://same.com/fhir?client_id=test&client_secret=old&token_url=https://same.com/token"
+    updated_connection = "fhir://same.com/fhir?client_id=test&client_secret=new&token_url=https://same.com/token"
+    connection_manager._create_client = Mock(side_effect=lambda *a, **k: Mock())
 
-    # Add all sources
-    for name, connection_string in test_sources:
-        connection_manager.add_source(name, connection_string)
+    async def get_client():
+        if inspect.iscoroutinefunction(connection_manager.get_client):
+            return await connection_manager.get_client("duplicate_source")
+        return connection_manager.get_client("duplicate_source")
 
-    # Verify all sources are stored consistently
-    for name, connection_string in test_sources:
-        assert name in connection_manager.sources
-        assert name in connection_manager._connection_strings
-        assert connection_manager._connection_strings[name] == connection_string
-
-    # Verify source count
-    assert len(connection_manager.sources) == 3
-    assert len(connection_manager._connection_strings) == 3
-
-
-def test_connection_manager_handles_duplicate_source_names(connection_manager):
-    """Connection managers handle duplicate source names by overwriting."""
-    original_connection = "fhir://original.com/fhir?client_id=test&client_secret=secret&token_url=https://original.com/token"
-    updated_connection = "fhir://updated.com/fhir?client_id=test&client_secret=secret&token_url=https://updated.com/token"
-
-    # Add original source
     connection_manager.add_source("duplicate_source", original_connection)
-    assert (
-        connection_manager._connection_strings["duplicate_source"]
-        == original_connection
-    )
+    first = await get_client()
+    second = await get_client()
+    assert connection_manager.sources["duplicate_source"].client_secret == "old"
 
-    # Add source with same name but different connection string
+    # Same endpoint, new credentials
     connection_manager.add_source("duplicate_source", updated_connection)
-    assert (
-        connection_manager._connection_strings["duplicate_source"] == updated_connection
-    )
+    replaced = await get_client()
+    assert connection_manager.sources["duplicate_source"].client_secret == "new"
+    assert connection_manager._create_client.call_args[0][0].client_secret == "new"
+    assert replaced is not first
+
+    # Async pools the client per config; sync builds a fresh one per call
+    if isinstance(connection_manager, AsyncFHIRConnectionManager):
+        assert second is first
 
     # Should only have one source with that name
-    source_count = sum(
-        1 for name in connection_manager.sources.keys() if name == "duplicate_source"
-    )
-    assert source_count == 1
-
-
-def test_connection_manager_handles_connection_string_corruption(connection_manager):
-    """Connection managers handle corrupted connection strings gracefully."""
-    # Test with both sync and async managers
-    for manager_class in [FHIRConnectionManager, AsyncFHIRConnectionManager]:
-        if manager_class == AsyncFHIRConnectionManager:
-            manager = manager_class(max_connections=10)
-        else:
-            manager = manager_class()
-
-        # Add valid source first
-        manager.add_source(
-            "valid",
-            "fhir://valid.com/fhir?client_id=test&client_secret=secret&token_url=https://valid.com/token",
-        )
-
-        # Verify source was added correctly
-        assert "valid" in manager.sources
-        assert "valid" in manager._connection_strings
-
-        # Manually corrupt the connection string (simulating memory corruption)
-        manager._connection_strings["valid"] = "corrupted_string_not_url"
-
-        # The connection string should now be corrupted
-        assert manager._connection_strings["valid"] == "corrupted_string_not_url"
-
-
-def test_connection_manager_memory_cleanup_on_source_removal(connection_manager):
-    """Connection managers properly clean up memory when sources are removed."""
-    # Test with both sync and async managers
-    for manager_class in [FHIRConnectionManager, AsyncFHIRConnectionManager]:
-        if manager_class == AsyncFHIRConnectionManager:
-            manager = manager_class(max_connections=10)
-        else:
-            manager = manager_class()
-
-        # Add source
-        manager.add_source(
-            "temp_source",
-            "fhir://temp.com/fhir?client_id=test&client_secret=secret&token_url=https://temp.com/token",
-        )
-
-        # Verify source was added
-        assert "temp_source" in manager.sources
-        assert "temp_source" in manager._connection_strings
-
-        # Simulate source removal (manual cleanup to verify memory management)
-        del manager.sources["temp_source"]
-        del manager._connection_strings["temp_source"]
-
-        # Verify cleanup worked
-        assert "temp_source" not in manager.sources
-        assert "temp_source" not in manager._connection_strings
+    assert list(connection_manager.sources.keys()) == ["duplicate_source"]
 
 
 def test_connection_manager_initialization_state(connection_manager):
     """Connection managers initialize with empty state."""
     assert len(connection_manager.sources) == 0
-    assert len(connection_manager._connection_strings) == 0
     assert isinstance(connection_manager.sources, dict)
-    assert isinstance(connection_manager._connection_strings, dict)
 
 
 def test_connection_manager_source_name_validation(connection_manager):
@@ -231,4 +150,3 @@ def test_connection_manager_source_name_validation(connection_manager):
     for name in valid_names:
         connection_manager.add_source(name, connection_string)
         assert name in connection_manager.sources
-        assert name in connection_manager._connection_strings

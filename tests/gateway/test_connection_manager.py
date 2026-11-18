@@ -43,9 +43,7 @@ def test_connection_manager_client_retrieval_and_default_selection(
     )
 
     # Mock the client creation method
-    connection_manager._create_server_from_connection_string = Mock(
-        return_value=mock_fhir_client
-    )
+    connection_manager._create_client = Mock(return_value=mock_fhir_client)
 
     # Test specific source retrieval
     client = connection_manager.get_client("first")
@@ -55,15 +53,9 @@ def test_connection_manager_client_retrieval_and_default_selection(
     client_default = connection_manager.get_client()
     assert client_default == mock_fhir_client
 
-    # Verify the connection string was used correctly
-    call_args = connection_manager._create_server_from_connection_string.call_args
-    connection_string = call_args[0][0]
-    from urllib.parse import urlparse
-
-    parsed_url = urlparse(connection_string)
-    assert (
-        parsed_url.hostname == "first.com"
-    )  # Should use first source's connection string
+    # Verify the first source's config was used
+    auth_config = connection_manager._create_client.call_args[0][0]
+    assert auth_config.base_url == "https://first.com/fhir"
 
 
 def test_connection_manager_cleanup_all_sources(connection_manager):
@@ -85,13 +77,13 @@ def test_connection_manager_cleanup_all_sources(connection_manager):
     mock_client2.close = Mock()
 
     # Mock the client creation to return our mock clients
-    def mock_create_client(connection_string):
-        if "source1.com" in connection_string:
+    def mock_create_client(auth_config):
+        if auth_config.base_url == "https://source1.com/fhir":
             return mock_client1
         else:
             return mock_client2
 
-    connection_manager._create_server_from_connection_string = mock_create_client
+    connection_manager._create_client = mock_create_client
 
     # Get clients (this creates them)
     client1 = connection_manager.get_client("source1")
