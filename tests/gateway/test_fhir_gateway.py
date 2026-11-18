@@ -2,10 +2,14 @@ import pytest
 from unittest.mock import Mock, patch
 from typing import Dict, Any
 
+import httpx
+
 from fhir.resources.patient import Patient
 from fhir.resources.bundle import Bundle, BundleEntry
 from fhir.resources.condition import Condition
 
+from healthchain.gateway.clients.fhir.base import FHIRAuthConfig
+from healthchain.gateway.clients.fhir.sync.client import FHIRClient
 from healthchain.gateway.fhir import FHIRGateway
 from healthchain.gateway.fhir.errors import FHIRConnectionError
 from healthchain.fhir import create_condition
@@ -286,30 +290,99 @@ def test_search_with_empty_bundle():
         assert result.entry is None
 
 
-def test_search_with_pagination(fhir_gateway):
-    """Gateway.search fetches all pages when pagination is enabled."""
-    # Create mock bundles for pagination
-    page1 = Bundle(
-        type="searchset",
-        entry=[BundleEntry(resource=Patient(id="1"))],
-        link=[{"relation": "next", "url": "Patient?page=2"}],
+BASE_URL = "https://fhir.example.org/R4"
+
+
+def _page(patient_id: str, next_link: str = None) -> Dict[str, Any]:
+    """Searchset Bundle JSON with one Patient and an optional next link."""
+    bundle = {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "entry": [{"resource": {"resourceType": "Patient", "id": patient_id}}],
+    }
+    if next_link:
+        bundle["link"] = [{"relation": "next", "url": next_link}]
+    return bundle
+
+
+def _paging_client(next_link: str, seen: list) -> FHIRClient:
+    """Real FHIRClient whose transport serves page 1 (with next_link), then page 2."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request.url.raw_path.decode())
+        if len(seen) == 1:
+            return httpx.Response(200, json=_page("1", next_link))
+        return httpx.Response(200, json=_page("2"))
+
+    return FHIRClient(
+        FHIRAuthConfig(base_url=BASE_URL), transport=httpx.MockTransport(handler)
     )
-    page2 = Bundle(
-        type="searchset",
-        entry=[BundleEntry(resource=Patient(id="2"))],
-        link=[{"relation": "next", "url": "Patient?page=3"}],
-    )
-    page3 = Bundle(type="searchset", entry=[BundleEntry(resource=Patient(id="3"))])
+
+
+@pytest.mark.parametrize(
+    "next_link, expected_raw_path",
+    [
+        # Encoded values, repeated keys and "=" inside values pass through untouched
+        (
+            f"{BASE_URL}/Patient?_tag=https%3A%2F%2Fexample.org%2Fdemo%7Csite-a"
+            "&date=ge2024-01-01&date=le2024-12-31&cursor=abc%3D%3D&state=x=y",
+            "/R4/Patient?_tag=https%3A%2F%2Fexample.org%2Fdemo%7Csite-a"
+            "&date=ge2024-01-01&date=le2024-12-31&cursor=abc%3D%3D&state=x=y",
+        ),
+        # HAPI base-level paging link goes to the base, not /Patient
+        (
+            f"{BASE_URL}?_getpages=xyz&_getpagesoffset=20",
+            "/R4?_getpages=xyz&_getpagesoffset=20",
+        ),
+        # Relative link resolves against the base URL
+        ("Patient?page=2", "/R4/Patient?page=2"),
+        # Explicit default port is the same origin
+        (
+            "https://fhir.example.org:443/R4/Patient?page=2",
+            "/R4/Patient?page=2",
+        ),
+    ],
+)
+def test_search_with_pagination(fhir_gateway, next_link, expected_raw_path):
+    """Gateway.search fetches each next link exactly as the server wrote it."""
+    seen = []
+    client = _paging_client(next_link, seen)
 
     with patch.object(
-        fhir_gateway, "_execute_with_client", side_effect=[page1, page2, page3]
-    ) as mock_execute:
+        fhir_gateway.connection_manager, "get_client", return_value=client
+    ):
         result = fhir_gateway.search(Patient, {"name": "Smith"}, follow_pagination=True)
 
-        assert mock_execute.call_count == 3
-        assert result.entry is not None
-        assert len(result.entry) == 3
-        assert [entry.resource.id for entry in result.entry] == ["1", "2", "3"]
+    assert seen == ["/R4/Patient?name=Smith", expected_raw_path]
+    assert [entry.resource.id for entry in result.entry] == ["1", "2"]
+
+
+@pytest.mark.parametrize(
+    "next_link",
+    [
+        "https://evil.example.com/R4/Patient?page=2&token=SECRET",
+        "http://fhir.example.org/R4/Patient?page=2&token=SECRET",
+        "https://fhir.example.org:8443/R4/Patient?page=2&token=SECRET",
+        "https://user:SECRET@fhir.example.org/R4/Patient",
+        "https://fhir.example.org:SECRET/R4",
+    ],
+)
+def test_search_with_pagination_refuses_off_origin_next_link(fhir_gateway, next_link):
+    """Gateway.search refuses next links outside the base origin without echoing them."""
+    seen = []
+    client = _paging_client(next_link, seen)
+
+    with patch.object(
+        fhir_gateway.connection_manager, "get_client", return_value=client
+    ):
+        with pytest.raises(FHIRConnectionError) as exc_info:
+            fhir_gateway.search(Patient, {"name": "Smith"}, follow_pagination=True)
+
+    message = str(exc_info.value)
+    assert "Refusing to follow a page link" in message
+    assert "SECRET" not in message
+    assert next_link not in message
+    assert seen == ["/R4/Patient?name=Smith"]
 
 
 def test_search_with_max_pages(fhir_gateway):

@@ -2,9 +2,13 @@ import pytest
 from unittest.mock import AsyncMock, Mock, patch
 from typing import Dict, Any
 
+import httpx
+
 from fhir.resources.patient import Patient
 from fhir.resources.bundle import Bundle
 
+from healthchain.gateway.clients.fhir.aio.client import AsyncFHIRClient
+from healthchain.gateway.clients.fhir.base import FHIRAuthConfig
 from healthchain.gateway.fhir import AsyncFHIRGateway
 
 
@@ -128,31 +132,53 @@ async def test_search_operation_with_parameters(fhir_gateway):
 
 @pytest.mark.asyncio
 async def test_search_with_pagination(fhir_gateway):
-    """AsyncFHIRGateway.search fetches all pages when pagination is enabled."""
-    # Create mock bundles for pagination
-    page1 = Bundle(
-        type="searchset",
-        entry=[{"resource": Patient(id="1")}],
-        link=[{"relation": "next", "url": "Patient?page=2"}],
+    """AsyncFHIRGateway.search fetches each next link exactly as the server wrote it."""
+    query = (
+        "_tag=https%3A%2F%2Fexample.org%2Fdemo%7Csite-a"
+        "&date=ge2024-01-01&date=le2024-12-31&cursor=abc%3D%3D&state=x=y"
     )
-    page2 = Bundle(
-        type="searchset",
-        entry=[{"resource": Patient(id="2")}],
-        link=[{"relation": "next", "url": "Patient?page=3"}],
-    )
-    page3 = Bundle(type="searchset", entry=[{"resource": Patient(id="3")}])
+    next_link = f"https://fhir.example.org/R4/Patient?{query}"
+    seen = []
 
-    with patch.object(
-        fhir_gateway, "_execute_with_client", side_effect=[page1, page2, page3]
-    ) as mock_execute:
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request.url.raw_path.decode())
+        bundle = {
+            "resourceType": "Bundle",
+            "type": "searchset",
+            "entry": [{"resource": {"resourceType": "Patient", "id": str(len(seen))}}],
+        }
+        if len(seen) == 1:
+            bundle["link"] = [{"relation": "next", "url": next_link}]
+        return httpx.Response(200, json=bundle)
+
+    # The async client always builds a token manager, so give it dummy OAuth
+    # fields and stub the headers so no token request is made
+    client = AsyncFHIRClient(
+        FHIRAuthConfig(
+            base_url="https://fhir.example.org/R4",
+            client_id="test",
+            client_secret="test",
+            token_url="https://auth.example.org/token",
+        ),
+        transport=httpx.MockTransport(handler),
+    )
+
+    with (
+        patch.object(
+            client, "_get_headers", AsyncMock(return_value=client.base_headers)
+        ),
+        patch.object(
+            fhir_gateway.connection_manager,
+            "get_client",
+            AsyncMock(return_value=client),
+        ),
+    ):
         result = await fhir_gateway.search(
             Patient, {"name": "Smith"}, follow_pagination=True
         )
 
-        assert mock_execute.call_count == 3
-        assert result.entry is not None
-        assert len(result.entry) == 3
-        assert [entry.resource.id for entry in result.entry] == ["1", "2", "3"]
+    assert seen == ["/R4/Patient?name=Smith", f"/R4/Patient?{query}"]
+    assert [entry.resource.id for entry in result.entry] == ["1", "2"]
 
 
 @pytest.mark.asyncio
