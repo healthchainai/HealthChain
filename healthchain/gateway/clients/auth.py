@@ -14,7 +14,7 @@ import httpx
 
 from typing import Dict, Optional, Any
 from datetime import datetime, timedelta, timezone
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, SecretStr
 
 
 logger = logging.getLogger(__name__)
@@ -23,9 +23,12 @@ logger = logging.getLogger(__name__)
 class OAuth2Config(BaseModel):
     """OAuth2 configuration for client credentials flow."""
 
+    # Re-validate on assignment so a reassigned secret stays masked
+    model_config = ConfigDict(validate_assignment=True)
+
     client_id: str
     token_url: str
-    client_secret: Optional[str] = None  # Client secret string for standard flow
+    client_secret: Optional[SecretStr] = None  # Masked in repr and dumps
     client_secret_path: Optional[str] = (
         None  # Path to private key file for JWT assertion
     )
@@ -65,7 +68,7 @@ class OAuth2Config(BaseModel):
                 raise ValueError(
                     f"Failed to read secret from {self.client_secret_path}: {e}"
                 )
-        return self.client_secret
+        return self.client_secret.get_secret_value()
 
 
 class TokenInfo(BaseModel):

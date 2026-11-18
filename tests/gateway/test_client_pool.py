@@ -116,7 +116,7 @@ async def test_pool_stats(client_pool, mock_client_factory):
     assert stats["limits"]["max_connections"] == 50
     assert stats["limits"]["max_keepalive_connections"] == 10
     assert stats["limits"]["keepalive_expiry"] == 3.0
-    assert stats["clients"] == {}
+    assert stats["clients"] == []
 
     # Add clients and check stats
     conn1 = "fhir://server1.example.com/R4"
@@ -127,11 +127,10 @@ async def test_pool_stats(client_pool, mock_client_factory):
 
     stats = client_pool.get_pool_stats()
     assert stats["total_clients"] == 2
-    assert conn1 in stats["clients"]
-    assert conn2 in stats["clients"]
+    assert len(stats["clients"]) == 2
 
     # Check connection details
-    client_stats = stats["clients"][conn1]
+    client_stats = stats["clients"][0]
     assert client_stats["active_connections"] == 2
     assert client_stats["available_connections"] == 1
 
@@ -144,7 +143,7 @@ async def test_pool_stats_without_pool_info(client_pool):
 
     stats = client_pool.get_pool_stats()
     assert stats["total_clients"] == 1
-    assert stats["clients"]["simple"] == {}
+    assert stats["clients"] == [{}]
 
 
 @pytest.mark.asyncio

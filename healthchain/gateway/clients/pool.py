@@ -1,6 +1,6 @@
 import httpx
 
-from typing import Any, Callable, Dict, TypeVar, Generic
+from typing import Any, Callable, Dict, Generic, Hashable, TypeVar
 
 # Generic client interface type
 ClientInterface = TypeVar("ClientInterface")
@@ -26,7 +26,7 @@ class ClientPool(Generic[ClientInterface]):
             max_keepalive_connections: Maximum number of keep-alive connections
             keepalive_expiry: How long to keep connections alive (seconds)
         """
-        self._clients: Dict[str, ClientInterface] = {}
+        self._clients: Dict[Hashable, ClientInterface] = {}
         self._client_limits = httpx.Limits(
             max_connections=max_connections,
             max_keepalive_connections=max_keepalive_connections,
@@ -34,13 +34,13 @@ class ClientPool(Generic[ClientInterface]):
         )
 
     async def get_client(
-        self, connection_string: str, client_factory: Callable
+        self, connection_string: Hashable, client_factory: Callable
     ) -> ClientInterface:
         """
         Get a client for the given connection string.
 
         Args:
-            connection_string: Connection string for the client
+            connection_string: Key identifying the client's configuration
             client_factory: Factory function to create new clients
 
         Returns:
@@ -70,10 +70,11 @@ class ClientPool(Generic[ClientInterface]):
                 "max_keepalive_connections": self._client_limits.max_keepalive_connections,
                 "keepalive_expiry": self._client_limits.keepalive_expiry,
             },
-            "clients": {},
+            # A list, so pool keys (which may hold credentials) are never exposed
+            "clients": [],
         }
 
-        for conn_str, client in self._clients.items():
+        for client in self._clients.values():
             # Try to get httpx client stats if available
             client_stats = {}
             if hasattr(client, "client") and hasattr(client.client, "_pool"):
@@ -86,6 +87,6 @@ class ClientPool(Generic[ClientInterface]):
                         ),
                     }
                 )
-            stats["clients"][conn_str] = client_stats
+            stats["clients"].append(client_stats)
 
         return stats

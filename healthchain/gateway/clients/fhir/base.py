@@ -12,7 +12,7 @@ from fhir.resources.R4B.capabilitystatement import CapabilityStatement
 from fhir.resources.resource import Resource
 
 from healthchain.gateway.clients.auth import OAuth2Config
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ConfigDict, SecretStr, field_validator
 
 
 logger = logging.getLogger(__name__)
@@ -32,6 +32,9 @@ class FHIRClientError(Exception):
 class FHIRAuthConfig(BaseModel):
     """Configuration for FHIR server authentication."""
 
+    # Re-validate on assignment so a reassigned secret stays masked
+    model_config = ConfigDict(validate_assignment=True)
+
     # Connection settings
     base_url: str
     timeout: int = 30
@@ -39,7 +42,7 @@ class FHIRAuthConfig(BaseModel):
 
     # OAuth2 settings (optional - for authenticated endpoints)
     client_id: Optional[str] = None
-    client_secret: Optional[str] = None  # Client secret string for standard flow
+    client_secret: Optional[SecretStr] = None  # Masked in repr and dumps
     client_secret_path: Optional[str] = (
         None  # Path to private key file for JWT assertion
     )
@@ -223,7 +226,7 @@ class FHIRAuthConfig(BaseModel):
 
         # Add secret (either client_secret or client_secret_path)
         if self.client_secret:
-            params["client_secret"] = self.client_secret
+            params["client_secret"] = self.client_secret.get_secret_value()
         elif self.client_secret_path:
             params["client_secret_path"] = self.client_secret_path
 

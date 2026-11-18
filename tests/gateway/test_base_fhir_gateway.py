@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from unittest.mock import Mock, patch, AsyncMock
 from typing import Dict, Any, List
@@ -146,9 +148,24 @@ def test_capability_statement_includes_registered_resources(fhir_gateway):
     assert "Observation" in resource_types
 
 
-def test_gateway_status_structure(fhir_gateway):
-    """Gateway status contains required fields with correct structure."""
+@pytest.mark.asyncio
+async def test_gateway_status_structure(fhir_gateway):
+    """Gateway status contains required fields and never exposes a source secret."""
+    fhir_gateway.add_source(
+        "secured",
+        "fhir://secured.com/fhir?client_id=app&client_secret=leak286secret"
+        "&token_url=https://secured.com/token",
+    )
+    is_async = isinstance(fhir_gateway, AsyncFHIRGateway)
+    if is_async:
+        await fhir_gateway.get_client("secured")
+    else:
+        fhir_gateway.get_client("secured").close()
+
     status = fhir_gateway.get_gateway_status()
+    if is_async:
+        await fhir_gateway.close()
+    assert "leak286secret" not in json.dumps(status, default=str)
 
     # Gateway type should match the actual class name
     expected_type = (

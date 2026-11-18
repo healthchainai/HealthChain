@@ -253,7 +253,7 @@ def test_connection_string_parsing_handles_both_auth_types():
     # Standard auth
     standard_string = "fhir://example.com/fhir/R4?client_id=test&client_secret=secret&token_url=https://example.com/token"
     standard_config = parse_fhir_auth_connection_string(standard_string)
-    assert standard_config.client_secret == "secret"
+    assert standard_config.client_secret.get_secret_value() == "secret"
     assert standard_config.client_secret_path is None
     assert not standard_config.use_jwt_assertion
 
@@ -284,7 +284,7 @@ def test_connection_string_parsing_handles_complex_parameters():
     config = parse_fhir_auth_connection_string(connection_string)
 
     assert config.client_id == "test client"  # URL decoded
-    assert config.client_secret == "test secret"  # URL decoded
+    assert config.client_secret.get_secret_value() == "test secret"  # URL decoded
     assert config.token_url == "https://example.com/token"  # URL decoded
     assert config.scope == "system/*.read"  # URL decoded
     assert config.base_url == "https://example.com:8080/fhir/R4"
