@@ -10,7 +10,7 @@ Connect live FHIR sources, turn extracts and model output into coded, validated 
     ```bash
     git clone https://github.com/healthchainai/HealthChain.git
     cd HealthChain
-    uv sync --all-extras   # or: pip install healthchain
+    pip install healthchain
     ```
 
     Each cookbook page states the exact `pip install` line it needs — optional capabilities live in extras (`[cda]`, `[examples]`, `[sandbox]`, ...), so you only install what the example uses.

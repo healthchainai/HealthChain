@@ -72,7 +72,7 @@ Mixed together, every research revision would mean retesting data access, and ev
 | Returns typed [FHIR R4](https://hl7.org/fhir/R4/) resources and resolves references ([`resolve_reference()`](../reference/utilities/fhir_helpers.md#resolve_reference))     | Which locations form each area, and which code carries each variable |
 | Serves results over HTTP ([`HealthChainAPI`](../reference/gateway/api.md))                                                                                                  | The measures: windows, admission rules, thresholds                   |
 
-Full working example: [cookbook/ward_monitoring.py](https://github.com/healthchainai/HealthChain/tree/main/cookbook/ward_monitoring.py) (FHIR access and mapping) and [cookbook/ward_definitions.py](https://github.com/healthchainai/HealthChain/tree/main/cookbook/ward_definitions.py) (research definitions).
+Full working example: [cookbook/ward_monitoring.py](https://github.com/healthchainai/HealthChain/tree/main/cookbook/ward_monitoring.py) (FHIR access), [cookbook/ward_mapping.py](https://github.com/healthchainai/HealthChain/tree/main/cookbook/ward_mapping.py) (mapping) and [cookbook/ward_definitions.py](https://github.com/healthchainai/HealthChain/tree/main/cookbook/ward_definitions.py) (research definitions).
 
 ---
 
@@ -83,7 +83,7 @@ The example and its data live in the HealthChain repository:
 ```bash
 git clone https://github.com/healthchainai/HealthChain.git
 cd HealthChain
-uv sync  # or: pip install .
+pip install healthchain
 ```
 
 ## Quick Start
@@ -129,6 +129,7 @@ The project setup is small, and each part has one job:
 ```text
 cookbook/
 ├── ward_monitoring.py      # reads the hospital's records and serves the summary
+├── ward_mapping.py         # site config and FHIR mapping: records to research variables
 ├── ward_definitions.py     # the research definitions, in plain Python
 └── data/ward_monitoring/
     ├── site_a/             # one hospital: its saved records and config
@@ -360,7 +361,7 @@ print(score.valueInteger, bed.name, "->", area_name)
 7 North bed 1 -> North
 ```
 
-Site B, mapped through its own config, gives exactly the same summary as site A, and the cookbook tests check this for every definition.
+Site B, mapped through its own config, now gives exactly the same summary as site A.
 
 ### Step 4: Compute the measures
 
@@ -456,7 +457,7 @@ live_data = from_gateway(gateway, "medplum", config)
     python cookbook/ward_monitoring.py --source medplum --as-of 2026-10-23T12:00:00Z
     ```
 
-    The [fixture notes](https://github.com/healthchainai/HealthChain/tree/main/cookbook/data/ward_monitoring/README.md#live-comparison-and-cleanup) include a full output comparison and cleanup instructions.
+    The [fixture notes](https://github.com/healthchainai/HealthChain/tree/main/cookbook/data/ward_monitoring/README.md#live-comparison) include a full output comparison.
 
 Every check is now a fresh query to the server, describing the ward as it is at that moment. The synthetic events are dated 23 October 2026, so four checks through that morning, with `as_of` set to each check's time, show North changing through the shift:
 

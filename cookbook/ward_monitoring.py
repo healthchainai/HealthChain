@@ -8,10 +8,11 @@ files or a live FHIR API, and serves the summary over HTTP.
 
 HealthChain reads and checks the FHIR data (FHIRGateway, load_bundle,
 validate_resource, resolve_reference) and serves the result (HealthChainAPI).
-Each site's local codes live in its config.json; the research definitions live
-in ward_definitions.py and never touch FHIR. All data is synthetic.
+The project's own FHIR mapping lives in ward_mapping.py, with each site's local
+codes in its config.json; the research definitions live in ward_definitions.py
+and never touch FHIR. All data is synthetic.
 
-Run from the repository root after `uv sync` (or `pip install .`):
+Run from the repository root after `pip install healthchain`:
     python cookbook/ward_monitoring.py              # print, then serve at :8000/docs
     python cookbook/ward_monitoring.py --json       # print the JSON once
     python cookbook/ward_monitoring.py --json --site b --window-hours 8 --acuity-high 5
@@ -25,20 +26,17 @@ Live FHIR API (needs MEDPLUM_* in .env; see the FHIR sandbox setup guide):
 
 import argparse
 import json
-from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Literal, NamedTuple
 
 from dotenv import load_dotenv
 from fastapi import HTTPException, Query
-from pydantic import BaseModel, Field, PositiveInt
 
 from healthchain.fhir import (
     FHIRValidationError,
     get_resources,
     load_bundle,
-    resolve_reference,
     validate_resource,
 )
 from healthchain.fhir.r4b import Bundle, Encounter, Location, Observation
@@ -46,20 +44,26 @@ from healthchain.gateway import FHIRGateway, HealthChainAPI
 from healthchain.gateway.clients import FHIRAuthConfig
 
 try:  # run as a script: python cookbook/ward_monitoring.py
-    from ward_definitions import (
-        ACUITY_HIGH,
-        ACUITY_MAX_AGE_HOURS,
-        ADMISSION_DEFINITIONS,
-        WINDOW_HOURS,
-        AreaVisit,
+    from ward_definitions import ACUITY_HIGH, ADMISSION_DEFINITIONS, WINDOW_HOURS
+    from ward_mapping import (
+        SiteConfig,
+        area_visits,
+        latest_scores,
+        load_config,
+        timestamp,
     )
 except ImportError:  # imported from the repository root
     from cookbook.ward_definitions import (
         ACUITY_HIGH,
-        ACUITY_MAX_AGE_HOURS,
         ADMISSION_DEFINITIONS,
         WINDOW_HOURS,
-        AreaVisit,
+    )
+    from cookbook.ward_mapping import (
+        SiteConfig,
+        area_visits,
+        latest_scores,
+        load_config,
+        timestamp,
     )
 
 load_dotenv()
@@ -67,26 +71,7 @@ load_dotenv()
 DATA_DIR = Path(__file__).parent / "data" / "ward_monitoring"
 
 
-# --- Site config: one hospital's local names -----------------------------------
-
-
-class Area(BaseModel):
-    name: str
-    capacity: PositiveInt
-
-
-class Code(BaseModel):
-    system: str
-    code: str
-
-
-class SiteConfig(BaseModel):
-    site: str
-    search_params: dict[str, str]  # how to query this site's FHIR API
-    location_system: str  # Location.identifier system that names areas
-    areas: dict[str, Area] = Field(min_length=1)  # keyed by identifier value
-    acuity_code: Code  # this site's Observation code for the NEWS2 score
-    location_status_map: dict[str, str] = {}  # fixes for a non-standard export
+# --- Steps 1-2: Read and check the FHIR data -----------------------------------
 
 
 class SiteData(NamedTuple):
@@ -94,22 +79,6 @@ class SiteData(NamedTuple):
     locations: Bundle
     observations: Bundle
     pulled_at: datetime  # the latest reference time the data can answer for
-
-
-def load_config(site_dir: Path) -> SiteConfig:
-    return SiteConfig.model_validate_json((site_dir / "config.json").read_text())
-
-
-def timestamp(value: datetime | str) -> datetime:
-    """A UTC datetime; refuses date-only or naive values, which can't be ordered."""
-    if isinstance(value, str):
-        value = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    if value.tzinfo is None or value.utcoffset() is None:
-        raise ValueError("Use complete, timezone-aware timestamps")
-    return value.astimezone(timezone.utc)
-
-
-# --- Steps 1-2: Read and check the FHIR data -----------------------------------
 
 
 def from_files(site_dir: Path, config: SiteConfig) -> SiteData:
@@ -144,93 +113,6 @@ def from_gateway(gateway: FHIRGateway, source: str, config: SiteConfig) -> SiteD
 
     pulled_at = datetime.now(timezone.utc)
     return SiteData(fetch(Encounter), fetch(Location), fetch(Observation), pulled_at)
-
-
-# --- Step 3: Map to research variables -----------------------------------------
-
-
-def area_for_location(
-    location: Location, locations: Bundle, config: SiteConfig
-) -> str | None:
-    """Walk Location.partOf up to the first configured area, or None if outside."""
-    while True:
-        for identifier in location.identifier or []:
-            if (
-                identifier.system == config.location_system
-                and identifier.value in config.areas
-            ):
-                return identifier.value
-        if location.partOf is None:
-            return None
-        parent = resolve_reference(locations, location.partOf)
-        if parent is None:
-            raise ValueError(f"Unresolved Location reference: {location.partOf}")
-        location = parent
-
-
-def area_visits(
-    encounter: Encounter, locations: Bundle, config: SiteConfig, as_of: datetime
-) -> list[AreaVisit]:
-    """Turn location history into area visits at a reference time. A bed move
-    within an area is not a new visit; moving to a different area is.
-
-    Presence comes from location periods, so earlier reference times give the
-    ward as it was then. An open-ended period relies on its current status."""
-    if encounter.period and encounter.period.start:
-        if timestamp(encounter.period.start) > as_of:
-            return []
-
-    def times(item) -> tuple[datetime | None, datetime | None]:
-        period = item.period
-        start = timestamp(period.start) if period and period.start else None
-        end = timestamp(period.end) if period and period.end else None
-        return start, end
-
-    history = sorted(
-        ((*times(item), item) for item in encounter.location or []),
-        key=lambda row: (row[0] is None, row[0] or as_of),
-    )
-    visits: list[AreaVisit] = []
-    last_area, last_end = None, None
-    for start, end, item in history:
-        if start is not None and start > as_of:
-            continue
-        bed = resolve_reference(locations, item.location)
-        if bed is None:
-            raise ValueError(f"Unresolved Location reference: {item.location}")
-        area = area_for_location(bed, locations, config)
-        if end is not None:
-            present = end > as_of
-        else:
-            present = encounter.status == "in-progress" and item.status == "active"
-        if area is not None:
-            if area == last_area and start is not None and start == last_end:
-                visits[-1] = replace(visits[-1], bed=bed.id, present=present)
-            else:
-                visits.append(AreaVisit(encounter.id, area, bed.id, start, present))
-        last_area, last_end = area, end
-    return visits
-
-
-def latest_scores(
-    data: SiteData, config: SiteConfig, as_of: datetime
-) -> dict[str, int]:
-    """Latest NEWS2 score per encounter, no older than the freshness rule allows."""
-    cutoff = as_of - timedelta(hours=ACUITY_MAX_AGE_HOURS)
-    code = (config.acuity_code.system, config.acuity_code.code)
-    latest: dict[str, tuple[datetime, int]] = {}
-    for obs in get_resources(data.observations, Observation):
-        if code not in {(c.system, c.code) for c in obs.code.coding or []}:
-            continue
-        if obs.valueInteger is None or obs.effectiveDateTime is None:
-            continue
-        when = timestamp(obs.effectiveDateTime)
-        encounter = resolve_reference(data.encounters, obs.encounter)
-        if encounter is None or not cutoff <= when <= as_of:
-            continue
-        if encounter.id not in latest or when > latest[encounter.id][0]:
-            latest[encounter.id] = (when, obs.valueInteger)
-    return {encounter: score for encounter, (_, score) in latest.items()}
 
 
 # --- Step 4: Compute the measures ----------------------------------------------
@@ -268,7 +150,7 @@ def summarise(
     beds = [v.bed for v in visits if v.present]
     if len(beds) != len(set(beds)):
         raise ValueError("Two encounters occupy the same bed")
-    scores = latest_scores(data, config, as_of)
+    scores = latest_scores(data.observations, data.encounters, config, as_of)
     count_admissions = ADMISSION_DEFINITIONS[admissions]
     cutoff = as_of - timedelta(hours=window_hours)
 

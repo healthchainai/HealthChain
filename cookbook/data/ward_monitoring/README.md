@@ -82,52 +82,34 @@ before, within 12 hours) and acuity unknown at 12:00 (too old).
 
 ## Checking the results
 
-From the repository root, with HealthChain installed in the active environment:
+From the repository root, with HealthChain and pytest installed:
 
 ```bash
-python -m pip install pytest
 python -m pytest tests/cookbook/test_ward_monitoring.py -q
 ```
 
-The expected result at this revision is **15 passed**. The tests compare both
-sites with all four expected outputs, check North at the earlier reference
-times, show that site B fails validation without its status mapping, and check
-the gateway path and the HTTP endpoint. The gateway test uses an in-memory
-stub; for a hosted server, see the
-[live comparison](#live-comparison-and-cleanup).
+The expected result at this revision is **15 passed**. The gateway test uses an
+in-memory stub; for a hosted server, see the
+[live comparison](#live-comparison).
 
-For a versioned reproduction, check out the release tag or commit being
-evaluated, install it with `python -m pip install .`, and use the documentation
-and fixtures from the same revision. Record the commands, results and any local
-edits alongside:
-
-```bash
-git rev-parse HEAD
-python --version
-python -m pip freeze
-```
+For a versioned reproduction, check out the release tag being evaluated,
+install it with `python -m pip install .`, and record `git rev-parse HEAD`,
+`python --version` and `python -m pip freeze` with the results.
 
 ## Scope of the checks
 
-Matching these outputs demonstrates reuse across the supplied variations, not
-clinical validity of a ward-strain model or compatibility with every hospital.
-HealthChain's resource validation checks structure and required primitive-code
-bindings; it does not cover profile conformance, FHIRPath constraints, clinical
-correctness or all terminology bindings. The recipe checks some reference and
-occupancy errors separately.
+Matching these outputs shows reuse across the supplied variations, not clinical
+validity or compatibility with every hospital; the
+[validation reference](../../../docs/reference/utilities/fhir_helpers.md#validation-loading)
+says what resource validation covers. History can't be rebuilt from records
+that weren't supplied, so a site's query must include what the chosen measure
+needs: all arrivals, for example, needs stays that have ended.
 
-Historical calculations depend on the records supplied. Missing movements and
-measurements cannot be reconstructed, and open-ended location periods rely on
-recorded status. A site's query must include the history the chosen measure
-needs: the all-arrivals rule, for example, needs stays that have already ended.
-
-## Live comparison and cleanup
+## Live comparison
 
 Follow the cookbook's [live-source step](../../../docs/cookbook/ward_monitoring.md#use-a-live-fhir-source)
 to configure Medplum and seed site A. The seed command reports `Uploaded (no
 Patient resources found)`, because the fixtures contain no Patient resources.
-Conditional creates skip records that already exist but don't update them, so
-remove the old demo records before uploading a changed fixture set.
 
 Compare the live output with the offline expected output (`--acuity-high 5`
 compares with `expected_acuity_5.json`, and so on):
@@ -136,48 +118,5 @@ compares with `expected_acuity_5.json`, and so on):
 python cookbook/ward_monitoring.py --json --source medplum --as-of 2026-10-23T12:00:00Z
 ```
 
-The explicit reference time evaluates the same synthetic events as the offline
-run; without it, admissions and score freshness are judged at the current time.
-`from_gateway` searches each resource type by the site tag, validates every
-resource and follows every result page. The three searches are separate
-requests, not an atomic snapshot. Server-assigned IDs differ from the saved
-files; areas are matched by `Location.identifier`.
-
-To remove the demo records, list the tagged site A records from the repository
-root and check the targets:
-
-```python
-from healthchain.fhir.r4b import Bundle
-from healthchain.gateway import FHIRGateway
-from healthchain.gateway.clients import FHIRAuthConfig
-from cookbook.ward_monitoring import DATA_DIR, from_gateway, load_config
-
-gateway = FHIRGateway()
-gateway.add_source("medplum", FHIRAuthConfig.from_env("MEDPLUM").to_connection_string())
-config = load_config(DATA_DIR / "site_a")
-
-demo = from_gateway(gateway, "medplum", config)
-targets = [
-    f"{entry.resource.__resource_type__}/{entry.resource.id}"
-    for bundle in (demo.observations, demo.encounters, demo.locations)
-    for entry in bundle.entry or []
-]
-print("\n".join(targets))
-```
-
-Then, in the same session, delete them from the configured Medplum project and
-check that none remain in search results (server history keeps them):
-
-```python
-if targets:
-    deletion = Bundle(
-        type="transaction",
-        entry=[{"request": {"method": "DELETE", "url": url}} for url in targets],
-    )
-    gateway.transaction(deletion, source="medplum")
-
-remaining = from_gateway(gateway, "medplum", config)
-assert not any(b.entry for b in (remaining.encounters, remaining.locations, remaining.observations))
-```
-
-Seeding again recreates the example.
+Without `--as-of`, admissions and score freshness are judged at the current
+time.
