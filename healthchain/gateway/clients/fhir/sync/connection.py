@@ -1,9 +1,12 @@
 import logging
-import urllib.parse
 
 from typing import Dict
 
-from healthchain.gateway.clients.fhir.base import FHIRServerInterface
+from healthchain.gateway.clients.fhir.base import (
+    FHIRAuthConfig,
+    FHIRServerInterface,
+    parse_fhir_auth_connection_string,
+)
 from healthchain.gateway.fhir.errors import FHIRConnectionError
 
 
@@ -20,15 +23,17 @@ class FHIRConnectionManager:
 
     def __init__(self):
         """Initialize the sync connection manager."""
-        # Store configuration
+        # Source name -> FHIRAuthConfig
         self.sources = {}
-        self._connection_strings = {}
 
-    def add_source(self, name: str, connection_string: str):
+    def add_source(self, name: str, connection_string: str | FHIRAuthConfig) -> None:
         """
-        Add a FHIR data source using connection string.
+        Add a FHIR data source using a connection string or a FHIRAuthConfig.
+
+        A connection string is parsed once here; the resulting config is stored.
 
         Format: fhir://hostname:port/path?param1=value1&param2=value2
+        (fhir:// resolves to https; http:// and https:// are kept as given)
 
         Examples:
             fhir://epic.org/api/FHIR/R4?client_id=my_app&client_secret=secret&token_url=https://epic.org/oauth2/token&use_jwt_assertion=true
@@ -36,37 +41,25 @@ class FHIRConnectionManager:
 
         Args:
             name: Source name identifier
-            connection_string: FHIR connection string
+            connection_string: FHIR connection string, or a FHIRAuthConfig
 
         Raises:
             FHIRConnectionError: If connection string is invalid
         """
-        # Store connection string for pooling
-        self._connection_strings[name] = connection_string
-
-        # Parse the connection string for validation only
         try:
-            if not connection_string.startswith("fhir://"):
-                raise ValueError("Connection string must start with fhir://")
-
-            # Parse URL for validation
-            parsed = urllib.parse.urlparse(connection_string)
-
-            # Validate that we have a valid hostname
-            if not parsed.netloc:
-                raise ValueError("Invalid connection string: missing hostname")
-
-            # Store the source name
-            self.sources[name] = None  # Placeholder - store metadata here
-
-            logger.info(f"Added FHIR source '{name}'")
-
-        except Exception as e:
+            if isinstance(connection_string, FHIRAuthConfig):
+                auth_config = connection_string
+            else:
+                auth_config = parse_fhir_auth_connection_string(connection_string)
+        except ValueError as e:
             raise FHIRConnectionError(
                 message=f"Failed to parse connection string: {str(e)}",
                 code="Invalid connection string",
                 state="500",
             )
+
+        self.sources[name] = auth_config
+        logger.info(f"Added FHIR source '{name}'")
 
     def get_client(self, source: str = None) -> FHIRServerInterface:
         """
@@ -79,18 +72,9 @@ class FHIRConnectionManager:
             FHIRServerInterface: A sync FHIR client
 
         Raises:
-            ValueError: If source is unknown or no connection string found
+            ValueError: If source is unknown or has no connection config
         """
-        source_name = source or next(iter(self.sources.keys()))
-        if source_name not in self.sources:
-            raise ValueError(f"Unknown source: {source_name}")
-
-        if source_name not in self._connection_strings:
-            raise ValueError(f"No connection string found for source: {source_name}")
-
-        connection_string = self._connection_strings[source_name]
-
-        return self._create_server_from_connection_string(connection_string)
+        return self._create_client(self._get_auth_config(source))
 
     def get_status(self) -> Dict[str, any]:
         """
@@ -117,24 +101,27 @@ class FHIRConnectionManager:
         """
         return self.sources.copy()
 
-    def _create_server_from_connection_string(
-        self, connection_string: str
-    ) -> FHIRServerInterface:
+    def _get_auth_config(self, source: str = None) -> FHIRAuthConfig:
+        """Look up the stored config for a source (first source if None)."""
+        source_name = source or next(iter(self.sources.keys()))
+        if source_name not in self.sources:
+            raise ValueError(f"Unknown source: {source_name}")
+
+        auth_config = self.sources[source_name]
+        if not isinstance(auth_config, FHIRAuthConfig):
+            raise ValueError(f"No connection config found for source: {source_name}")
+        return auth_config
+
+    def _create_client(self, auth_config: FHIRAuthConfig) -> FHIRServerInterface:
         """
-        Create a sync FHIR server instance from a connection string.
+        Create a sync FHIR server instance from a stored config.
 
         Args:
-            connection_string: FHIR connection string
+            auth_config: FHIR connection and auth configuration
 
         Returns:
             FHIRServerInterface: A new sync FHIR server instance
         """
         from healthchain.gateway.clients.fhir.sync.client import create_fhir_client
-        from healthchain.gateway.clients.fhir.base import (
-            parse_fhir_auth_connection_string,
-        )
-
-        # Parse connection string as OAuth2.0 configuration
-        auth_config = parse_fhir_auth_connection_string(connection_string)
 
         return create_fhir_client(auth_config=auth_config)

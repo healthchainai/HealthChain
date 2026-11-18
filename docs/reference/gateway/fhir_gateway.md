@@ -126,13 +126,16 @@ Connection strings use the `fhir://` scheme with query parameters:
 fhir://hostname:port/path?param1=value1&param2=value2
 ```
 
-**Required Parameters:**
+`fhir://` resolves to `https://`. You can also write `http://` or `https://` directly, which keeps that scheme. Use `http://` for a local test server such as `http://localhost:8080/fhir`.
+
+Auth parameters are optional. Without them, the source is treated as a public endpoint. Public sources currently work with `FHIRGateway` only; `AsyncFHIRGateway` still requests an OAuth token. If any of `client_id`, `token_url`, `client_secret`, `client_secret_path` or `use_jwt_assertion` is set, then `client_id`, `token_url` and a secret are all required.
+
+`add_source` also accepts a `FHIRAuthConfig` in place of the string.
+
+**Auth Parameters:**
 
 - `client_id`: OAuth2 client ID
 - `token_url`: OAuth2 token endpoint
-
-**Optional Parameters:**
-
 - `client_secret`: OAuth2 client secret (for client credentials flow)
 - `client_secret_path`: Path to private key file (for JWT assertion)
 - `scope`: OAuth2 scope (default: "`system/*.read system/*.write`")

@@ -142,7 +142,7 @@ sources:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `<name>` | object | — | Arbitrary source name used in `gateway.search(..., source="<name>")` |
-| `<name>.env_prefix` | string | — | Prefix for env vars: `{PREFIX}_CLIENT_ID`, `{PREFIX}_CLIENT_SECRET`, `{PREFIX}_BASE_URL`, `{PREFIX}_TOKEN_URL` |
+| `<name>.env_prefix` | string | — | Prefix for env vars: `{PREFIX}_CLIENT_ID`, `{PREFIX}_CLIENT_SECRET`, `{PREFIX}_BASE_URL`, `{PREFIX}_TOKEN_URL`. Only `{PREFIX}_BASE_URL` is required for a public server. |
 
 With sources declared, use `FHIRGateway.from_config()` instead of `gateway.add_source()`:
 
