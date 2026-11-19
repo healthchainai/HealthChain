@@ -14,6 +14,7 @@ from healthchain.gateway.clients.auth import (
     OAuth2Config,
     TokenInfo,
     AsyncOAuth2TokenManager,
+    TokenRefreshError,
 )
 
 
@@ -189,8 +190,11 @@ async def test_oauth2_token_manager_error_handling(mock_post, token_manager):
         "401 Unauthorized", request=Mock(spec=Request), response=mock_response
     )
 
-    with pytest.raises(Exception, match="Failed to refresh token: 401"):
+    with pytest.raises(
+        TokenRefreshError, match="Failed to refresh token: 401"
+    ) as exc_info:
         await token_manager.get_access_token()
+    assert exc_info.value.status_code == 401
 
 
 @patch("jwt.encode")

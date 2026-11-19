@@ -65,9 +65,31 @@ def test_error_mapping_by_status_code(status_code, expected_fragment):
     assert "read Patient/123 failed" in error.message
 
 
-def test_error_mapping_by_message_content():
-    """FHIRErrorHandler maps errors by parsing status code from error message."""
-    mock_exception = Exception("Request failed with status 404 - not found")
+@pytest.mark.parametrize(
+    "error_message,status_code,expected_state,expected_message",
+    [
+        (
+            "FHIR request failed: 500 - upstream returned 404",
+            500,
+            "500",
+            "search Observation failed: HTTP error",
+        ),
+        (
+            "Request failed with status 404 - not found",
+            None,
+            None,
+            "search Observation failed",
+        ),
+        ("value 'pt-4041' is invalid", None, None, "search Observation failed"),
+    ],
+)
+def test_error_mapping_by_message_content(
+    error_message, status_code, expected_state, expected_message
+):
+    """FHIRErrorHandler never infers a status code from the error message."""
+    mock_exception = Exception(error_message)
+    if status_code is not None:
+        mock_exception.status_code = status_code
 
     with pytest.raises(FHIRConnectionError) as exc_info:
         FHIRErrorHandler.handle_fhir_error(
@@ -75,19 +97,19 @@ def test_error_mapping_by_message_content():
         )
 
     error = exc_info.value
-    assert "resource you are looking for does not exist" in error.message
-    assert error.state == "404"
-    assert "search Observation failed" in error.message
+    assert error.state == expected_state
+    assert error.message == expected_message
+    assert error.code == error_message
 
 
 @pytest.mark.parametrize(
-    "has_status_code,expected_state",
+    "has_status_code,expected_state,expected_message",
     [
-        (True, "599"),
-        (False, "UNKNOWN"),
+        (True, "599", "update Patient/123 failed: HTTP error"),
+        (False, None, "update Patient/123 failed"),
     ],
 )
-def test_error_handling_edge_cases(has_status_code, expected_state):
+def test_error_handling_edge_cases(has_status_code, expected_state, expected_message):
     """FHIRErrorHandler handles unknown status codes and missing attributes."""
     mock_exception = Exception("Server error")
     if has_status_code:
@@ -100,7 +122,7 @@ def test_error_handling_edge_cases(has_status_code, expected_state):
 
     error = exc_info.value
     assert error.state == expected_state
-    assert "update Patient/123 failed: HTTP error" in error.message
+    assert error.message == expected_message
 
 
 @pytest.mark.parametrize(
