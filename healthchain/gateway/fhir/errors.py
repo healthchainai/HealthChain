@@ -72,6 +72,9 @@ class FHIRErrorHandler:
         """
         Handle FHIR operation errors consistently.
 
+        Uses the exception's ``status_code`` when it has one. Errors without a
+        status code are reported without an HTTP status.
+
         Args:
             e: The original exception
             resource_type: The FHIR resource type being operated on
@@ -84,33 +87,19 @@ class FHIRErrorHandler:
         error_msg = str(e)
         resource_ref = f"{resource_type}{'' if fhir_id is None else f'/{fhir_id}'}"
 
-        # Try status code first
         status_code = getattr(e, "status_code", None)
-        if status_code in cls.ERROR_MAP:
-            msg = cls.ERROR_MAP[status_code]
+        if status_code is None:
             raise FHIRConnectionError(
-                message=f"{operation} {resource_ref} failed: {msg}",
+                message=f"{operation} {resource_ref} failed",
                 code=error_msg,
-                state=str(status_code),
                 show_state=False,
             )
 
-        # Fall back to message parsing
-        error_msg_lower = error_msg.lower()
-        for code, msg in cls.ERROR_MAP.items():
-            if str(code) in error_msg_lower:
-                raise FHIRConnectionError(
-                    message=f"{operation} {resource_ref} failed: {msg}",
-                    code=error_msg,
-                    state=str(code),
-                    show_state=False,
-                )
-
-        # Default fallback error
+        msg = cls.ERROR_MAP.get(status_code, "HTTP error")
         raise FHIRConnectionError(
-            message=f"{operation} {resource_ref} failed: HTTP error",
+            message=f"{operation} {resource_ref} failed: {msg}",
             code=error_msg,
-            state=str(status_code) if status_code else "UNKNOWN",
+            state=str(status_code),
             show_state=False,
         )
 

@@ -9,6 +9,7 @@ from healthchain.fhir import (
     FHIRValidationError,
     ValidationReport,
     create_resource_from_dict,
+    get_fhir_resource,
     load_bundle,
     validate_resource,
 )
@@ -89,6 +90,16 @@ def test_validate_resource_missing_resource_type():
     assert report.valid is False
     assert report.issues[0].severity == "fatal"
     assert report.issues[0].code == "structure"
+
+
+def test_validate_resource_rejects_non_resource_input():
+    """Input that is neither a dict nor a model is reported, not crashed on."""
+    report = validate_resource("pt-1")
+
+    assert report.valid is False
+    assert report.issues[0].severity == "fatal"
+    assert report.issues[0].code == "structure"
+    assert "str" in report.issues[0].diagnostics
 
 
 def test_validate_resource_unknown_resource_type():
@@ -220,6 +231,42 @@ def test_load_bundle_aggregates_entry_errors():
     assert "Bundle.entry[1].resource.subject" in expressions
     assert "Bundle.entry[1].resource.onsetDateTime" in expressions
     assert "Bundle.entry[2].resource.status" in expressions
+
+
+@pytest.mark.parametrize(
+    "entry, expression",
+    [
+        (42, "Bundle.entry"),
+        ([{"resource": "pt-1"}], "Bundle.entry[0].resource"),
+    ],
+)
+def test_load_bundle_reports_malformed_entries(entry, expression):
+    """A non-list entry or a non-object entry resource is reported, not crashed on."""
+    with pytest.raises(FHIRValidationError) as exc_info:
+        load_bundle(
+            {"resourceType": "Bundle", "type": "searchset", "entry": entry},
+            version="R4B",
+        )
+
+    report = exc_info.value.report
+    assert report.valid is False
+    assert [issue.expression for issue in report.issues] == [expression]
+
+
+@pytest.mark.parametrize("version", ["R4B", "STU3"])
+def test_load_bundle_accepts_resource_instances(version):
+    """Entry resources may be model instances of the requested FHIR version."""
+    patient_class = get_fhir_resource("Patient", version)
+    bundle = load_bundle(
+        {
+            "resourceType": "Bundle",
+            "type": "collection",
+            "entry": [{"resource": patient_class(id="p1")}],
+        },
+        version=version,
+    )
+
+    assert isinstance(bundle.entry[0].resource, patient_class)
 
 
 def test_load_bundle_rejects_non_bundle():

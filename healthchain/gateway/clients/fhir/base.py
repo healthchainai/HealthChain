@@ -316,7 +316,8 @@ class FHIRServerInterface(ABC):
         except json.JSONDecodeError:
             raise FHIRClientError(
                 f"Invalid JSON response: {response.text}",
-                status_code=response.status_code,
+                # A success status with a bad body is not an HTTP error
+                status_code=None if response.is_success else response.status_code,
             )
 
         if not response.is_success:
