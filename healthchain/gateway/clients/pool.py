@@ -75,15 +75,18 @@ class ClientPool(Generic[ClientInterface]):
         }
 
         for client in self._clients.values():
-            # Try to get httpx client stats if available
+            # httpx clients keep their httpcore pool on the default transport;
+            # custom transports (e.g. httpx.MockTransport) have no pool
             client_stats = {}
-            if hasattr(client, "client") and hasattr(client.client, "_pool"):
-                pool = client.client._pool
+            transport = getattr(getattr(client, "client", None), "_transport", None)
+            pool = getattr(transport, "_pool", None)
+            if pool is not None:
+                connections = pool.connections
                 client_stats.update(
                     {
-                        "active_connections": len(pool._pool),
-                        "available_connections": len(
-                            [c for c in pool._pool if c.is_available()]
+                        "active_connections": len(connections),
+                        "available_connections": sum(
+                            c.is_available() for c in connections
                         ),
                     }
                 )
