@@ -290,6 +290,21 @@ def validate_resource(
                 fhir_version=fhir_version,
                 issues=_structural_issues(e, resolved_type),
             )
+    elif not isinstance(resource, BaseModel):
+        return ValidationReport(
+            valid=False,
+            resource_type=resource_type,
+            issues=[
+                ValidationIssue(
+                    severity="fatal",
+                    code="structure",
+                    diagnostics=(
+                        "Expected a dict or FHIR resource, got "
+                        f"{type(resource).__name__}"
+                    ),
+                )
+            ],
+        )
     else:
         resolved_type = resource.__class__.__name__
         detected = get_resource_version(resource)
@@ -383,16 +398,21 @@ def load_bundle(
     # Validate the bundle skeleton and each entry resource independently, so
     # a structural error in one entry doesn't mask issues in the others
     issues: List[ValidationIssue] = []
-    entries = data.get("entry") or []
-    skeleton = {
-        **data,
-        "entry": [
-            {k: v for k, v in entry.items() if k != "resource"}
-            if isinstance(entry, dict)
-            else entry
-            for entry in entries
-        ],
-    }
+    entries = data.get("entry")
+    if isinstance(entries, list):
+        skeleton = {
+            **data,
+            "entry": [
+                {k: v for k, v in entry.items() if k != "resource"}
+                if isinstance(entry, dict)
+                else entry
+                for entry in entries
+            ],
+        }
+    else:
+        # Validate as-is: a missing or null entry passes, and any other
+        # non-list is reported by the skeleton validation at Bundle.entry
+        skeleton, entries = data, []
     skeleton_report = validate_resource(
         skeleton, resource_type="Bundle", version=version
     )
