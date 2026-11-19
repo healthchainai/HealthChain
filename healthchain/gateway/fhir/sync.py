@@ -10,7 +10,7 @@ from healthchain.gateway.clients.fhir.base import FHIRServerInterface
 from healthchain.gateway.clients.fhir.sync.connection import FHIRConnectionManager
 from healthchain.gateway.fhir.base import BaseFHIRGateway
 from healthchain.gateway.fhir.errors import FHIRErrorHandler
-from healthchain.fhir import add_provenance_metadata
+from healthchain.fhir import FHIRValidationError, add_provenance_metadata, load_bundle
 
 
 logger = logging.getLogger(__name__)
@@ -85,6 +85,9 @@ class FHIRGateway(BaseFHIRGateway):
         client_kwargs = client_kwargs or {}
         try:
             return getattr(client, operation)(*client_args, **client_kwargs)
+        except FHIRValidationError:
+            # Already carries a report; don't relabel it as a connection error
+            raise
         except Exception as e:
             FHIRErrorHandler.handle_fhir_error(e, resource_type, resource_id, operation)
 
@@ -237,6 +240,7 @@ class FHIRGateway(BaseFHIRGateway):
         provenance_tag: str = None,
         follow_pagination: bool = False,
         max_pages: Optional[int] = None,
+        validate: bool = False,
     ) -> Bundle:
         """
         Search for FHIR resources (sync version).
@@ -250,9 +254,17 @@ class FHIRGateway(BaseFHIRGateway):
             follow_pagination: If True, fetch all pages by following the server's
                 `next` links as-is; links to another host are refused
             max_pages: Maximum number of pages to fetch (None for unlimited)
+            validate: If True, check the merged results with load_bundle, including
+                codes against their value sets, and raise on any issue. A page that
+                fails to parse raises regardless; its issue paths are relative to
+                that page
 
         Returns:
             Bundle containing search results
+
+        Raises:
+            FHIRValidationError: If a page fails to parse, or validate=True and
+                the results have validation issues
 
         Example:
             # Basic search
@@ -300,6 +312,11 @@ class FHIRGateway(BaseFHIRGateway):
                 page_count += 1
 
             bundle.entry = all_entries
+
+        # Check the merged results in one pass, so entry paths are global.
+        # R4B, not the session default: the clients return R4B Bundles
+        if validate:
+            load_bundle(bundle.model_dump(), version="R4B")
 
         # Add provenance metadata if requested
         if add_provenance and bundle.entry:

@@ -232,6 +232,8 @@ for entry in results.entry:
     print(f"Found: {patient.name[0].family}, {patient.name[0].given[0]}")
 ```
 
+Pass `validate=True` to check the results the same way [`load_bundle`](../utilities/fhir_helpers.md#load_bundle) does, including codes against their value sets; any issue raises `FHIRValidationError` with the full report.
+
 ### Advanced Search
 
 ```python
