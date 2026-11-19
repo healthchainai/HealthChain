@@ -125,7 +125,7 @@ class AsyncFHIRClient(FHIRServerInterface):
         response = await self.client.get(url, headers=headers)
         data = self._handle_response(response)
 
-        return Bundle(**data)
+        return self._parse_bundle(data)
 
     async def fetch_page(self, url: str) -> Bundle:
         """
@@ -147,7 +147,7 @@ class AsyncFHIRClient(FHIRServerInterface):
         response = await self.client.get(page_url, headers=headers)
         data = self._handle_response(response)
 
-        return Bundle(**data)
+        return self._parse_bundle(data)
 
     async def create(self, resource: Resource) -> Resource:
         """

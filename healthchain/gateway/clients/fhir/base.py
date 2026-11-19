@@ -11,8 +11,9 @@ from fhir.resources.R4B.bundle import Bundle
 from fhir.resources.R4B.capabilitystatement import CapabilityStatement
 from fhir.resources.resource import Resource
 
+from healthchain.fhir import load_bundle
 from healthchain.gateway.clients.auth import OAuth2Config
-from pydantic import BaseModel, ConfigDict, SecretStr, field_validator
+from pydantic import BaseModel, ConfigDict, SecretStr, ValidationError, field_validator
 
 
 logger = logging.getLogger(__name__)
@@ -331,6 +332,19 @@ class FHIRServerInterface(ABC):
             )
 
         return data
+
+    def _parse_bundle(self, data: dict) -> Bundle:
+        """Parse a search page, raising FHIRValidationError if it doesn't parse.
+
+        On failure the page is handed to load_bundle, which raises with a
+        per-entry report instead of a raw Pydantic error.
+        """
+        try:
+            return Bundle(**data)
+        except (ValidationError, KeyError):
+            # fhir.resources raises KeyError for an unknown entry resourceType.
+            # R4B, not the session default: the clients parse with R4B models
+            return load_bundle(data, version="R4B")
 
     @lru_cache(maxsize=128)
     def _resolve_resource_type(

@@ -143,7 +143,7 @@ class FHIRClient(FHIRServerInterface):
         response = self.client.get(url, headers=headers)
         data = self._handle_response(response)
 
-        return Bundle(**data)
+        return self._parse_bundle(data)
 
     def fetch_page(self, url: str) -> Bundle:
         """
@@ -165,7 +165,7 @@ class FHIRClient(FHIRServerInterface):
         response = self.client.get(page_url, headers=headers)
         data = self._handle_response(response)
 
-        return Bundle(**data)
+        return self._parse_bundle(data)
 
     def create(self, resource: Resource) -> Resource:
         """
