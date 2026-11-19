@@ -5,6 +5,8 @@ from unittest.mock import Mock, AsyncMock
 
 from healthchain.gateway.clients.pool import ClientPool
 from healthchain.gateway.api.protocols import FHIRServerInterfaceProtocol
+from healthchain.gateway.clients.fhir.aio import AsyncFHIRClient
+from healthchain.gateway.clients.fhir.base import FHIRAuthConfig
 
 
 @pytest.fixture
@@ -17,12 +19,14 @@ def mock_client_factory():
 
         # Add httpx client attributes for pool stats
         client.client = Mock()
-        client.client._pool = Mock()
         available_conn = Mock()
         available_conn.is_available.return_value = True
         unavailable_conn = Mock()
         unavailable_conn.is_available.return_value = False
-        client.client._pool._pool = [available_conn, unavailable_conn]
+        client.client._transport._pool.connections = [
+            available_conn,
+            unavailable_conn,
+        ]
 
         client._limits = limits
         return client
@@ -133,6 +137,27 @@ async def test_pool_stats(client_pool, mock_client_factory):
     client_stats = stats["clients"][0]
     assert client_stats["active_connections"] == 2
     assert client_stats["available_connections"] == 1
+
+
+@pytest.mark.asyncio
+async def test_pool_stats_with_real_async_fhir_client(client_pool):
+    """ClientPool reads connection counts from a real httpx.AsyncClient transport."""
+
+    def real_factory(connection_string, limits=None):
+        auth_config = FHIRAuthConfig(
+            base_url="https://test.fhir.org/R4",
+            client_id="test_client",
+            client_secret="test_secret",
+            token_url="https://test.fhir.org/oauth/token",
+        )
+        return AsyncFHIRClient(auth_config=auth_config, limits=limits)
+
+    await client_pool.get_client("fhir://test.fhir.org/R4", real_factory)
+
+    stats = client_pool.get_pool_stats()
+    assert stats["clients"] == [{"active_connections": 0, "available_connections": 0}]
+
+    await client_pool.close_all()
 
 
 @pytest.mark.asyncio
