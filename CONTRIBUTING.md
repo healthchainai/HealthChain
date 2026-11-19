@@ -55,8 +55,7 @@ When writing docs:
 To work on the documentation site locally:
 
 ```shell
-uv sync --group docs
-uv run mkdocs serve
+uv run --with-requirements requirements-doc.txt mkdocs serve
 ```
 
 ## 🍳 Writing cookbooks

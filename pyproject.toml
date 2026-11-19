@@ -77,7 +77,6 @@ dev = [
     "pre-commit>=3.5.0,<4",
     "pytest-asyncio>=0.25",
     "pytest-codeblocks>=0.17.0,<0.18",
-    "ipykernel>=6.29.5,<7",
     "pytest-cov>=7.1.0",
     "typer>=0.24.1",
     "pip-audit>=2.10.0",
@@ -86,20 +85,6 @@ dev = [
 ]
 scripts = [
     "scikit-learn>=1.7.2",
-]
-docs = [
-    "mkdocs>=1.6.1,<2",
-    "mkdocs-material[imaging]>=9.5.34,<10",
-    "mkdocstrings>=0.26.0,<0.27",
-    "mkdocstrings-python>=1.11.1,<2",
-    "griffe<1.15",
-    "mkdocs-llmstxt>=0.5.0",
-]
-
-[tool.uv]
-default-groups = [
-    "dev",
-    "docs",
 ]
 
 [tool.ruff]
