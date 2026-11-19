@@ -20,6 +20,14 @@ from pydantic import BaseModel, ConfigDict, SecretStr
 logger = logging.getLogger(__name__)
 
 
+class TokenRefreshError(Exception):
+    """The token endpoint returned an HTTP error status."""
+
+    def __init__(self, message: str, status_code: int):
+        self.status_code = status_code
+        super().__init__(message)
+
+
 class OAuth2Config(BaseModel):
     """OAuth2 configuration for client credentials flow."""
 
@@ -184,7 +192,10 @@ class OAuth2TokenManager:
                 logger.error(
                     f"Token refresh failed: {e.response.status_code} {e.response.text}"
                 )
-                raise Exception(f"Failed to refresh token: {e.response.status_code}")
+                raise TokenRefreshError(
+                    f"Failed to refresh token: {e.response.status_code}",
+                    status_code=e.response.status_code,
+                ) from e
             except Exception as e:
                 logger.error(f"Token refresh error: {str(e)}")
                 raise
@@ -325,7 +336,10 @@ class AsyncOAuth2TokenManager:
                 logger.error(
                     f"Token refresh failed: {e.response.status_code} {e.response.text}"
                 )
-                raise Exception(f"Failed to refresh token: {e.response.status_code}")
+                raise TokenRefreshError(
+                    f"Failed to refresh token: {e.response.status_code}",
+                    status_code=e.response.status_code,
+                ) from e
             except Exception as e:
                 logger.error(f"Token refresh error: {str(e)}")
                 raise

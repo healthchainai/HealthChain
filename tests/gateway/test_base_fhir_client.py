@@ -188,6 +188,16 @@ def test_fhir_client_error_extraction_and_invalid_json(fhir_client):
     with pytest.raises(FHIRClientError) as exc_info:
         fhir_client._handle_response(mock_response)
     assert "Invalid JSON response" in str(exc_info.value)
+    assert exc_info.value.status_code == 500
+
+    # Invalid JSON on a success response carries no HTTP status
+    mock_response.is_success = True
+    mock_response.status_code = 200
+
+    with pytest.raises(FHIRClientError) as exc_info:
+        fhir_client._handle_response(mock_response)
+    assert "Invalid JSON response" in str(exc_info.value)
+    assert exc_info.value.status_code is None
 
 
 def test_fhir_client_error_class():
