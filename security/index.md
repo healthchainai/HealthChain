@@ -1,0 +1,116 @@
+# Security Configuration
+
+For answers about patient-data storage, real patient data, configured external services, HIPAA, GDPR, and the NHS DSPT, see the project [Security and data-handling FAQ](https://github.com/healthchainai/HealthChain/blob/main/SECURITY.md).
+
+## Security controls
+
+HealthChain includes configurable API-key authentication, audit logging, and TLS support through `healthchain.yaml`. These application controls are not a compliance certification or a complete security programme.
+
+______________________________________________________________________
+
+## API key authentication
+
+Enable inbound authentication by setting `security.auth: api-key` in `healthchain.yaml`:
+
+```yaml
+security:
+  auth: api-key
+```
+
+Then set the expected key in `.env`:
+
+```bash
+HEALTHCHAIN_API_KEY=your-key-here
+```
+
+All routes except `/health`, `/docs`, `/redoc`, and `/openapi.json` will require the key on every request. Pass it as a Bearer token or an `X-API-Key` header:
+
+```bash
+# Bearer token
+curl -H "Authorization: Bearer your-key-here" http://localhost:8000/fhir/Patient/123
+
+# X-API-Key header
+curl -H "X-API-Key: your-key-here" http://localhost:8000/fhir/Patient/123
+```
+
+Missing or incorrect keys receive a `401 Unauthorized` response:
+
+```json
+{ "detail": "Invalid or missing API key" }
+```
+
+Missing env var
+
+If `HEALTHCHAIN_API_KEY` is not set when the service starts, a warning is logged and all authenticated requests will be rejected. The service still starts — misconfiguration is visible without crashing.
+
+______________________________________________________________________
+
+## CORS
+
+CORS only affects browsers. Set `security.allowed_origins` when a browser app on a different origin (a SMART app, web dashboard, or browser-based app) calls the gateway. Server-to-server callers (EHR backends, scripts, agents) are not affected.
+
+```yaml
+security:
+  allowed_origins:
+    - https://dashboard.example.org
+```
+
+The default `["*"]` allows any origin, which suits local development. In production, list your front-end origins explicitly.
+
+Before a cross-origin request that carries an API key, the browser sends an `OPTIONS` preflight without credentials. HealthChain answers it before auth, so preflights never receive a `401` and are not written to the audit log.
+
+______________________________________________________________________
+
+## Audit logging
+
+Set `compliance.audit_log` to a file path to enable per-request audit logging:
+
+```yaml
+compliance:
+  audit_log: ./logs/audit.jsonl
+```
+
+The log directory is created automatically if it does not exist. Each request appends one JSON line:
+
+```json
+{
+  "timestamp": "2026-05-06T10:23:41.123456+00:00",
+  "method": "GET",
+  "path": "/fhir/Patient/123",
+  "status_code": 200,
+  "duration_ms": 14.2,
+  "request_id": "a1b2c3d4-...",
+  "user": "api-key"
+}
+```
+
+`request_id` uses the `X-Request-ID` header if present, otherwise a UUID is generated. `user` is `"api-key"` for requests that pass `api-key` auth, and `null` otherwise. Requests rejected by auth are logged too, with `status_code: 401` and `user: null`. CORS preflight requests are not logged (see [CORS](#cors)).
+
+Log writes are non-blocking — IO errors are swallowed so a full disk or permission issue does not take down the service.
+
+______________________________________________________________________
+
+## TLS
+
+Enable TLS by pointing `healthchain.yaml` at your certificate and key:
+
+```yaml
+security:
+  tls:
+    enabled: true
+    cert_path: ./certs/server.crt
+    key_path: ./certs/server.key
+```
+
+HealthChain passes these to uvicorn automatically when `healthchain serve` starts — no extra flags needed.
+
+**Generating a self-signed certificate for local testing:**
+
+```bash
+mkdir -p certs
+openssl req -x509 -newkey rsa:4096 -keyout certs/server.key \
+  -out certs/server.crt -days 365 -nodes \
+  -subj "/CN=localhost"
+```
+
+**For an internet-accessible service**, use a certificate issued by a trusted CA. If the application runs behind a reverse proxy such as nginx or Caddy, terminate TLS at the proxy and leave `tls.enabled: false` in HealthChain — the proxy handles the certificate and HealthChain serves the application.

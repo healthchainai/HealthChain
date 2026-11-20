@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" role="img" aria-label="Grounded Q&amp;A flow: a patient question hits the /qa endpoint, live FHIR resources are fetched and formatted into clinical context by a pipeline, and the LLM answers anchored to the record">
+  <rect x="0" y="0" width="880" height="560" rx="16" fill="#faf8f7"/>
+  <text x="34" y="52" font-size="19" letter-spacing="2" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">QUESTION</text>
+  <text x="620" y="52" font-size="19" letter-spacing="2" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#bf6b4a">GROUNDED ANSWER</text>
+
+  <rect x="34" y="92" width="254" height="96" rx="14" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.75"/>
+  <text x="56" y="128" font-size="18" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">"When is my next</text>
+  <text x="56" y="156" font-size="18" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">appointment?"</text>
+  <path d="M84 188 L104 188 L88 212 z" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.75"/>
+
+  <path d="M288 140 L344 140" stroke="#5f5866" stroke-width="1.75" fill="none" marker-end="url(#dd1)"/>
+
+  <rect x="348" y="96" width="204" height="88" rx="10" fill="#fdf0e8" stroke="#e59875" stroke-width="2.5"/>
+  <text x="372" y="132" font-size="20" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#bf6b4a">POST /qa</text>
+  <text x="372" y="162" font-size="16" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">HealthChainAPI</text>
+
+  <path d="M410 184 L410 262" stroke="#5f5866" stroke-width="1.75" stroke-dasharray="6 6" fill="none" marker-end="url(#dd1)"/>
+  <path d="M486 262 L486 184" stroke="#5f5866" stroke-width="1.75" stroke-dasharray="6 6" fill="none" marker-end="url(#dd1)"/>
+  <rect x="330" y="266" width="244" height="96" rx="10" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.75"/>
+  <text x="352" y="300" font-size="18" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">live EHR · FHIR R4</text>
+  <text x="352" y="330" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">Condition · Appointment</text>
+  <text x="352" y="354" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">CarePlan · fresh fetch</text>
+
+  <path d="M552 140 L608 140" stroke="#5f5866" stroke-width="1.75" fill="none" marker-end="url(#dd1)"/>
+  <rect x="612" y="88" width="236" height="104" rx="10" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.75"/>
+  <text x="634" y="122" font-size="18" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">context pipeline</text>
+  <text x="634" y="150" font-size="15" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#5f5866">record → LLM context</text>
+  <text x="634" y="176" font-size="14" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#bf6b4a">LLM never sees raw JSON</text>
+
+  <path d="M729 192 L729 250" stroke="#5f5866" stroke-width="1.75" fill="none" marker-end="url(#dd1)"/>
+  <rect x="648" y="254" width="164" height="56" rx="28" fill="#ffffff" stroke="#c9c2cd" stroke-width="1.75"/>
+  <text x="690" y="290" font-size="19" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">any LLM</text>
+
+  <path d="M729 310 L729 368" stroke="#bf6b4a" stroke-width="3" fill="none" marker-end="url(#dd2)"/>
+  <rect x="410" y="372" width="438" height="128" rx="14" fill="#fdf0e8" stroke="#e59875" stroke-width="2.5"/>
+  <text x="436" y="410" font-size="17" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">"Your cardiology follow-up is on</text>
+  <text x="436" y="438" font-size="17" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#211c26">24 July at 9:30 with Dr. Osei."</text>
+  <text x="436" y="476" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#bf6b4a">anchored to the patient's record ✓</text>
+
+  <defs>
+    <marker id="dd1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5f5866"/>
+    </marker>
+    <marker id="dd2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#bf6b4a"/>
+    </marker>
+  </defs>
+</svg>
