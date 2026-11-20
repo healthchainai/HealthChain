@@ -41,6 +41,9 @@ dependencies = [
     "httpx>=0.27.0,<0.28",
     "lxml>=5.2.2,<7",
     "fhir-resources>=8.1.0,<8.2.0",
+    # fhir-core 1.1.5+ rejects datetimes without a timezone and +0000 offsets,
+    # which real-world FHIR data uses. fhir-resources doesn't cap it (#303).
+    "fhir-core>=1.1.3,<1.1.5",
     "fastapi-events>=0.12.2,<0.13",
     "pyjwt[crypto]>=2,<3",
     "pyyaml>=6.0.3,<7",
