@@ -1,0 +1,406 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "timestamp": "2026-10-23T12:00:00Z",
+  "entry": [
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Encounter/recent",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "recent",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/encounter",
+            "value": "recent"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-a/patient",
+            "value": "P01"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T07:30:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "Location/n1"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T08:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Encounter/same-area-move",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "same-area-move",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/encounter",
+            "value": "same-area-move"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-a/patient",
+            "value": "P02"
+          }
+        },
+        "period": {
+          "start": "2026-10-22T16:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "Location/n5"
+            },
+            "status": "completed",
+            "period": {
+              "start": "2026-10-22T16:00:00Z",
+              "end": "2026-10-23T09:00:00Z"
+            }
+          },
+          {
+            "location": {
+              "reference": "Location/n2"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T09:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Encounter/boundary",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "boundary",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/encounter",
+            "value": "boundary"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-a/patient",
+            "value": "P03"
+          }
+        },
+        "period": {
+          "start": "2026-10-22T23:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "Location/n3"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T00:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Encounter/missing-time",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "missing-time",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/encounter",
+            "value": "missing-time"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-a/patient",
+            "value": "P04"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T03:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "Location/n4"
+            },
+            "status": "active"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Encounter/cross-area-move",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "cross-area-move",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/encounter",
+            "value": "cross-area-move"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-a/patient",
+            "value": "P05"
+          }
+        },
+        "period": {
+          "start": "2026-10-22T20:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "Location/n1"
+            },
+            "status": "completed",
+            "period": {
+              "start": "2026-10-22T20:00:00Z",
+              "end": "2026-10-23T07:00:00Z"
+            }
+          },
+          {
+            "location": {
+              "reference": "Location/s1"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T07:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Encounter/older-south",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "older-south",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/encounter",
+            "value": "older-south"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-a/patient",
+            "value": "P06"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T03:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "Location/s2"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T04:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Encounter/left-early",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "left-early",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/encounter",
+            "value": "left-early"
+          }
+        ],
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-a/patient",
+            "value": "P07"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T00:30:00Z",
+          "end": "2026-10-23T05:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "Location/n2"
+            },
+            "status": "completed",
+            "period": {
+              "start": "2026-10-23T01:00:00Z",
+              "end": "2026-10-23T05:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Encounter/overflow",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "overflow",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/encounter",
+            "value": "overflow"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-a/patient",
+            "value": "P08"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T09:30:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "Location/e1"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T10:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Encounter/not-yet-arrived",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "not-yet-arrived",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/encounter",
+            "value": "not-yet-arrived"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-a/patient",
+            "value": "P09"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T13:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "Location/s3"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T13:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Encounter/outside-ward",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "outside-ward",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/encounter",
+            "value": "outside-ward"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP"
+        },
+        "subject": {
+          "identifier": {
+            "system": "https://example.org/site-a/patient",
+            "value": "P10"
+          }
+        },
+        "period": {
+          "start": "2026-10-23T02:00:00Z"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "Location/opd-1"
+            },
+            "status": "active",
+            "period": {
+              "start": "2026-10-23T02:00:00Z"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
