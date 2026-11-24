@@ -32,10 +32,9 @@ gateway.add_source(
     "fhir://fhir.example.com/api/FHIR/R4/?client_id=your_app&client_secret=secret&token_url=https://fhir.example.com/oauth2/token"
 )
 
-with gateway:
-    # FHIR operations
-    patient = gateway.read(Patient, "123", "my_fhir_server")
-    print(f"Patient: {patient.name[0].family}")
+# FHIR operations
+patient = gateway.read(Patient, "123", "my_fhir_server")
+print(f"Patient: {patient.name[0].family}")
 ```
 
 ### Asynchronous Gateway
