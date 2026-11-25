@@ -185,10 +185,11 @@ def extract_diabetes(doc: Document) -> Document:
     """Adds a FHIR Condition for diabetes if mentioned in the text."""
     if "diabetes" in doc.text.lower():
         condition = create_condition(
+            subject="Patient/123",
             code="73211009",
             display="Diabetes mellitus",
         )
-        doc.fhir.problem_list.append(condition)
+        doc.fhir.problem_list = [condition]
 
     return doc
 

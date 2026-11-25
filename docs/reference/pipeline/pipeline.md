@@ -159,7 +159,7 @@ def extract_medications(doc: Document) -> Document:
                 code=ent._.cui if hasattr(ent._, "cui") else None,
                 display=ent.text
             )
-            doc.fhir.medication_list.append(med_statement)
+            doc.fhir.medication_list = [med_statement]
 
     return doc
 ```

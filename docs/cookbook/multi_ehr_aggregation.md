@@ -135,12 +135,11 @@ from healthchain.gateway import HealthChainAPI
 app = HealthChainAPI(
     title="Multi-EHR Data Aggregation",
     description="Aggregate patient data from multiple FHIR sources",
-    port=8888,
     service_type="fhir-gateway",
 )
 app.register_gateway(gateway, path="/fhir")
 
-app.run()
+app.run(port=8888)
 ```
 
 !!! tip "FHIR Endpoints Provided by the Service"

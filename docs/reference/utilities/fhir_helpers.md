@@ -381,7 +381,7 @@ print(doc_ref.model_dump())
 
 ### set_condition_category()
 
-Sets the category of a [**Condition**](https://www.hl7.org/fhir/condition.html) resource to "`problem-list-item`".
+Sets the category of a [**Condition**](https://www.hl7.org/fhir/condition.html) resource to "`problem-list-item`" or "`encounter-diagnosis`".
 
 ```python
 from healthchain.fhir import set_condition_category, create_condition
@@ -393,7 +393,7 @@ problem_list_item = create_condition(
     display="Hypertension"
 )
 
-set_condition_category(problem_list_item)
+set_condition_category(problem_list_item, "problem-list-item")
 
 # Output the modified resource
 print(problem_list_item.model_dump())
@@ -700,10 +700,10 @@ Merges multiple FHIR [**Bundle**](https://www.hl7.org/fhir/bundle.html) resource
 
 - Resources from each bundle are combined into a single output bundle of `type: collection`.
 - All entries from all input bundles will appear in the resulting bundle's `entry` array.
-- If bundles have the same resource (e.g. matching `id` or identical resources), they will *all* be included unless you handle duplicates before/after calling `merge_bundles`.
+- If bundles have the same resource (e.g. matching `id`), they will *all* be included unless you pass `deduplicate=True`, which keeps the first resource for each `dedupe_key` value (default `id`).
 
 ```python
-from healthchain.fhir import merge_bundles, create_bundle, create_condition
+from healthchain.fhir import merge_bundles, create_bundle, add_resource, create_condition
 
 # Create two bundles with different resources
 bundle1 = create_bundle()
@@ -716,7 +716,7 @@ add_resource(bundle2, create_condition(
 ))
 
 # Merge the bundles together
-merged = merge_bundles(bundle1, bundle2)
+merged = merge_bundles([bundle1, bundle2])
 
 # Output the merged bundle
 print(merged.model_dump())
