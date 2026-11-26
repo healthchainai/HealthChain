@@ -1,6 +1,8 @@
 import json
+import time
 
 import pytest
+from datetime import datetime, timedelta, timezone
 from unittest.mock import Mock, patch, AsyncMock
 from typing import Dict, Any, List
 
@@ -148,8 +150,9 @@ def test_capability_statement_includes_registered_resources(fhir_gateway):
     assert "Observation" in resource_types
 
 
+@pytest.mark.skipif(not hasattr(time, "tzset"), reason="time.tzset is Unix-only")
 @pytest.mark.asyncio
-async def test_gateway_status_structure(fhir_gateway):
+async def test_gateway_status_structure(fhir_gateway, monkeypatch):
     """Gateway status contains required fields and never exposes a source secret."""
     fhir_gateway.add_source(
         "secured",
@@ -162,7 +165,14 @@ async def test_gateway_status_structure(fhir_gateway):
     else:
         fhir_gateway.get_client("secured").close()
 
-    status = fhir_gateway.get_gateway_status()
+    # Run on a non-UTC host so local time mislabelled as UTC would show up
+    monkeypatch.setenv("TZ", "EST5")
+    time.tzset()
+    try:
+        status = fhir_gateway.get_gateway_status()
+    finally:
+        monkeypatch.undo()
+        time.tzset()
     if is_async:
         await fhir_gateway.close()
     assert "leak286secret" not in json.dumps(status, default=str)
@@ -175,7 +185,9 @@ async def test_gateway_status_structure(fhir_gateway):
     )
     assert status["gateway_type"] == expected_type
     assert status["status"] == "active"
-    assert isinstance(status["timestamp"], str)
+    timestamp = datetime.fromisoformat(status["timestamp"])
+    assert timestamp.utcoffset() == timedelta(0)
+    assert abs(timestamp - datetime.now(timezone.utc)) < timedelta(minutes=1)
     assert isinstance(status["version"], str)
 
 
