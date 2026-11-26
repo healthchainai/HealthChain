@@ -11,6 +11,7 @@ from fhir.resources.R4B.patient import Patient
 from fhir.resources.R4B.bundle import Bundle
 from fhir.resources.R4B.capabilitystatement import CapabilityStatement
 
+from healthchain.fhir import FHIRValidationError
 from healthchain.gateway.clients.fhir.aio import AsyncFHIRClient
 from healthchain.gateway.clients.fhir.base import FHIRAuthConfig
 
@@ -74,6 +75,55 @@ def mock_httpx_response():
     response.status_code = 200
     response.json.return_value = {"resourceType": "Patient", "id": "123"}
     return response
+
+
+BAD_META = {"lastUpdated": "2026-11-19T17:45:21+0000"}
+
+INVALID_RESPONSE_CASES = [
+    (
+        "capabilities",
+        "get",
+        (),
+        {
+            "resourceType": "CapabilityStatement",
+            "status": "active",
+            "kind": "instance",
+            "fhirVersion": "4.0.1",
+            "date": "2023-01-01T00:00:00Z",
+            "format": ["json"],
+            "meta": BAD_META,
+        },
+        "CapabilityStatement.meta.lastUpdated",
+    ),
+    (
+        "read",
+        "get",
+        (Patient, "123"),
+        {"resourceType": "Patient", "id": "123", "meta": BAD_META},
+        "Patient.meta.lastUpdated",
+    ),
+    (
+        "create",
+        "post",
+        (Patient(id="123"),),
+        {"resourceType": "Patient", "id": "123", "meta": BAD_META},
+        "Patient.meta.lastUpdated",
+    ),
+    (
+        "update",
+        "put",
+        (Patient(id="123"),),
+        {"resourceType": "Patient", "id": "123", "meta": BAD_META},
+        "Patient.meta.lastUpdated",
+    ),
+    (
+        "transaction",
+        "post",
+        (Bundle(type="transaction"),),
+        {"resourceType": "Bundle", "type": "transaction-response", "meta": BAD_META},
+        "Bundle.meta.lastUpdated",
+    ),
+]
 
 
 @pytest.mark.asyncio
@@ -193,6 +243,31 @@ async def test_fhir_client_search_and_capabilities(fhir_client):
             )
             assert isinstance(result, CapabilityStatement)
             assert result.status == "active"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "method, verb, args, response_json, expected_expression", INVALID_RESPONSE_CASES
+)
+async def test_fhir_client_raises_validation_error_for_invalid_response(
+    fhir_client,
+    mock_httpx_response,
+    method,
+    verb,
+    args,
+    response_json,
+    expected_expression,
+):
+    """Every AsyncFHIRClient call that parses a response raises FHIRValidationError."""
+    mock_httpx_response.json.return_value = response_json
+
+    with patch.object(fhir_client.client, verb, return_value=mock_httpx_response):
+        with patch.object(fhir_client, "_get_headers", return_value={}):
+            with pytest.raises(FHIRValidationError) as exc_info:
+                await getattr(fhir_client, method)(*args)
+
+    expressions = [issue.expression for issue in exc_info.value.report.issues]
+    assert expected_expression in expressions
 
 
 @pytest.mark.asyncio

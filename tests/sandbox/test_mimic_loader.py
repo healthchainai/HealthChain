@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from healthchain.fhir import FHIRValidationError
 from healthchain.sandbox.loaders.mimic import MimicOnFHIRLoader
 
 
@@ -268,11 +269,13 @@ def test_mimic_loader_raises_error_for_invalid_fhir_resources(temp_mimic_data_di
 
     loader = MimicOnFHIRLoader()
 
-    # FHIR validation now catches the invalid resource
-    with pytest.raises(Exception):
+    with pytest.raises(FHIRValidationError) as exc_info:
         loader.load(
             data_dir=str(temp_mimic_data_dir), resource_types=["MimicMedication"]
         )
+
+    expressions = [issue.expression for issue in exc_info.value.report.issues]
+    assert "Bundle.entry[0].resource.subject" in expressions
 
 
 def test_mimic_loader_skips_resources_without_resource_type(temp_mimic_data_dir):
