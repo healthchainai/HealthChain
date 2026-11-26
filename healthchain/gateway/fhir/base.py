@@ -3,7 +3,7 @@ import inspect
 import warnings
 
 from fastapi import Depends, HTTPException, Path, Query
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Type, TypeVar, Optional
 from fastapi.responses import JSONResponse
 
@@ -277,7 +277,7 @@ class BaseFHIRGateway(BaseGateway):
             "gateway_type": self.__class__.__name__,
             "version": "1.0.0",  # TODO: Extract from package
             "status": "active",
-            "timestamp": datetime.now().isoformat() + "Z",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "sources": {
                 "count": len(self.connection_manager.sources)
                 if self.connection_manager
