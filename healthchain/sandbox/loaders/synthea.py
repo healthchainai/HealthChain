@@ -12,6 +12,7 @@ from typing import Dict, List, Optional
 
 from fhir.resources.R4B.bundle import Bundle
 
+from healthchain.fhir.validation import parse_resource
 from healthchain.sandbox.datasets import DatasetLoader
 
 log = logging.getLogger(__name__)
@@ -152,9 +153,13 @@ class SyntheaFHIRPatientLoader(DatasetLoader):
         # Convert to Bundle objects
         bundles = {}
         for resource_type, resources in resources_by_type.items():
-            bundles[resource_type.lower()] = Bundle(
-                type="collection",
-                entry=[{"resource": resource} for resource in resources],
+            bundles[resource_type.lower()] = parse_resource(
+                Bundle,
+                {
+                    "resourceType": "Bundle",
+                    "type": "collection",
+                    "entry": [{"resource": resource} for resource in resources],
+                },
             )
             log.info(
                 f"Loaded {len(resources)} {resource_type} resource(s) from {patient_file_path.name}"

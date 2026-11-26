@@ -43,12 +43,13 @@ def test_parse_with_document_reference(
     assert result.data == "Test document content"
 
 
+@pytest.mark.parametrize("date", ["2026-11-19T17:45:21+0000", "2026-11-19T17:45:21"])
 def test_parse_with_invalid_document_reference_date_raises(
-    cds_fhir_adapter, test_cds_request, doc_ref_with_content
+    cds_fhir_adapter, test_cds_request, doc_ref_with_content, date
 ):
-    """A non-conformant prefetch date raises instead of yielding empty note text."""
+    """A non-conformant or timezone-less prefetch date raises, not silently fixed."""
     document = doc_ref_with_content.model_dump(exclude_none=True)
-    document["date"] = "2026-11-19T17:45:21+0000"
+    document["date"] = date
     test_cds_request.prefetch["document"] = document
 
     with pytest.raises(FHIRValidationError) as exc_info:
