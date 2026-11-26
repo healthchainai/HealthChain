@@ -1,5 +1,6 @@
 import pytest
 
+from healthchain.fhir import FHIRValidationError
 from healthchain.io.containers import Document
 from healthchain.io.containers.document import CdsAnnotations
 from healthchain.models.responses.cdsresponse import Action, CDSResponse, Card
@@ -40,6 +41,21 @@ def test_parse_with_document_reference(
     assert isinstance(result, Document)
     assert isinstance(result.fhir._prefetch_resources["document"], DocumentReference)
     assert result.data == "Test document content"
+
+
+def test_parse_with_invalid_document_reference_date_raises(
+    cds_fhir_adapter, test_cds_request, doc_ref_with_content
+):
+    """A non-conformant prefetch date raises instead of yielding empty note text."""
+    document = doc_ref_with_content.model_dump(exclude_none=True)
+    document["date"] = "2026-11-19T17:45:21+0000"
+    test_cds_request.prefetch["document"] = document
+
+    with pytest.raises(FHIRValidationError) as exc_info:
+        cds_fhir_adapter.parse(test_cds_request)
+
+    expressions = [issue.expression for issue in exc_info.value.report.issues]
+    assert "DocumentReference.date" in expressions
 
 
 def test_parse_with_multiple_attachments(

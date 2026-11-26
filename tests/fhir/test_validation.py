@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 import pytest
 from fhir.resources.R4B.bundle import Bundle
@@ -219,6 +220,25 @@ def test_load_bundle_aggregates_entry_errors():
             {"resource": VALID_CONDITION},
             {"resource": {"resourceType": "Condition", "onsetDateTime": "bad"}},
             {"resource": {**VALID_MEDICATION_STATEMENT, "status": "recorded"}},
+            # Real-world datetimes that fhir-core <1.1.5 accepted
+            {
+                "resource": {
+                    **VALID_MEDICATION_STATEMENT,
+                    "effectiveDateTime": "2026-11-19T17:45:21+0000",
+                }
+            },
+            {
+                "resource": {
+                    **VALID_CONDITION,
+                    "meta": {"lastUpdated": "2026-11-19T17:45:21"},
+                }
+            },
+            {
+                "resource": {
+                    **VALID_MEDICATION_STATEMENT,
+                    "effectiveDateTime": datetime(2026, 11, 19, 17, 45, 21),
+                }
+            },
         ],
     }
 
@@ -231,6 +251,9 @@ def test_load_bundle_aggregates_entry_errors():
     assert "Bundle.entry[1].resource.subject" in expressions
     assert "Bundle.entry[1].resource.onsetDateTime" in expressions
     assert "Bundle.entry[2].resource.status" in expressions
+    assert "Bundle.entry[3].resource.effectiveDateTime" in expressions
+    assert "Bundle.entry[4].resource.meta.lastUpdated" in expressions
+    assert "Bundle.entry[5].resource.effectiveDateTime" in expressions
 
 
 @pytest.mark.parametrize(

@@ -4,6 +4,7 @@ from fhir.resources.R4B.encounter import Encounter
 from fhir.resources.R4B.condition import Condition
 from fhir.resources.R4B.procedure import Procedure
 from fhir.resources.R4B.patient import Patient
+from fhir.resources.R4B.meta import Meta
 
 from healthchain.sandbox.generators import CdsDataGenerator
 from healthchain.sandbox.workflows import Workflow
@@ -40,6 +41,12 @@ def test_generator_orchestrator_patient_view():
     assert isinstance(generator.generated_data["encounter"], Encounter)
     assert generator.generated_data["condition"] is not None
     assert isinstance(generator.generated_data["condition"], Condition)
+
+
+def test_instant_generator_output_is_valid_fhir_instant():
+    instant = CdsDataGenerator().fetch_generator("InstantGenerator").generate()
+
+    assert Meta(lastUpdated=instant).lastUpdated.tzinfo is not None
 
 
 @pytest.mark.skip()

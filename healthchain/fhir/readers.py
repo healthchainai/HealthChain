@@ -325,14 +325,20 @@ def convert_prefetch_to_fhir_objects(
     """Convert a dictionary of FHIR resource dicts to FHIR Resource objects.
 
     Takes a prefetch dictionary where values may be either dict representations of FHIR
-    resources or already instantiated FHIR Resource objects, and ensures all values are
-    FHIR Resource objects.
+    resources or already instantiated FHIR Resource objects. Dicts that carry a
+    ``resourceType`` are validated and converted to FHIR Resource objects; other values
+    are kept as they are, with a warning.
 
     Args:
         prefetch_dict: Dictionary mapping keys to FHIR resource dicts or objects
 
     Returns:
-        Dict[str, Resource]: Dictionary with same keys but all values as FHIR Resource objects
+        Dict[str, Resource]: Dictionary with same keys, with resource dicts converted
+            to FHIR Resource objects
+
+    Raises:
+        FHIRValidationError: If a resource dict fails FHIR validation. The report
+            names each failing field path.
 
     Example:
         >>> prefetch = {
@@ -350,16 +356,11 @@ def convert_prefetch_to_fhir_objects(
             # Convert dict to FHIR Resource object
             resource_type = resource_data.get("resourceType")
             if resource_type:
-                try:
-                    # Fix timezone-naive datetimes before validation
-                    fixed_data = _fix_timezone_naive_datetimes(resource_data)
-                    resource_class = get_fhir_resource(resource_type)
-                    result[key] = resource_class(**fixed_data)
-                except Exception as e:
-                    logger.warning(
-                        f"Failed to convert {resource_type} to FHIR object: {e}"
-                    )
-                    result[key] = resource_data
+                # Fix timezone-naive datetimes before validation
+                fixed_data = _fix_timezone_naive_datetimes(resource_data)
+                result[key] = create_resource_from_dict(
+                    fixed_data, resource_type, raise_on_error=True
+                )
             else:
                 logger.warning(
                     f"No resourceType found for key '{key}', keeping as dict"
