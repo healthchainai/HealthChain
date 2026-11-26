@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from fhir.resources.R4B.bundle import Bundle
 
+from healthchain.fhir.validation import parse_resource
 from healthchain.sandbox.datasets import DatasetLoader
 
 log = logging.getLogger(__name__)
@@ -172,9 +173,13 @@ class MimicOnFHIRLoader(DatasetLoader):
         # CDS Hooks prefetch
         bundles = {}
         for fhir_type, resources in resources_by_type.items():
-            bundles[fhir_type.lower()] = Bundle(
-                type="collection",
-                entry=[{"resource": resource} for resource in resources],
+            bundles[fhir_type.lower()] = parse_resource(
+                Bundle,
+                {
+                    "resourceType": "Bundle",
+                    "type": "collection",
+                    "entry": [{"resource": resource} for resource in resources],
+                },
             )
 
         return bundles
