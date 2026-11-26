@@ -18,11 +18,11 @@ wheels = [
 
 [[package]]
 name = "annotated-types"
-version = "0.7.0"
+version = "0.8.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ee/67/531ea369ba64dcff5ec9c3402f9f51bf748cec26dde048a2f973a4eea7f5/annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89", size = 16081, upload-time = "2024-05-20T21:33:25.928Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5f/56/a8120250d128bed162cd73c76d45f6ef9991f3e068f62a8ee060afa3104a/annotated_types-0.8.0.tar.gz", hash = "sha256:13b2beaad985e05e2d6407ee4c4f35590b11f8d693a258a561055cac8f64cab7", size = 15893, upload-time = "2026-07-23T20:16:13.995Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/78/b6/6307fbef88d9b5ee7421e68d78a9f162e0da4900bc5f5793f6d3d0e34fb8/annotated_types-0.7.0-py3-none-any.whl", hash = "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53", size = 13643, upload-time = "2024-05-20T21:33:24.1Z" },
+    { url = "https://files.pythonhosted.org/packages/99/91/8acff4f5e50511b911bbccb72b8628a49c68ce14148cd9f6431094859a90/annotated_types-0.8.0-py3-none-any.whl", hash = "sha256:f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0", size = 13427, upload-time = "2026-07-23T20:16:12.938Z" },
 ]
 
 [[package]]
@@ -641,26 +641,26 @@ wheels = [
 
 [[package]]
 name = "fhir-core"
-version = "1.1.4"
+version = "1.1.12"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a4/98/210f317815f6eafa8cb21fbf203e6ac75bd53f2b25c1376bc1a647b3b4d7/fhir_core-1.1.4.tar.gz", hash = "sha256:d6549665c32f6b710da19d1309851d5d5f8902af899925623d6f4441eb1f2176", size = 33870, upload-time = "2025-07-11T18:10:59.565Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f7/1b/0072a6ec7716df558bbcc134611df02d8ba22e286cbf64070fe6190f9d75/fhir_core-1.1.12.tar.gz", hash = "sha256:8f1674104ff575ff00dd2b4ff7ed6caf043d6d5a306990536e1b6ee2ccd06732", size = 40415, upload-time = "2026-10-18T20:20:47.011Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2b/16/0fb20a14046b6b8a447019e939e58ee8dbe54a6bd06472f93d9ec6801ed8/fhir_core-1.1.4-py2.py3-none-any.whl", hash = "sha256:66d81639f9a45e646cf21cae492d68d89550a22409bf68a9b292b789e0d0061d", size = 29183, upload-time = "2025-07-11T18:10:58.167Z" },
+    { url = "https://files.pythonhosted.org/packages/67/22/4a118da089892195692b5e3519992708dc67fb84d49fddee5d9a1f3f43b4/fhir_core-1.1.12-py2.py3-none-any.whl", hash = "sha256:2ae218ed43b32705ce1c37150253942bd88350248a77f66e8ca2b6c3ed8263b2", size = 34264, upload-time = "2026-10-18T20:20:45.735Z" },
 ]
 
 [[package]]
 name = "fhir-resources"
-version = "8.1.0"
+version = "8.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fhir-core" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d4/7f/882dde9ce229fccfa81257c6989edb4b0d67f7e8ae94170e74be024fdfa9/fhir_resources-8.1.0.tar.gz", hash = "sha256:8d64a717f37ea50bde97c1b8ff3fd969a6074df99c167183a273abe4da8bbfa5", size = 1599741, upload-time = "2025-07-10T12:36:01.137Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/98/06/331d78ad6db6903be6b912701c44b32af295279907b3a2e6ad6c2e2f97b1/fhir_resources-8.3.0.tar.gz", hash = "sha256:bdfd1c7bd1b89bfa269c1f435727771f6c632cd857e2848221713b3f8b9f46e8", size = 1617996, upload-time = "2026-07-03T15:23:54.01Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cc/a9/18672a8a1c570cb7b4eeafe1decd267f291997d20f240fffb17145a525f9/fhir_resources-8.1.0-py2.py3-none-any.whl", hash = "sha256:4370a5b6b35f278705328368bf79b3a17db91025fd4ec896fb963edd44ecc5de", size = 2267435, upload-time = "2025-07-10T12:35:59.096Z" },
+    { url = "https://files.pythonhosted.org/packages/d1/86/32914542064b8aee77ac48142f8a1955df78da4eb905dd41697d26941d21/fhir_resources-8.3.0-py2.py3-none-any.whl", hash = "sha256:151e6c9b4336e36383cc2aaf2067a6f112a420fce1c7bd289182e55dd950871b", size = 2288069, upload-time = "2026-07-03T15:23:51.97Z" },
 ]
 
 [[package]]
@@ -711,7 +711,6 @@ name = "healthchain"
 version = "0.0.0"
 source = { editable = "." }
 dependencies = [
-    { name = "annotated-types" },
     { name = "colorama" },
     { name = "fastapi", version = "0.162.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "fastapi", version = "0.165.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
@@ -770,13 +769,12 @@ scripts = [
 
 [package.metadata]
 requires-dist = [
-    { name = "annotated-types", specifier = ">=0.6.0,<0.8" },
     { name = "colorama", specifier = ">=0.4.6,<0.5" },
     { name = "faker", marker = "extra == 'sandbox'", specifier = ">=25.1.0,<26" },
     { name = "fastapi", specifier = ">=0.133.0,<0.166" },
     { name = "fastapi-events", specifier = ">=0.12.2,<0.13" },
-    { name = "fhir-core", specifier = ">=1.1.3,<1.1.5" },
-    { name = "fhir-resources", specifier = ">=8.1.0,<8.2.0" },
+    { name = "fhir-core", specifier = ">=1.1.12" },
+    { name = "fhir-resources", specifier = ">=8.3.0,<9" },
     { name = "httpx", specifier = ">=0.27.0,<0.28" },
     { name = "langchain-core", marker = "extra == 'langchain'", specifier = ">=0.3.0,<2" },
     { name = "lxml", specifier = ">=5.2.2,<7" },

@@ -2,7 +2,7 @@
 
 import pytest
 from unittest.mock import MagicMock
-from datetime import datetime
+from datetime import datetime, timezone
 
 from healthchain.gateway import NoteReaderService
 from healthchain.gateway.cds import CDSHooksService
@@ -74,7 +74,7 @@ def fhir_gateway():
             }
         ]
         document.meta = Meta(
-            lastUpdated=datetime.now().isoformat(),
+            lastUpdated=datetime.now(timezone.utc).isoformat(),
             tag=[{"system": "http://healthchain.org/tag", "code": "ai-enhanced"}],
         )
         return document
