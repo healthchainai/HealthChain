@@ -54,10 +54,9 @@ include = [
 ]
 
 [project.optional-dependencies]
-# mcp 2.x renamed FastMCP to MCPServer (mcp.server.mcpserver) and removed
-# mcp.server.fastmcp, which healthchain/tools/toolkit.py imports.
-# 2.x needs a migration (#302).
-mcp = ["mcp>=1.30.0,<2"]
+# Toolkit uses MCPServer (mcp.server.mcpserver) on mcp 2.x, with a
+# FastMCP fallback for mcp 1.x (see #302).
+mcp = ["mcp>=1.30.0,<3"]
 langchain = ["langchain-core>=0.3.0,<2"]
 cda = ["python-liquid>=2.2.1,<3", "xmltodict>=0.13.0,<0.14"]
 sandbox = ["faker>=25.1.0,<26"]

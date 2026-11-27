@@ -389,15 +389,19 @@ class FHIRToolkit:
     def as_mcp(self, name: str = "healthchain", **fastmcp_kwargs: Any):
         """Package the toolkit as an MCP server (requires healthchain[mcp]).
 
-        Returns a FastMCP instance; call ``.run()`` on it to serve over stdio,
+        Returns an MCPServer instance; call ``.run()`` on it to serve over stdio,
         or ``.run(transport="streamable-http")`` for HTTP.
         """
         try:
-            from mcp.server.fastmcp import FastMCP
+            # mcp 2.x renamed FastMCP to MCPServer; keep mcp 1.x working too.
+            from mcp.server.mcpserver import MCPServer
         except ImportError:
-            raise ImportError(
-                "Could not import mcp. Install it with: `pip install healthchain[mcp]`"
-            )
+            try:
+                from mcp.server.fastmcp import FastMCP as MCPServer
+            except ImportError:
+                raise ImportError(
+                    "Could not import mcp. Install it with: `pip install healthchain[mcp]`"
+                )
 
         instructions = fastmcp_kwargs.pop(
             "instructions",
@@ -405,9 +409,9 @@ class FHIRToolkit:
             "loaded bundles, and look up terminology codes. Codes should come "
             "from lookup_code, never from memory.",
         )
-        server = FastMCP(name, instructions=instructions, **fastmcp_kwargs)
+        server = MCPServer(name, instructions=instructions, **fastmcp_kwargs)
         for tool in self.get_tools():
-            # structured_output=False: results are JSON content. FastMCP cannot
+            # structured_output=False: results are JSON content. MCPServer cannot
             # derive an output model from Dict[str, Any] returns, and the
             # errors-as-values convention needs no output schema.
             server.add_tool(
