@@ -238,12 +238,16 @@ def test_event_dispatcher_integration(mock_dispatcher):
 
 @pytest.fixture
 def cds_app():
-    """HealthChainAPI with a registered CDSHooksService and one hook."""
+    """HealthChainAPI with a registered CDSHooksService and two patient-view hooks."""
     app = HealthChainAPI(enable_events=False)
     cds = CDSHooksService()
 
     @cds.hook("patient-view", id="test-hook")
     def handler(request: CDSRequest) -> CDSResponse:
+        return CDSResponse(cards=[])
+
+    @cds.hook("patient-view", id="second-hook")
+    def second_handler(request: CDSRequest) -> CDSResponse:
         return CDSResponse(cards=[])
 
     app.register_service(cds)
@@ -297,6 +301,7 @@ def test_resolve_soap_url_fallback_when_no_service_registered():
 def test_resolve_cds_workflow_returns_hook_type(cds_app):
     """Workflow is resolved from the hook type registered against the given ID."""
     assert cds_app._resolve_cds_workflow("test-hook") == "patient-view"
+    assert cds_app._resolve_cds_workflow("second-hook") == "patient-view"
 
 
 def test_resolve_cds_workflow_returns_none_for_unknown_id(cds_app):
