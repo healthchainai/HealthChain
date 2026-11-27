@@ -1,9 +1,15 @@
 {
   "resourceType": "Condition",
-  {% if entry.act.entryRelationship.is_array %}
-    {% assign obs = entry.act.entryRelationship[0].observation %}
+  {% assign relationships = entry.act.entryRelationship %}
+  {% if relationships.observation %}
+    {% assign obs = relationships.observation %}
   {% else %}
-    {% assign obs = entry.act.entryRelationship.observation %}
+    {% for relationship in relationships %}
+      {% if relationship.observation %}
+        {% assign obs = relationship.observation %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
   {% endif %}
   {% if obs.entryRelationship.observation.code['@code'] == config.identifiers.clinical_status.code %}
     {% if obs.entryRelationship.observation.value %}
