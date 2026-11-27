@@ -10,7 +10,7 @@ Connect live FHIR sources, turn extracts and model output into coded, validated 
     ```bash
     git clone https://github.com/healthchainai/HealthChain.git
     cd HealthChain
-    uv sync --all-extras   # or: pip install healthchain
+    pip install healthchain
     ```
 
     Each cookbook page states the exact `pip install` line it needs — optional capabilities live in extras (`[cda]`, `[examples]`, `[sandbox]`, ...), so you only install what the example uses.
@@ -33,6 +33,20 @@ Connect live FHIR sources, turn extracts and model output into coded, validated 
 
 <div class="cookbook-wrapper">
 <div class="cookbook-grid" id="cookbookGrid">
+
+<a href="ward_monitoring/" class="cookbook-card" data-tags="ml fhir-gateway intermediate zero-setup">
+  <div class="cookbook-card-icon">🛏️</div>
+  <div class="cookbook-card-title">Ward Monitoring on Live FHIR Data</div>
+  <div class="cookbook-card-description">
+    Compute ward occupancy, admissions and acuity from FHIR, revise a research definition, and rerun it on another site or a live FHIR server.
+  </div>
+  <div class="cookbook-tags">
+    <span class="tag tag-intermediate">Intermediate</span>
+    <span class="tag tag-ml">Research / ML</span>
+    <span class="tag tag-fhir-gateway">FHIR Gateway</span>
+    <span class="tag tag-zerosetup">Zero Setup</span>
+  </div>
+</a>
 
 <a href="research_extract_fhir_api/" class="cookbook-card" data-tags="ml fhir-gateway beginner zero-setup">
   <div class="cookbook-card-icon">🗄️</div>

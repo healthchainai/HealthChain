@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" role="img" aria-label="The same NEWS2 score of 7 at two hospitals. Site A: the score links to the stay, the stay to bed W7-N-1, the bed to area W7-N. Site B: the score, coded DEPENDENCY, links to the stay, the stay to bed WN-A01, the bed to bay A, the bay to area WEST-NORTH. resolve_reference follows each link, and each site's config translates its area to the research area North.">
+  <rect x="0" y="0" width="880" height="560" rx="16" fill="#2b2532"/>
+  <rect x="16" y="70" width="690" height="376" rx="14" fill="#3d2f28" stroke="#e59875" stroke-width="2.5"/>
+  <text x="30" y="104" font-size="16" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#e59875">resolve_reference() follows each link</text>
+  <rect x="684" y="80" width="10" height="10" fill="#e59875"/>
+  <rect x="672" y="92" width="10" height="10" fill="#f0b49a"/>
+  <rect x="684" y="104" width="10" height="10" fill="#e59875"/>
+  <text x="30" y="148" font-size="14" letter-spacing="2" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">SITE A</text>
+  <rect x="30" y="160" width="118" height="100" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="42" y="190" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">score 7</text>
+  <text x="42" y="214" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">Observation</text>
+  <text x="42" y="238" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">ACU</text>
+  <rect x="172" y="160" width="110" height="100" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="184" y="190" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">stay</text>
+  <text x="184" y="214" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">Encounter</text>
+  <text x="184" y="238" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">recent</text>
+  <rect x="306" y="160" width="110" height="100" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="318" y="190" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">bed</text>
+  <text x="318" y="214" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">Location</text>
+  <text x="318" y="238" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">W7-N-1</text>
+  <rect x="574" y="160" width="118" height="100" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="586" y="190" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">area</text>
+  <text x="586" y="214" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">Location</text>
+  <text x="586" y="238" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">W7-N</text>
+  <path d="M148 210 L168 210" stroke="#a89fb0" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <path d="M282 210 L302 210" stroke="#a89fb0" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <path d="M416 210 L570 210" stroke="#a89fb0" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <text x="30" y="308" font-size="14" letter-spacing="2" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">SITE B</text>
+  <rect x="30" y="320" width="118" height="100" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="42" y="350" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">score 7</text>
+  <text x="42" y="374" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">Observation</text>
+  <text x="42" y="398" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">DEPENDENCY</text>
+  <rect x="172" y="320" width="110" height="100" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="184" y="350" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">stay</text>
+  <text x="184" y="374" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">Encounter</text>
+  <text x="184" y="398" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">recent</text>
+  <rect x="306" y="320" width="110" height="100" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="318" y="350" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">bed</text>
+  <text x="318" y="374" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">Location</text>
+  <text x="318" y="398" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">WN-A01</text>
+  <rect x="440" y="320" width="110" height="100" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="452" y="350" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">bay</text>
+  <text x="452" y="374" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">Location</text>
+  <text x="452" y="398" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">bay A</text>
+  <rect x="574" y="320" width="118" height="100" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="586" y="350" font-size="15" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">area</text>
+  <text x="586" y="374" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">Location</text>
+  <text x="586" y="398" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">WEST-NORTH</text>
+  <path d="M148 370 L168 370" stroke="#a89fb0" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <path d="M282 370 L302 370" stroke="#a89fb0" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <path d="M416 370 L436 370" stroke="#a89fb0" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <path d="M550 370 L570 370" stroke="#a89fb0" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <text x="452" y="200" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">no bay level</text>
+  <path d="M692 210 C716 210 712 276 732 276" stroke="#a89fb0" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <path d="M692 370 C716 370 712 304 732 304" stroke="#a89fb0" stroke-width="1.75" fill="none" marker-end="url(#wa1)"/>
+  <rect x="736" y="240" width="130" height="100" rx="8" fill="#241f2a" stroke="#4d4556" stroke-width="1.5"/>
+  <text x="748" y="284" font-size="18" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#f0edf2">North</text>
+  <text x="748" y="310" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">research area</text>
+  <text x="736" y="362" font-size="13" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">via site config</text>
+  <text x="16" y="490" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">The two hospitals name and arrange their beds differently.</text>
+  <text x="16" y="516" font-size="14" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" fill="#a89fb0">Both arrive at North, so the research definitions need no site-specific code.</text>
+  <defs>
+    <marker id="wa1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#a89fb0"/></marker>
+  </defs>
+</svg>

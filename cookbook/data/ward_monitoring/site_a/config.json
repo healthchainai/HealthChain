@@ -1,0 +1,15 @@
+{
+  "site": "Site A",
+  "search_params": { "_tag": "https://example.org/healthchain-demo|ward-monitoring-site-a" },
+  "location_system": "https://example.org/site-a/location",
+  "areas": {
+    "W7-N": { "name": "North", "capacity": 5 },
+    "W7-S": { "name": "South", "capacity": 3 },
+    "W7-E": { "name": "Escalation", "capacity": 1 }
+  },
+  "acuity_code": {
+    "system": "https://example.org/site-a/observation",
+    "code": "ACU"
+  },
+  "location_status_map": {}
+}

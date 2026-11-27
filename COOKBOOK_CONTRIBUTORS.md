@@ -17,6 +17,8 @@ To get started, comment on [issue #208](https://github.com/healthchainai/HealthC
 | Contributor | Cookbook | Merged |
 | ----------- | -------- | ------ |
 | [@asaraog](https://github.com/asaraog) | [Prior Authorization: Chart Pull to Coded Packet](https://healthchainai.github.io/HealthChain/cookbook/prior_auth_packet/) ([#268](https://github.com/healthchainai/HealthChain/pull/268)) | Oct 2026 |
+| [@cwoodmansey](https://github.com/cwoodmansey) | [Ward Monitoring on Live FHIR Data](https://healthchainai.github.io/HealthChain/cookbook/ward_monitoring/) ([#277](https://github.com/healthchainai/HealthChain/pull/277)) | Nov 2026 |
+| [@radhikakumar13](https://github.com/radhikakumar13) | [Ward Monitoring on Live FHIR Data](https://healthchainai.github.io/HealthChain/cookbook/ward_monitoring/) ([#277](https://github.com/healthchainai/HealthChain/pull/277)) | Nov 2026 |
 
 ---
 

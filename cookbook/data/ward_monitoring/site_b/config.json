@@ -1,0 +1,15 @@
+{
+  "site": "Site B",
+  "search_params": { "_tag": "https://example.org/healthchain-demo|ward-monitoring-site-b" },
+  "location_system": "https://example.org/site-b/bed-board",
+  "areas": {
+    "WEST-NORTH": { "name": "North", "capacity": 5 },
+    "WEST-SOUTH": { "name": "South", "capacity": 3 },
+    "WEST-SURGE": { "name": "Escalation", "capacity": 1 }
+  },
+  "acuity_code": {
+    "system": "https://example.org/site-b/flowsheet",
+    "code": "DEPENDENCY"
+  },
+  "location_status_map": { "current": "active" }
+}

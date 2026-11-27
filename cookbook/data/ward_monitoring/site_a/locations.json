@@ -1,0 +1,376 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "timestamp": "2026-10-23T12:00:00Z",
+  "entry": [
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/w7",
+      "resource": {
+        "resourceType": "Location",
+        "id": "w7",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "W7"
+          }
+        ],
+        "name": "ICU",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "wa"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/w7-n",
+      "resource": {
+        "resourceType": "Location",
+        "id": "w7-n",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "W7-N"
+          }
+        ],
+        "name": "ICU North",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "area"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/w7"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/w7-s",
+      "resource": {
+        "resourceType": "Location",
+        "id": "w7-s",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "W7-S"
+          }
+        ],
+        "name": "ICU South",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "area"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/w7"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/w7-e",
+      "resource": {
+        "resourceType": "Location",
+        "id": "w7-e",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "W7-E"
+          }
+        ],
+        "name": "ICU Escalation",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "area"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/w7"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/opd",
+      "resource": {
+        "resourceType": "Location",
+        "id": "opd",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "OPD"
+          }
+        ],
+        "name": "Outpatients",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "wa"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/n1",
+      "resource": {
+        "resourceType": "Location",
+        "id": "n1",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "W7-N-1"
+          }
+        ],
+        "name": "North bed 1",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/w7-n"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/n2",
+      "resource": {
+        "resourceType": "Location",
+        "id": "n2",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "W7-N-2"
+          }
+        ],
+        "name": "North bed 2",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/w7-n"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/n3",
+      "resource": {
+        "resourceType": "Location",
+        "id": "n3",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "W7-N-3"
+          }
+        ],
+        "name": "North bed 3",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/w7-n"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/n4",
+      "resource": {
+        "resourceType": "Location",
+        "id": "n4",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "W7-N-4"
+          }
+        ],
+        "name": "North bed 4",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/w7-n"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/n5",
+      "resource": {
+        "resourceType": "Location",
+        "id": "n5",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "W7-N-5"
+          }
+        ],
+        "name": "North bed 5",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/w7-n"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/s1",
+      "resource": {
+        "resourceType": "Location",
+        "id": "s1",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "W7-S-1"
+          }
+        ],
+        "name": "South bed 1",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/w7-s"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/s2",
+      "resource": {
+        "resourceType": "Location",
+        "id": "s2",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "W7-S-2"
+          }
+        ],
+        "name": "South bed 2",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/w7-s"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/s3",
+      "resource": {
+        "resourceType": "Location",
+        "id": "s3",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "W7-S-3"
+          }
+        ],
+        "name": "South bed 3",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/w7-s"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/e1",
+      "resource": {
+        "resourceType": "Location",
+        "id": "e1",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "W7-E-1"
+          }
+        ],
+        "name": "Escalation bed 1",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/w7-e"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://example.org/site-a/fhir/Location/opd-1",
+      "resource": {
+        "resourceType": "Location",
+        "id": "opd-1",
+        "identifier": [
+          {
+            "system": "https://example.org/site-a/location",
+            "value": "OPD-1"
+          }
+        ],
+        "name": "Outpatient chair 1",
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bd"
+            }
+          ]
+        },
+        "partOf": {
+          "reference": "Location/opd"
+        }
+      }
+    }
+  ]
+}
