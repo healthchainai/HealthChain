@@ -195,6 +195,53 @@ def test_get_coded_entries_observation_value():
     assert entry.value == 140.0
     assert entry.unit == "mmHg"
     assert entry.authored_on == "2024-02-01T08:30:00+00:00"
+    assert entry.encounter is None
+
+
+def test_get_coded_entries_observation_value_integer_and_encounter():
+    """Observations with valueInteger and encounter carry both fields."""
+    bundle = _bundle_of(
+        {
+            "resourceType": "Observation",
+            "status": "final",
+            "code": {
+                "coding": [
+                    {
+                        "system": "http://snomed.info/sct",
+                        "code": "1104051000000101",
+                        "display": "NEWS2 total score",
+                    }
+                ]
+            },
+            "subject": {"reference": "Patient/123"},
+            "encounter": {"reference": "Encounter/enc-1"},
+            "effectiveDateTime": "2024-02-01T08:30:00Z",
+            "valueInteger": 5,
+        }
+    )
+
+    entry = get_coded_entries(bundle, "Observation")[0]
+
+    assert entry.value == 5.0
+    assert entry.unit is None
+    assert entry.encounter == "Encounter/enc-1"
+
+
+def test_get_coded_entries_value_integer_zero_not_treated_as_missing():
+    """A valueInteger of 0 is preserved rather than treated as falsy None."""
+    bundle = _bundle_of(
+        {
+            "resourceType": "Observation",
+            "status": "final",
+            "code": {"coding": [{"code": "1104051000000101"}]},
+            "subject": {"reference": "Patient/123"},
+            "valueInteger": 0,
+        }
+    )
+
+    entry = get_coded_entries(bundle, "Observation")[0]
+
+    assert entry.value == 0.0
 
 
 def test_get_coded_entries_resolves_medication_reference(reference_bundle):

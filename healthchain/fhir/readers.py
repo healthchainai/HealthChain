@@ -67,13 +67,17 @@ class CodedEntry(BaseModel):
     subject: Optional[str] = Field(
         default=None, description="Reference string of subject/patient, if any"
     )
+    encounter: Optional[str] = Field(
+        default=None, description="Reference string of encounter, if any"
+    )
     authored_on: Optional[str] = Field(
         default=None,
         description="First of authoredOn/effectiveDateTime/occurrenceDateTime/"
         "recordedDate, ISO 8601",
     )
     value: Optional[float] = Field(
-        default=None, description="valueQuantity.value for value-bearing resources"
+        default=None,
+        description="valueQuantity.value or valueInteger for value-bearing resources",
     )
     unit: Optional[str] = Field(
         default=None, description="valueQuantity.unit for value-bearing resources"
@@ -173,7 +177,17 @@ def get_coded_entries(
             subject = getattr(resource, "subject", None) or getattr(
                 resource, "patient", None
             )
+            encounter = getattr(resource, "encounter", None) or getattr(
+                resource, "context", None
+            )
             quantity = getattr(resource, "valueQuantity", None)
+            value_int = getattr(resource, "valueInteger", None)
+            if quantity is not None and quantity.value is not None:
+                entry_value: Optional[float] = float(quantity.value)
+            elif value_int is not None:
+                entry_value = float(value_int)
+            else:
+                entry_value = None
             entries.append(
                 CodedEntry(
                     code=codings[0].code,
@@ -184,10 +198,11 @@ def get_coded_entries(
                     resource_type=type_name,
                     resource_id=getattr(resource, "id", None),
                     subject=getattr(subject, "reference", None) if subject else None,
+                    encounter=(
+                        getattr(encounter, "reference", None) if encounter else None
+                    ),
                     authored_on=_entry_date(resource),
-                    value=float(quantity.value)
-                    if quantity is not None and quantity.value is not None
-                    else None,
+                    value=entry_value,
                     unit=quantity.unit if quantity is not None else None,
                 )
             )
