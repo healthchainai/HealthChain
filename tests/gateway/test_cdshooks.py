@@ -70,10 +70,10 @@ def test_cdshooks_hook_decorator_with_metadata_variants(test_cds_request):
         calls.append("patient-view")
         return CDSResponse(cards=[])
 
-    # Custom metadata
+    # Custom metadata; the id equals another service's hook type
     @gateway.hook(
         "order-select",
-        id="custom-id",
+        id="patient-view",
         title="Custom Title",
         description="Custom description",
         usage_requirements="Requires patient context",
@@ -82,22 +82,36 @@ def test_cdshooks_hook_decorator_with_metadata_variants(test_cds_request):
         calls.append("order-select")
         return CDSResponse(cards=[])
 
-    # Verify both handlers registered correctly
-    assert "patient-view" in gateway._handlers
-    assert "order-select" in gateway._handlers
+    # Registry is keyed by service id; capabilities list hook types
+    assert set(gateway._handlers) == {"test-patient-view", "patient-view"}
+    assert gateway.get_capabilities() == ["order-select", "patient-view"]
 
     # Check default metadata
-    default_meta = gateway._handler_metadata["patient-view"]
-    assert default_meta["id"] == "test-patient-view"
+    default_meta = gateway._handler_metadata["test-patient-view"]
+    assert default_meta["hook"] == "patient-view"
     assert default_meta["title"] == "Patient View"
     assert default_meta["description"] == "CDS Hook service created by HealthChain"
 
     # Check custom metadata
-    custom_meta = gateway._handler_metadata["order-select"]
-    assert custom_meta["id"] == "custom-id"
+    custom_meta = gateway._handler_metadata["patient-view"]
+    assert custom_meta["hook"] == "order-select"
     assert custom_meta["title"] == "Custom Title"
     assert custom_meta["description"] == "Custom description"
     assert custom_meta["usage_requirements"] == "Requires patient context"
+
+    # Hook-type calls never match ids, and id calls never match hook types
+    order_select_request = test_cds_request.model_copy(update={"hook": "order-select"})
+    gateway.handle_request(test_cds_request)
+    gateway.handle_request(order_select_request, service_id="patient-view")
+    assert calls == ["patient-view", "order-select"]
+    calls.clear()
+
+    # A service never runs on a request for another hook type
+    with pytest.raises(ValueError, match="serves 'order-select', got 'patient-view'"):
+        gateway.handle_request(test_cds_request, service_id="patient-view")
+    with pytest.raises(ValueError, match="serves 'order-select', got 'patient-view'"):
+        gateway.dispatch("order-select", request=test_cds_request)
+    assert calls == []
 
     # A request for another hook type is rejected by this route, even when served elsewhere
     app = FastAPI()
@@ -224,35 +238,69 @@ def test_cdshooks_gateway_handle_discovery():
     assert hooks["order-select"].title == "Order Select"
 
 
-def test_cdshooks_gateway_routing_and_custom_paths():
-    """CDSHooksService works as APIRouter with correct route registration."""
-    # Test default paths
+def test_cdshooks_gateway_routing_and_custom_paths(test_cds_request):
+    """Services sharing a hook type each run at their own route, keyed by id."""
+
+    def _card_response(summary):
+        return CDSResponse(
+            cards=[Card(summary=summary, indicator="info", source={"label": "Test"})]
+        )
+
+    # Test default paths: two services serve the same hook type
     gateway = CDSHooksService()
 
-    @gateway.hook("patient-view", id="test-patient-view")
-    def handle_patient_view(request):
-        return CDSResponse(cards=[])
+    @gateway.hook("patient-view", id="allergies", title="Allergies")
+    def handle_allergies(request):
+        return _card_response("allergies")
 
-    # Verify gateway is now an APIRouter
-    from fastapi import APIRouter
+    @gateway.hook("patient-view", id="sepsis", title="Sepsis")
+    def handle_sepsis(request):
+        return _card_response("sepsis")
 
-    assert isinstance(gateway, APIRouter)
+    app = FastAPI()
+    app.include_router(gateway)
+    client = TestClient(app)
+    body = test_cds_request.model_dump(mode="json", exclude_none=True)
 
-    # Verify routes are registered directly in the router
-    assert hasattr(gateway, "routes")
-    assert len(gateway.routes) >= 2
+    def summary_at(service_id):
+        response = client.post(f"/cds/cds-services/{service_id}", json=body)
+        assert response.status_code == 200
+        return response.json()["cards"][0]["summary"]
 
-    # Check that routes have been registered
-    route_paths = [route.path for route in gateway.routes]
-    route_methods = [list(route.methods)[0] for route in gateway.routes]
+    assert summary_at("allergies") == "allergies"
+    assert summary_at("sepsis") == "sepsis"
 
-    # Should have discovery endpoint
-    assert any("cds-discovery" in path for path in route_paths)
-    assert "GET" in route_methods
+    discovery = client.get("/cds/cds-discovery").json()
+    assert [(s["id"], s["hook"], s["title"]) for s in discovery["services"]] == [
+        ("allergies", "patient-view", "Allergies"),
+        ("sepsis", "patient-view", "Sepsis"),
+    ]
 
-    # Should have hook service endpoint
-    assert any("test-patient-view" in path for path in route_paths)
-    assert "POST" in route_methods
+    # Direct calls by hook type refuse to pick one of several services
+    with pytest.raises(ValueError, match="allergies, sepsis"):
+        gateway.dispatch("patient-view", request=test_cds_request)
+    with pytest.raises(ValueError, match="allergies, sepsis"):
+        gateway.handle_request(test_cds_request)
+    result = gateway.handle_request(test_cds_request, service_id="sepsis")
+    assert result.cards[0].summary == "sepsis"
+
+    # Duplicate ids and register_handler() are rejected without changing anything
+    route_count = len(gateway.routes)
+    handlers = dict(gateway._handlers)
+    with pytest.raises(ValueError, match="'allergies' is already registered"):
+
+        @gateway.hook("patient-view", id="allergies")
+        def handle_duplicate(request):
+            return _card_response("duplicate")
+
+    for service_id in ("fresh-id", "allergies"):
+        with pytest.raises(TypeError, match=r"hook\("):
+            gateway.register_handler(service_id, lambda request: None)
+
+    assert len(gateway.routes) == route_count
+    assert gateway._handlers == handlers
+    assert client.get("/cds/cds-discovery").json() == discovery
+    assert summary_at("allergies") == "allergies"
 
     # Test custom paths
     custom_config = CDSHooksConfig(
@@ -273,9 +321,6 @@ def test_cdshooks_gateway_routing_and_custom_paths():
     custom_route_paths = [route.path for route in custom_gateway.routes]
     assert any("custom-discovery" in path for path in custom_route_paths)
     assert any("test-service" in path for path in custom_route_paths)
-
-    # Verify get_routes() method no longer exists
-    assert not hasattr(gateway, "get_routes")
 
 
 def test_cdshooks_gateway_event_emission():
