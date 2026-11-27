@@ -1,8 +1,23 @@
-import json
-import uuid
 import base64
+import json
+import logging
+import uuid
 from datetime import datetime
 from typing import Dict, Any, Optional, List, Union, Callable
+
+logger = logging.getLogger(__name__)
+
+_CDA_DATE_FORMATS: tuple[tuple[str, str | None], ...] = (
+    ("%Y", "%Y"),
+    ("%Y%m", "%Y-%m"),
+    ("%Y%m%d", "%Y-%m-%d"),
+    ("%Y%m%d%H%M%z", None),
+    ("%Y%m%d%H%M%S%z", None),
+    ("%Y%m%d%H%M%S.%f%z", None),
+    ("%Y%m%d%H%M", None),
+    ("%Y%m%d%H%M%S", None),
+    ("%Y%m%d%H%M%S.%f", None),
+)
 
 
 def map_system(
@@ -82,7 +97,12 @@ def map_status(
 def format_date(
     date_str: str, input_format: str = "%Y%m%d", output_format: str = "iso"
 ) -> Optional[str]:
-    """Formats dates to the specified format
+    """Formats dates to the specified format.
+
+    When ``input_format`` uses the default ``"%Y%m%d"``, accepts standard CDA
+    ``TS`` precisions (``YYYY``, ``YYYYMM``, ``YYYYMMDD``, and timestamps
+    with optional fractional seconds and timezone offsets) and preserves date
+    precision and offsets when ``output_format == "iso"``.
 
     Args:
         date_str: Date string to format
@@ -96,12 +116,32 @@ def format_date(
         return None
 
     try:
+        if input_format == "%Y%m%d":
+            for fmt, iso_fmt in _CDA_DATE_FORMATS:
+                try:
+                    dt = datetime.strptime(date_str, fmt)
+                except ValueError:
+                    continue
+                if output_format == "iso":
+                    return dt.strftime(iso_fmt) if iso_fmt else dt.isoformat()
+                return dt.strftime(output_format)
+            logger.warning("Failed to parse CDA date string %r", date_str)
+            return None
+
         dt = datetime.strptime(date_str, input_format)
         if output_format == "iso":
-            return dt.isoformat() + "Z"  # Add UTC timezone indicator
-        else:
-            return dt.strftime(output_format)
+            has_time = any(
+                token in input_format
+                for token in ("%H", "%I", "%M", "%S", "%f", "%z", "%Z", "%X", "%c")
+            )
+            if not has_time:
+                return dt.date().isoformat()
+            return dt.isoformat() if dt.tzinfo is not None else dt.isoformat() + "Z"
+        return dt.strftime(output_format)
     except (ValueError, TypeError):
+        logger.warning(
+            "Failed to parse date string %r with format %r", date_str, input_format
+        )
         return None
 
 

@@ -62,9 +62,17 @@ def test_map_status(test_mappings):
     assert map_status("unknown", test_mappings) == "unknown"
 
 
-def test_format_date():
-    # Test ISO format output
-    assert format_date("20230405") == "2023-04-05T00:00:00Z"
+def test_format_date(caplog):
+    # Date-only CDA values preserve date precision (no midnight UTC fabrication)
+    assert format_date("20230405") == "2023-04-05"
+    assert format_date("20190517") == "2019-05-17"
+    assert format_date("201905") == "2019-05"
+    assert format_date("2019") == "2019"
+
+    # CDA timestamps with time and offset preserve offset in FHIR dateTime
+    assert format_date("20221129095009+0000") == "2022-11-29T09:50:09+00:00"
+    assert format_date("20221129095009-0500") == "2022-11-29T09:50:09-05:00"
+    assert format_date("202211290950+0530") == "2022-11-29T09:50:00+05:30"
 
     # Test custom output format
     assert format_date("20230405", output_format="%m/%d/%Y") == "04/05/2023"
@@ -74,9 +82,12 @@ def test_format_date():
         format_date("04-05-2023", input_format="%m-%d-%Y", output_format="%Y%m%d")
         == "20230405"
     )
+    assert format_date("04-05-2023", input_format="%m-%d-%Y") == "2023-04-05"
 
-    # Test invalid date
-    assert format_date("invalid") is None
+    # Test invalid date logs a warning rather than silently failing
+    with caplog.at_level("WARNING", logger="healthchain.interop.filters"):
+        assert format_date("invalid") is None
+    assert "invalid" in caplog.text
 
     # Test empty input
     assert format_date("") is None
@@ -132,19 +143,19 @@ def test_extract_effective_period():
     }
 
     period = extract_effective_period(effective_time)
-    assert period == {"start": "2023-01-01T00:00:00Z", "end": "2023-12-31T00:00:00Z"}
+    assert period == {"start": "2023-01-01", "end": "2023-12-31"}
 
     # Test with only start date
     effective_time = {"@xsi:type": "IVL_TS", "low": {"@value": "20230101"}}
 
     period = extract_effective_period(effective_time)
-    assert period == {"start": "2023-01-01T00:00:00Z"}
+    assert period == {"start": "2023-01-01"}
 
     # Test with only end date
     effective_time = {"@xsi:type": "IVL_TS", "high": {"@value": "20231231"}}
 
     period = extract_effective_period(effective_time)
-    assert period == {"end": "2023-12-31T00:00:00Z"}
+    assert period == {"end": "2023-12-31"}
 
     # Test with non-IVL_TS type
     effective_time = {"@value": "20230101"}
