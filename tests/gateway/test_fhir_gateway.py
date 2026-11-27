@@ -12,7 +12,7 @@ from healthchain.gateway.clients.fhir.base import FHIRAuthConfig
 from healthchain.gateway.clients.fhir.sync.client import FHIRClient
 from healthchain.gateway.fhir import FHIRGateway
 from healthchain.gateway.fhir.errors import FHIRConnectionError
-from healthchain.fhir import create_condition
+from healthchain.fhir import FHIRValidationError, create_condition, load_bundle
 
 
 class MockConnectionManager:
@@ -293,26 +293,32 @@ def test_search_with_empty_bundle():
 BASE_URL = "https://fhir.example.org/R4"
 
 
-def _page(patient_id: str, next_link: str = None) -> Dict[str, Any]:
-    """Searchset Bundle JSON with one Patient and an optional next link."""
+def _page(
+    patient_id: str, next_link: str = None, resource: Dict[str, Any] = None
+) -> Dict[str, Any]:
+    """Searchset Bundle JSON with one Patient (or `resource`) and an optional next link."""
     bundle = {
         "resourceType": "Bundle",
         "type": "searchset",
-        "entry": [{"resource": {"resourceType": "Patient", "id": patient_id}}],
+        "entry": [
+            {"resource": resource or {"resourceType": "Patient", "id": patient_id}}
+        ],
     }
     if next_link:
         bundle["link"] = [{"relation": "next", "url": next_link}]
     return bundle
 
 
-def _paging_client(next_link: str, seen: list) -> FHIRClient:
+def _paging_client(
+    next_link: str, seen: list, page_2_resource: Dict[str, Any] = None
+) -> FHIRClient:
     """Real FHIRClient whose transport serves page 1 (with next_link), then page 2."""
 
     def handler(request: httpx.Request) -> httpx.Response:
         seen.append(request.url.raw_path.decode())
         if len(seen) == 1:
             return httpx.Response(200, json=_page("1", next_link))
-        return httpx.Response(200, json=_page("2"))
+        return httpx.Response(200, json=_page("2", resource=page_2_resource))
 
     return FHIRClient(
         FHIRAuthConfig(base_url=BASE_URL), transport=httpx.MockTransport(handler)
@@ -351,10 +357,81 @@ def test_search_with_pagination(fhir_gateway, next_link, expected_raw_path):
     with patch.object(
         fhir_gateway.connection_manager, "get_client", return_value=client
     ):
-        result = fhir_gateway.search(Patient, {"name": "Smith"}, follow_pagination=True)
+        result = fhir_gateway.search(
+            Patient, {"name": "Smith"}, follow_pagination=True, validate=True
+        )
 
     assert seen == ["/R4/Patient?name=Smith", expected_raw_path]
     assert [entry.resource.id for entry in result.entry] == ["1", "2"]
+
+
+BAD_GENDER = {"resourceType": "Patient", "id": "2", "gender": "bogus"}
+# The unknown field's value contains "404", which used to be reported as Not Found
+UNKNOWN_FIELD = {"resourceType": "Patient", "id": "2", "unknownField": "pt-4041"}
+UNKNOWN_TYPE = {"resourceType": "NotAResource"}
+
+
+def _merged(page_2_resource: Dict[str, Any]) -> Dict[str, Any]:
+    """The Bundle search returns after merging page 1 into page 2."""
+    merged = _page("2", resource=page_2_resource)
+    merged["entry"] = _page("1")["entry"] + merged["entry"]
+    return merged
+
+
+@pytest.mark.parametrize(
+    "page_2_resource, validate, expected_source, expected_expression",
+    [
+        # Binding issue: only checked with validate=True, on the merged Bundle,
+        # so the entry index counts across pages
+        (
+            BAD_GENDER,
+            True,
+            _merged(BAD_GENDER),
+            "Bundle.entry[1].resource.gender",
+        ),
+        (BAD_GENDER, False, None, None),
+        # Page that fails to parse: always raises, with that page's report
+        (
+            UNKNOWN_FIELD,
+            False,
+            _page("2", resource=UNKNOWN_FIELD),
+            "Bundle.entry[0].resource.unknownField",
+        ),
+        (
+            UNKNOWN_TYPE,
+            False,
+            _page("2", resource=UNKNOWN_TYPE),
+            "Bundle.entry[0].resource",
+        ),
+    ],
+)
+def test_search_reports_invalid_results_as_load_bundle_does(
+    fhir_gateway, page_2_resource, validate, expected_source, expected_expression
+):
+    """Gateway.search raises FHIRValidationError with the report load_bundle gives."""
+    client = _paging_client("Patient?page=2", [], page_2_resource)
+
+    with patch.object(
+        fhir_gateway.connection_manager, "get_client", return_value=client
+    ):
+        if expected_source is None:
+            result = fhir_gateway.search(
+                Patient, {"name": "Smith"}, follow_pagination=True, validate=validate
+            )
+            assert [entry.resource.id for entry in result.entry] == ["1", "2"]
+            return
+
+        with pytest.raises(FHIRValidationError) as exc_info:
+            fhir_gateway.search(
+                Patient, {"name": "Smith"}, follow_pagination=True, validate=validate
+            )
+
+    with pytest.raises(FHIRValidationError) as expected:
+        load_bundle(expected_source, version="R4B")
+    assert exc_info.value.report == expected.value.report
+    assert [issue.expression for issue in exc_info.value.report.issues] == [
+        expected_expression
+    ]
 
 
 @pytest.mark.parametrize(

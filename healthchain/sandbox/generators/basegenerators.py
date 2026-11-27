@@ -115,7 +115,7 @@ class IdGenerator(BaseGenerator):
 class InstantGenerator(BaseGenerator):
     @staticmethod
     def generate():
-        return faker.date_time().isoformat()
+        return faker.date_time(tzinfo=datetime.timezone.utc).isoformat()
 
 
 @register_generator

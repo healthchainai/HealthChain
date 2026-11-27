@@ -111,14 +111,26 @@ async def test_connection_manager_handles_duplicate_source_names(connection_mana
     connection_manager.add_source("duplicate_source", original_connection)
     first = await get_client()
     second = await get_client()
-    assert connection_manager.sources["duplicate_source"].client_secret == "old"
+    assert (
+        connection_manager.sources["duplicate_source"].client_secret.get_secret_value()
+        == "old"
+    )
 
     # Same endpoint, new credentials
     connection_manager.add_source("duplicate_source", updated_connection)
     replaced = await get_client()
-    assert connection_manager.sources["duplicate_source"].client_secret == "new"
-    assert connection_manager._create_client.call_args[0][0].client_secret == "new"
+    assert (
+        connection_manager.sources["duplicate_source"].client_secret.get_secret_value()
+        == "new"
+    )
+    created_config = connection_manager._create_client.call_args[0][0]
+    assert created_config.client_secret.get_secret_value() == "new"
     assert replaced is not first
+
+    # Secret rotated in place
+    connection_manager.sources["duplicate_source"].client_secret = "newer"
+    rotated = await get_client()
+    assert rotated is not replaced
 
     # Async pools the client per config; sync builds a fresh one per call
     if isinstance(connection_manager, AsyncFHIRConnectionManager):

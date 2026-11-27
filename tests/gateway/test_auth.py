@@ -14,6 +14,7 @@ from healthchain.gateway.clients.auth import (
     OAuth2Config,
     TokenInfo,
     OAuth2TokenManager,
+    TokenRefreshError,
 )
 from healthchain.gateway.clients.fhir.base import (
     FHIRAuthConfig,
@@ -190,8 +191,11 @@ def test_oauth2_token_manager_error_handling(mock_post, token_manager):
         "401 Unauthorized", request=Mock(spec=Request), response=mock_response
     )
 
-    with pytest.raises(Exception, match="Failed to refresh token: 401"):
+    with pytest.raises(
+        TokenRefreshError, match="Failed to refresh token: 401"
+    ) as exc_info:
         token_manager.get_access_token()
+    assert exc_info.value.status_code == 401
 
 
 @patch("jwt.encode")
@@ -394,8 +398,23 @@ def test_parse_connection_string_with_auth():
     assert config.base_url == "https://epic.com/api/FHIR/R4"
     assert config.requires_auth is True
     assert config.client_id == "test_app"
-    assert config.client_secret == "test_secret"
+    assert config.client_secret.get_secret_value() == "test_secret"
     assert config.token_url == "https://epic.com/oauth2/token"
+
+    # The secret never appears when a config is printed or serialized
+    oauth2_config = config.to_oauth2_config()
+    for model in (config, oauth2_config):
+        for rendered in (
+            repr(model),
+            str(model),
+            str(model.model_dump()),
+            model.model_dump_json(),
+        ):
+            assert "test_secret" not in rendered
+
+        # Reassigned secrets stay masked
+        model.client_secret = "rotated"
+        assert "rotated" not in repr(model)
 
 
 @pytest.mark.parametrize(

@@ -5,7 +5,6 @@ and reading data from FHIR resources.
 """
 
 import logging
-import re
 
 from typing import Optional, Dict, Any, List, Union
 
@@ -15,6 +14,11 @@ from fhir.resources.R4B.bundle import Bundle
 from fhir.resources.R4B.documentreference import DocumentReference
 
 from healthchain.fhir.bundlehelpers import get_resources, resolve_reference
+from healthchain.fhir.validation import (
+    FHIRValidationError,
+    parse_resource,
+    validate_resource,
+)
 from healthchain.fhir.version import get_fhir_resource
 
 logger = logging.getLogger(__name__)
@@ -210,42 +214,6 @@ def get_medications(bundle: Bundle, status: Optional[str] = None) -> List[CodedE
     return get_coded_entries(bundle, list(_MEDICATION_TYPES), status=status)
 
 
-def _fix_timezone_naive_datetimes(data: Any) -> Any:
-    """
-    Recursively fix timezone-naive datetime strings by appending UTC timezone.
-
-    Pydantic v2 requires timezone-aware datetimes. This function walks through
-    nested dicts/lists and adds 'Z' (UTC) to datetime strings that match the
-    pattern YYYY-MM-DDTHH:MM:SS but lack timezone info.
-
-    Args:
-        data: Dict, list, or primitive value to process
-
-    Returns:
-        Processed data with timezone-aware datetime strings
-
-    Example:
-        >>> data = {"start": "2021-04-19T00:00:00", "name": "Test"}
-        >>> _fix_timezone_naive_datetimes(data)
-        {"start": "2021-04-19T00:00:00Z", "name": "Test"}
-    """
-    # Pattern: YYYY-MM-DDTHH:MM:SS optionally followed by microseconds
-    # Must NOT already have timezone (Z or +/-HH:MM)
-    datetime_pattern = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?$")
-
-    if isinstance(data, dict):
-        return {
-            key: _fix_timezone_naive_datetimes(value) for key, value in data.items()
-        }
-    elif isinstance(data, list):
-        return [_fix_timezone_naive_datetimes(item) for item in data]
-    elif isinstance(data, str) and datetime_pattern.match(data):
-        # Add UTC timezone
-        return f"{data}Z"
-    else:
-        return data
-
-
 def create_resource_from_dict(
     resource_dict: Dict, resource_type: str, raise_on_error: bool = False
 ) -> Optional[Resource]:
@@ -263,31 +231,19 @@ def create_resource_from_dict(
     Raises:
         FHIRValidationError: If raise_on_error is True and validation fails
     """
+    if raise_on_error:
+        try:
+            resource_class = get_fhir_resource(resource_type)
+        except ValueError as e:
+            # Unknown resource type: validate_resource reports it as not-supported
+            report = validate_resource(resource_dict, resource_type=resource_type)
+            raise FHIRValidationError(report) from e
+        return parse_resource(resource_class, resource_dict)
+
     try:
         resource_class = get_fhir_resource(resource_type)
         return resource_class(**resource_dict)
     except Exception as e:
-        if raise_on_error:
-            from healthchain.fhir.validation import (
-                FHIRValidationError,
-                ValidationIssue,
-                ValidationReport,
-                validate_resource,
-            )
-
-            report = validate_resource(resource_dict, resource_type=resource_type)
-            if report.valid:
-                # The constructor failed for a reason validation didn't reproduce
-                report = ValidationReport(
-                    valid=False,
-                    resource_type=resource_type,
-                    issues=[
-                        ValidationIssue(
-                            severity="fatal", code="exception", diagnostics=str(e)
-                        )
-                    ],
-                )
-            raise FHIRValidationError(report) from e
         logger.error(f"Failed to create FHIR resource: {str(e)}")
         return None
 
@@ -325,14 +281,21 @@ def convert_prefetch_to_fhir_objects(
     """Convert a dictionary of FHIR resource dicts to FHIR Resource objects.
 
     Takes a prefetch dictionary where values may be either dict representations of FHIR
-    resources or already instantiated FHIR Resource objects, and ensures all values are
-    FHIR Resource objects.
+    resources or already instantiated FHIR Resource objects. Dicts that carry a
+    ``resourceType`` are validated and converted to FHIR Resource objects; other values
+    are kept as they are, with a warning.
 
     Args:
         prefetch_dict: Dictionary mapping keys to FHIR resource dicts or objects
 
     Returns:
-        Dict[str, Resource]: Dictionary with same keys but all values as FHIR Resource objects
+        Dict[str, Resource]: Dictionary with same keys, with resource dicts converted
+            to FHIR Resource objects
+
+    Raises:
+        FHIRValidationError: If a resource dict fails FHIR validation, including
+            a dateTime with a time but no timezone offset; values are never
+            rewritten. The report names each failing field path.
 
     Example:
         >>> prefetch = {
@@ -350,16 +313,9 @@ def convert_prefetch_to_fhir_objects(
             # Convert dict to FHIR Resource object
             resource_type = resource_data.get("resourceType")
             if resource_type:
-                try:
-                    # Fix timezone-naive datetimes before validation
-                    fixed_data = _fix_timezone_naive_datetimes(resource_data)
-                    resource_class = get_fhir_resource(resource_type)
-                    result[key] = resource_class(**fixed_data)
-                except Exception as e:
-                    logger.warning(
-                        f"Failed to convert {resource_type} to FHIR object: {e}"
-                    )
-                    result[key] = resource_data
+                result[key] = create_resource_from_dict(
+                    resource_data, resource_type, raise_on_error=True
+                )
             else:
                 logger.warning(
                     f"No resourceType found for key '{key}', keeping as dict"

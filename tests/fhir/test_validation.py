@@ -1,14 +1,17 @@
 import json
+from datetime import datetime
 
 import pytest
 from fhir.resources.R4B.bundle import Bundle
 from fhir.resources.R4B.condition import Condition
 from fhir.resources.R4B.operationoutcome import OperationOutcome
+from fhir.resources.R4B.patient import Patient
 
 from healthchain.fhir import (
     FHIRValidationError,
     ValidationReport,
     create_resource_from_dict,
+    get_fhir_resource,
     load_bundle,
     validate_resource,
 )
@@ -91,14 +94,52 @@ def test_validate_resource_missing_resource_type():
     assert report.issues[0].code == "structure"
 
 
-def test_validate_resource_unknown_resource_type():
-    """An unknown resource type reports not-supported."""
-    report = validate_resource({"resourceType": "NotAType"})
+def test_validate_resource_rejects_non_resource_input():
+    """Input that is neither a dict nor a model is reported, not crashed on."""
+    report = validate_resource("pt-1")
+
+    assert report.valid is False
+    assert report.issues[0].severity == "fatal"
+    assert report.issues[0].code == "structure"
+    assert "str" in report.issues[0].diagnostics
+
+
+@pytest.mark.parametrize(
+    "resource, resource_type",
+    [
+        ({"resourceType": "NotAType"}, "NotAType"),
+        (
+            {"resourceType": "Patient", "contained": [{"resourceType": "Bogus"}]},
+            "Patient",
+        ),
+        # A built resource mutated after construction; dumping it warns
+        pytest.param(
+            Patient.model_construct(id="p1", contained=[{"resourceType": "Bogus"}]),
+            "Patient",
+            marks=pytest.mark.filterwarnings("ignore::UserWarning"),
+        ),
+        (
+            {
+                "resourceType": "Bundle",
+                "type": "collection",
+                "entry": [
+                    {"resource": {"resourceType": None}},
+                    {"resource": {"resourceType": "Bogus"}},
+                    {"resource": {"id": "no-type"}},
+                ],
+            },
+            "Bundle",
+        ),
+    ],
+)
+def test_validate_resource_unknown_resource_type(resource, resource_type):
+    """An unknown resource type, at any depth, reports not-supported."""
+    report = validate_resource(resource)
 
     assert report.valid is False
     assert report.issues[0].severity == "fatal"
     assert report.issues[0].code == "not-supported"
-    assert report.resource_type == "NotAType"
+    assert report.resource_type == resource_type
 
 
 def test_validate_resource_explicit_type_argument():
@@ -208,6 +249,25 @@ def test_load_bundle_aggregates_entry_errors():
             {"resource": VALID_CONDITION},
             {"resource": {"resourceType": "Condition", "onsetDateTime": "bad"}},
             {"resource": {**VALID_MEDICATION_STATEMENT, "status": "recorded"}},
+            # Real-world datetimes that fhir-core <1.1.5 accepted
+            {
+                "resource": {
+                    **VALID_MEDICATION_STATEMENT,
+                    "effectiveDateTime": "2026-11-19T17:45:21+0000",
+                }
+            },
+            {
+                "resource": {
+                    **VALID_CONDITION,
+                    "meta": {"lastUpdated": "2026-11-19T17:45:21"},
+                }
+            },
+            {
+                "resource": {
+                    **VALID_MEDICATION_STATEMENT,
+                    "effectiveDateTime": datetime(2026, 11, 19, 17, 45, 21),
+                }
+            },
         ],
     }
 
@@ -220,6 +280,60 @@ def test_load_bundle_aggregates_entry_errors():
     assert "Bundle.entry[1].resource.subject" in expressions
     assert "Bundle.entry[1].resource.onsetDateTime" in expressions
     assert "Bundle.entry[2].resource.status" in expressions
+    assert "Bundle.entry[3].resource.effectiveDateTime" in expressions
+    assert "Bundle.entry[4].resource.meta.lastUpdated" in expressions
+    assert "Bundle.entry[5].resource.effectiveDateTime" in expressions
+
+
+@pytest.mark.parametrize(
+    "entry, expression",
+    [
+        (42, "Bundle.entry"),
+        ([{"resource": "pt-1"}], "Bundle.entry[0].resource"),
+        (
+            [
+                {
+                    "resource": {
+                        "resourceType": "Patient",
+                        "contained": [{"resourceType": "Bogus"}],
+                    }
+                }
+            ],
+            "Bundle.entry[0].resource",
+        ),
+        (
+            [{"response": {"status": "200", "outcome": {"resourceType": "Bogus"}}}],
+            "Bundle",
+        ),
+    ],
+)
+def test_load_bundle_reports_malformed_entries(entry, expression):
+    """A non-list entry or a non-object entry resource is reported, not crashed on."""
+    with pytest.raises(FHIRValidationError) as exc_info:
+        load_bundle(
+            {"resourceType": "Bundle", "type": "searchset", "entry": entry},
+            version="R4B",
+        )
+
+    report = exc_info.value.report
+    assert report.valid is False
+    assert [issue.expression for issue in report.issues] == [expression]
+
+
+@pytest.mark.parametrize("version", ["R4B", "STU3"])
+def test_load_bundle_accepts_resource_instances(version):
+    """Entry resources may be model instances of the requested FHIR version."""
+    patient_class = get_fhir_resource("Patient", version)
+    bundle = load_bundle(
+        {
+            "resourceType": "Bundle",
+            "type": "collection",
+            "entry": [{"resource": patient_class(id="p1")}],
+        },
+        version=version,
+    )
+
+    assert isinstance(bundle.entry[0].resource, patient_class)
 
 
 def test_load_bundle_rejects_non_bundle():

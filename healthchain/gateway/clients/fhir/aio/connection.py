@@ -78,9 +78,11 @@ class AsyncFHIRConnectionManager(FHIRConnectionManager):
         """
         auth_config = self._get_auth_config(source)
 
-        # Key by config content, so replacing a source's config gets a new client
+        # Key by a snapshot of the config's (field, value) pairs: a new or changed
+        # config gets a new client, and SecretStr compares by its real value
+        # while staying masked
         return await self.client_pool.get_client(
-            auth_config.model_dump_json(),
+            tuple(auth_config),
             lambda _key, limits=None: self._create_client(auth_config, limits=limits),
         )
 

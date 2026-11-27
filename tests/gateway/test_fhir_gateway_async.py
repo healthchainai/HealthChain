@@ -9,6 +9,7 @@ from fhir.resources.bundle import Bundle
 
 from healthchain.gateway.clients.fhir.aio.client import AsyncFHIRClient
 from healthchain.gateway.clients.fhir.base import FHIRAuthConfig
+from healthchain.fhir import FHIRValidationError, load_bundle
 from healthchain.gateway.fhir import AsyncFHIRGateway
 
 
@@ -130,8 +131,27 @@ async def test_search_operation_with_parameters(fhir_gateway):
         assert result == mock_bundle
 
 
+BAD_GENDER = {"gender": "bogus"}
+UNKNOWN_FIELD = {"unknownField": "pt-4041"}
+
+
 @pytest.mark.asyncio
-async def test_search_with_pagination(fhir_gateway):
+@pytest.mark.parametrize(
+    "bad_page, bad_fields, validate, expected_expression",
+    [
+        # Valid results pass the check
+        (None, {}, True, None),
+        # Binding issue on page 2: only checked with validate=True, on the merged
+        # Bundle, so the entry index counts across pages
+        (2, BAD_GENDER, True, "Bundle.entry[1].resource.gender"),
+        (2, BAD_GENDER, False, None),
+        # Page 1 that fails to parse: always raises, with that page's report
+        (1, UNKNOWN_FIELD, False, "Bundle.entry[0].resource.unknownField"),
+    ],
+)
+async def test_search_with_pagination(
+    fhir_gateway, bad_page, bad_fields, validate, expected_expression
+):
     """AsyncFHIRGateway.search fetches each next link exactly as the server wrote it."""
     query = (
         "_tag=https%3A%2F%2Fexample.org%2Fdemo%7Csite-a"
@@ -139,16 +159,21 @@ async def test_search_with_pagination(fhir_gateway):
     )
     next_link = f"https://fhir.example.org/R4/Patient?{query}"
     seen = []
+    pages = []
 
     def handler(request: httpx.Request) -> httpx.Response:
         seen.append(request.url.raw_path.decode())
+        patient = {"resourceType": "Patient", "id": str(len(seen))}
+        if len(seen) == bad_page:
+            patient.update(bad_fields)
         bundle = {
             "resourceType": "Bundle",
             "type": "searchset",
-            "entry": [{"resource": {"resourceType": "Patient", "id": str(len(seen))}}],
+            "entry": [{"resource": patient}],
         }
         if len(seen) == 1:
             bundle["link"] = [{"relation": "next", "url": next_link}]
+        pages.append(bundle)
         return httpx.Response(200, json=bundle)
 
     # The async client always builds a token manager, so give it dummy OAuth
@@ -173,12 +198,31 @@ async def test_search_with_pagination(fhir_gateway):
             AsyncMock(return_value=client),
         ),
     ):
-        result = await fhir_gateway.search(
-            Patient, {"name": "Smith"}, follow_pagination=True
-        )
+        if expected_expression is None:
+            result = await fhir_gateway.search(
+                Patient, {"name": "Smith"}, follow_pagination=True, validate=validate
+            )
+            assert seen == ["/R4/Patient?name=Smith", f"/R4/Patient?{query}"]
+            assert [entry.resource.id for entry in result.entry] == ["1", "2"]
+            return
 
-    assert seen == ["/R4/Patient?name=Smith", f"/R4/Patient?{query}"]
-    assert [entry.resource.id for entry in result.entry] == ["1", "2"]
+        with pytest.raises(FHIRValidationError) as exc_info:
+            await fhir_gateway.search(
+                Patient, {"name": "Smith"}, follow_pagination=True, validate=validate
+            )
+
+    if bad_page == 1:
+        # The search stops at the page that failed to parse
+        expected_source = pages[0]
+    else:
+        # The merged Bundle: page 2 carrying the entries of both pages
+        expected_source = {**pages[1], "entry": pages[0]["entry"] + pages[1]["entry"]}
+    with pytest.raises(FHIRValidationError) as expected:
+        load_bundle(expected_source, version="R4B")
+    assert exc_info.value.report == expected.value.report
+    assert [issue.expression for issue in exc_info.value.report.issues] == [
+        expected_expression
+    ]
 
 
 @pytest.mark.asyncio

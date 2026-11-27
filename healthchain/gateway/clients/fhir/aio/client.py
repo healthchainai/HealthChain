@@ -7,6 +7,7 @@ from fhir.resources.R4B.bundle import Bundle
 from fhir.resources.R4B.capabilitystatement import CapabilityStatement
 from fhir.resources.resource import Resource
 
+from healthchain.fhir.validation import parse_resource
 from healthchain.gateway.clients.auth import AsyncOAuth2TokenManager
 from healthchain.gateway.clients.fhir.base import FHIRAuthConfig, FHIRServerInterface
 
@@ -75,11 +76,14 @@ class AsyncFHIRClient(FHIRServerInterface):
 
         Returns:
             CapabilityStatement resource
+
+        Raises:
+            FHIRValidationError: If the response is not a valid FHIR resource
         """
         headers = await self._get_headers()
         response = await self.client.get(self._build_url("metadata"), headers=headers)
         data = self._handle_response(response)
-        return CapabilityStatement(**data)
+        return parse_resource(CapabilityStatement, data)
 
     async def read(
         self, resource_type: Union[str, Type[Resource]], resource_id: str
@@ -93,6 +97,9 @@ class AsyncFHIRClient(FHIRServerInterface):
 
         Returns:
             Resource instance
+
+        Raises:
+            FHIRValidationError: If the response is not a valid FHIR resource
         """
         type_name, resource_class = self._resolve_resource_type(resource_type)
         url = self._build_url(f"{type_name}/{resource_id}")
@@ -102,7 +109,7 @@ class AsyncFHIRClient(FHIRServerInterface):
         response = await self.client.get(url, headers=headers)
         data = self._handle_response(response)
 
-        return resource_class(**data)
+        return parse_resource(resource_class, data)
 
     async def search(
         self, resource_type: Union[str, Type[Resource]], params: Dict[str, Any] = None
@@ -116,6 +123,9 @@ class AsyncFHIRClient(FHIRServerInterface):
 
         Returns:
             Bundle containing search results
+
+        Raises:
+            FHIRValidationError: If the response is not a valid FHIR resource
         """
         type_name, _ = self._resolve_resource_type(resource_type)
         url = self._build_url(type_name, params)
@@ -125,7 +135,7 @@ class AsyncFHIRClient(FHIRServerInterface):
         response = await self.client.get(url, headers=headers)
         data = self._handle_response(response)
 
-        return Bundle(**data)
+        return parse_resource(Bundle, data)
 
     async def fetch_page(self, url: str) -> Bundle:
         """
@@ -139,6 +149,7 @@ class AsyncFHIRClient(FHIRServerInterface):
 
         Raises:
             FHIRClientError: If the link points outside the configured base URL
+            FHIRValidationError: If the response is not a valid FHIR resource
         """
         page_url = self._resolve_page_url(url)
         logger.debug(f"Sending GET request to {page_url}")
@@ -147,7 +158,7 @@ class AsyncFHIRClient(FHIRServerInterface):
         response = await self.client.get(page_url, headers=headers)
         data = self._handle_response(response)
 
-        return Bundle(**data)
+        return parse_resource(Bundle, data)
 
     async def create(self, resource: Resource) -> Resource:
         """
@@ -158,6 +169,9 @@ class AsyncFHIRClient(FHIRServerInterface):
 
         Returns:
             Created resource with server-assigned ID
+
+        Raises:
+            FHIRValidationError: If the response is not a valid FHIR resource
         """
         type_name, resource_class = self._resolve_resource_type(
             resource.__resource_type__
@@ -172,7 +186,7 @@ class AsyncFHIRClient(FHIRServerInterface):
         data = self._handle_response(response)
 
         # Return the same resource type
-        return resource_class(**data)
+        return parse_resource(resource_class, data)
 
     async def update(self, resource: Resource) -> Resource:
         """
@@ -183,6 +197,9 @@ class AsyncFHIRClient(FHIRServerInterface):
 
         Returns:
             Updated resource
+
+        Raises:
+            FHIRValidationError: If the response is not a valid FHIR resource
         """
         if not resource.id:
             raise ValueError("Resource must have an ID for update")
@@ -200,7 +217,7 @@ class AsyncFHIRClient(FHIRServerInterface):
         data = self._handle_response(response)
 
         # Return the same resource type
-        return resource_class(**data)
+        return parse_resource(resource_class, data)
 
     async def delete(
         self, resource_type: Union[str, Type[Resource]], resource_id: str
@@ -238,6 +255,9 @@ class AsyncFHIRClient(FHIRServerInterface):
 
         Returns:
             Response bundle
+
+        Raises:
+            FHIRValidationError: If the response is not a valid FHIR resource
         """
         url = self._build_url("")  # Base URL for transaction
         logger.debug(f"Sending POST request to {url}")
@@ -248,7 +268,7 @@ class AsyncFHIRClient(FHIRServerInterface):
         )
         data = self._handle_response(response)
 
-        return Bundle(**data)
+        return parse_resource(Bundle, data)
 
 
 def create_async_fhir_client(

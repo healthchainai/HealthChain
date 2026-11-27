@@ -14,18 +14,29 @@ import httpx
 
 from typing import Dict, Optional, Any
 from datetime import datetime, timedelta, timezone
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, SecretStr
 
 
 logger = logging.getLogger(__name__)
 
 
+class TokenRefreshError(Exception):
+    """The token endpoint returned an HTTP error status."""
+
+    def __init__(self, message: str, status_code: int):
+        self.status_code = status_code
+        super().__init__(message)
+
+
 class OAuth2Config(BaseModel):
     """OAuth2 configuration for client credentials flow."""
 
+    # Re-validate on assignment so a reassigned secret stays masked
+    model_config = ConfigDict(validate_assignment=True)
+
     client_id: str
     token_url: str
-    client_secret: Optional[str] = None  # Client secret string for standard flow
+    client_secret: Optional[SecretStr] = None  # Masked in repr and dumps
     client_secret_path: Optional[str] = (
         None  # Path to private key file for JWT assertion
     )
@@ -65,7 +76,7 @@ class OAuth2Config(BaseModel):
                 raise ValueError(
                     f"Failed to read secret from {self.client_secret_path}: {e}"
                 )
-        return self.client_secret
+        return self.client_secret.get_secret_value()
 
 
 class TokenInfo(BaseModel):
@@ -181,7 +192,10 @@ class OAuth2TokenManager:
                 logger.error(
                     f"Token refresh failed: {e.response.status_code} {e.response.text}"
                 )
-                raise Exception(f"Failed to refresh token: {e.response.status_code}")
+                raise TokenRefreshError(
+                    f"Failed to refresh token: {e.response.status_code}",
+                    status_code=e.response.status_code,
+                ) from e
             except Exception as e:
                 logger.error(f"Token refresh error: {str(e)}")
                 raise
@@ -322,7 +336,10 @@ class AsyncOAuth2TokenManager:
                 logger.error(
                     f"Token refresh failed: {e.response.status_code} {e.response.text}"
                 )
-                raise Exception(f"Failed to refresh token: {e.response.status_code}")
+                raise TokenRefreshError(
+                    f"Failed to refresh token: {e.response.status_code}",
+                    status_code=e.response.status_code,
+                ) from e
             except Exception as e:
                 logger.error(f"Token refresh error: {str(e)}")
                 raise
