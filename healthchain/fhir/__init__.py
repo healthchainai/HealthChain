@@ -54,6 +54,7 @@ from healthchain.fhir.validation import (
 from healthchain.fhir.bundlehelpers import (
     create_bundle,
     add_resource,
+    get_part_of_ancestors,
     get_resource_type,
     get_resources,
     resolve_reference,
@@ -115,6 +116,7 @@ __all__ = [
     # Bundle operations
     "create_bundle",
     "add_resource",
+    "get_part_of_ancestors",
     "get_resource_type",
     "get_resources",
     "resolve_reference",

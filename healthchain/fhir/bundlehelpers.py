@@ -196,6 +196,74 @@ def resolve_reference(
     return None
 
 
+def get_part_of_ancestors(bundle: Bundle, resource: Resource) -> List[Resource]:
+    """Walk ``partOf`` links from a resource to its ancestors in a bundle.
+
+    Follows ``resource.partOf`` iteratively (e.g. ``Location`` bed -> bay ->
+    area -> ward, or child -> parent ``Organization``), returning ancestors
+    nearest-first.
+
+    Args:
+        bundle: The bundle containing the target resources
+        resource: The starting FHIR resource (for example a Location or Organization)
+
+    Returns:
+        List of ancestor resources ordered nearest parent first (empty if
+        ``resource`` has no ``partOf`` reference)
+
+    Raises:
+        ValueError: If a ``partOf`` reference cannot be resolved within
+            ``bundle``, or if the ``partOf`` chain contains a cycle
+    """
+    ancestors: List[Resource] = []
+    seen_object_ids: set[int] = {id(resource)}
+    seen_resource_keys: set[tuple[str, str]] = set()
+    start_id = getattr(resource, "id", None)
+    if start_id:
+        seen_resource_keys.add((resource.__class__.__name__, start_id))
+
+    current = resource
+    while True:
+        part_of = getattr(current, "partOf", None)
+        if part_of is None:
+            break
+        ref_str = part_of.reference if isinstance(part_of, Reference) else part_of
+        if not ref_str:
+            break
+
+        parent = resolve_reference(bundle, part_of, parent=current)
+        if parent is None:
+            current_id = getattr(current, "id", None)
+            source_label = (
+                f"{current.__class__.__name__}/{current_id}"
+                if current_id
+                else current.__class__.__name__
+            )
+            raise ValueError(
+                f"Unresolvable partOf reference {ref_str!r} on {source_label}"
+            )
+
+        parent_id = getattr(parent, "id", None)
+        parent_key = (parent.__class__.__name__, parent_id) if parent_id else None
+        if id(parent) in seen_object_ids or (
+            parent_key is not None and parent_key in seen_resource_keys
+        ):
+            target_label = (
+                f"{parent.__class__.__name__}/{parent_id}"
+                if parent_id
+                else parent.__class__.__name__
+            )
+            raise ValueError(f"Cycle detected in partOf hierarchy at {target_label}")
+
+        seen_object_ids.add(id(parent))
+        if parent_key is not None:
+            seen_resource_keys.add(parent_key)
+        ancestors.append(parent)
+        current = parent
+
+    return ancestors
+
+
 def set_resources(
     bundle: Bundle,
     resources: List[Resource],

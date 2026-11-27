@@ -14,6 +14,7 @@ from fhir.resources.R4B.reference import Reference
 from healthchain.fhir.bundlehelpers import (
     create_bundle,
     add_resource,
+    get_part_of_ancestors,
     get_resources,
     resolve_reference,
     set_resources,
@@ -363,3 +364,91 @@ def test_resolve_reference_empty_reference_returns_none(reference_bundle):
 def test_resolve_reference_empty_bundle_returns_none():
     """Resolving against an empty bundle returns None."""
     assert resolve_reference(create_bundle(), "Patient/123") is None
+
+
+def test_get_part_of_ancestors_location_hierarchy():
+    """Location partOf chain returns ancestors ordered nearest-first."""
+    from fhir.resources.R4B.location import Location
+
+    ward = Location(id="ward-1", name="Ward A")
+    area = Location(
+        id="area-1", name="Area 1", partOf=Reference(reference="Location/ward-1")
+    )
+    bay = Location(
+        id="bay-1", name="Bay 1", partOf=Reference(reference="Location/area-1")
+    )
+    bed = Location(
+        id="bed-1", name="Bed 1", partOf=Reference(reference="Location/bay-1")
+    )
+
+    bundle = create_bundle()
+    for loc in (ward, area, bay, bed):
+        add_resource(bundle, loc)
+
+    assert get_part_of_ancestors(bundle, bed) == [bay, area, ward]
+    assert get_part_of_ancestors(bundle, ward) == []
+
+
+def test_get_part_of_ancestors_organization_hierarchy():
+    """Organization partOf chain resolves across fullUrl and relative references."""
+    from fhir.resources.R4B.organization import Organization
+
+    trust = Organization(id="trust-1", name="NHS Trust")
+    hospital = Organization(
+        id="hosp-1",
+        name="City Hospital",
+        partOf=Reference(reference="urn:uuid:trust-uuid"),
+    )
+    dept = Organization(
+        id="dept-1",
+        name="Cardiology",
+        partOf=Reference(reference="Organization/hosp-1"),
+    )
+
+    bundle = create_bundle()
+    add_resource(bundle, trust, full_url="urn:uuid:trust-uuid")
+    add_resource(bundle, hospital)
+    add_resource(bundle, dept)
+
+    assert get_part_of_ancestors(bundle, dept) == [hospital, trust]
+
+
+def test_get_part_of_ancestors_missing_parent_raises():
+    """Unresolvable partOf target raises a descriptive ValueError."""
+    from fhir.resources.R4B.location import Location
+
+    bed = Location(
+        id="bed-1", name="Bed 1", partOf=Reference(reference="Location/missing-bay")
+    )
+    bundle = create_bundle()
+    add_resource(bundle, bed)
+
+    with pytest.raises(ValueError, match="Unresolvable partOf reference.*missing-bay"):
+        get_part_of_ancestors(bundle, bed)
+
+
+def test_get_part_of_ancestors_cycle_raises():
+    """A cycle in partOf references is detected and raises ValueError."""
+    from fhir.resources.R4B.location import Location
+
+    loc_a = Location(id="loc-a", partOf=Reference(reference="Location/loc-b"))
+    loc_b = Location(id="loc-b", partOf=Reference(reference="Location/loc-a"))
+
+    bundle = create_bundle()
+    add_resource(bundle, loc_a)
+    add_resource(bundle, loc_b)
+
+    with pytest.raises(ValueError, match="Cycle detected in partOf hierarchy.*loc-a"):
+        get_part_of_ancestors(bundle, loc_a)
+
+
+def test_get_part_of_ancestors_self_cycle_raises():
+    """A self-referencing partOf raises ValueError immediately."""
+    from fhir.resources.R4B.organization import Organization
+
+    org = Organization(id="org-1", partOf=Reference(reference="Organization/org-1"))
+    bundle = create_bundle()
+    add_resource(bundle, org)
+
+    with pytest.raises(ValueError, match="Cycle detected in partOf hierarchy.*org-1"):
+        get_part_of_ancestors(bundle, org)
