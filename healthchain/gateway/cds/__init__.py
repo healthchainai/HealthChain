@@ -88,6 +88,8 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
         APIRouter.__init__(self, prefix=self.config.base_path, tags=["CDS Hooks"])
 
         self._handler_metadata = {}
+        self._service_handlers: Dict[str, Callable] = {}
+        self._service_metadata: Dict[str, Dict[str, Any]] = {}
 
         # Set event dispatcher if provided
         if event_dispatcher and use_events:
@@ -130,7 +132,7 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
             cds: "CDSHooksService" = Depends(get_self_service),
         ):
             """CDS Hook service endpoint."""
-            return cds.handle_request(request)
+            return cds.handle_request(request, service_id=hook_id)
 
         self.add_api_route(
             path=endpoint,
@@ -171,14 +173,28 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
                 raise ValueError(
                     f"Hook type {hook_type} is not allowed. Must be one of: {self.config.allowed_hooks}"
                 )
+            if id in self._service_handlers:
+                raise ValueError(
+                    f"CDS hook service with id '{id}' is already registered"
+                )
 
-            # Register the handler
+            service_title = title or hook_type.replace("-", " ").title()
+
+            # Track handlers and metadata by service id so multiple services can share a hook type
+            self._service_handlers[id] = handler
+            self._service_metadata[id] = {
+                "hook": hook_type,
+                "id": id,
+                "title": service_title,
+                "description": description,
+                "usage_requirements": usage_requirements,
+            }
+
+            # Maintain hook-type mapping for backward compatibility with direct dispatch()
             self.register_handler(hook_type, handler)
-
-            # Add CDS-specific metadata
             self._handler_metadata[hook_type] = {
                 "id": id,
-                "title": title or hook_type.replace("-", " ").title(),
+                "title": service_title,
                 "description": description,
                 "usage_requirements": usage_requirements,
             }
@@ -212,21 +228,32 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
 
         return CDSServiceInformation(services=services)
 
-    def handle_request(self, request: CDSRequest) -> CDSResponse:
+    def handle_request(
+        self, request: CDSRequest, service_id: Optional[str] = None
+    ) -> CDSResponse:
         """
         CDS service endpoint handler.
 
         Args:
             request: CDSRequest object
+            service_id: Optional registered service id from the endpoint route
 
         Returns:
             CDSResponse object
         """
-        # Get the hook type from the request
         hook_type = request.hook
 
-        # Process the request using the appropriate handler
-        response = self.dispatch(hook_type, request=request)
+        if service_id is not None:
+            handler = self._service_handlers.get(service_id)
+            if handler is None:
+                logger.warning(f"No handler registered for CDS service id: {service_id}")
+                response = CDSResponse(cards=[])
+            else:
+                response = self._invoke_handler(
+                    handler, request, f"service id: {service_id}"
+                )
+        else:
+            response = self.dispatch(hook_type, request=request)
 
         # If we have an event dispatcher, emit an event for the hook execution
         if self.events.dispatcher and self.use_events:
@@ -296,6 +323,18 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
         # Execute the handler with the request
         return self._execute_handler(request)
 
+    def _invoke_handler(
+        self, handler: Callable, request: CDSRequest, target: str
+    ) -> CDSResponse:
+        """Execute a CDS handler and normalize its result to a CDSResponse."""
+        try:
+            logger.debug(f"Calling handler for {target}")
+            result = handler(request)
+            return self._process_result(result)
+        except Exception as e:
+            logger.error(f"Error in CDS hook handler: {str(e)}", exc_info=True)
+            return CDSResponse(cards=[])
+
     def _execute_handler(self, request: CDSRequest) -> CDSResponse:
         """
         Execute a registered CDS hook with the given request.
@@ -307,20 +346,8 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
             CDSResponse object with cards
         """
         hook_type = request.hook
-
-        try:
-            # Call the registered handler with the request model directly
-            logger.debug(f"Calling handler for hook type: {hook_type}")
-            handler = self._handlers[hook_type]
-
-            result = handler(request)
-
-            # Process the result
-            return self._process_result(result)
-
-        except Exception as e:
-            logger.error(f"Error in CDS hook handler: {str(e)}", exc_info=True)
-            return CDSResponse(cards=[])
+        handler = self._handlers[hook_type]
+        return self._invoke_handler(handler, request, f"hook type: {hook_type}")
 
     def _process_result(self, result: Any) -> CDSResponse:
         """
@@ -372,8 +399,10 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
         Returns:
             List of hook metadata dictionaries
         """
-        metadata = []
+        if self._service_metadata:
+            return [dict(meta) for meta in self._service_metadata.values()]
 
+        metadata = []
         for hook_type in self._handlers.keys():
             hook_metadata = self._handler_metadata.get(hook_type, {})
             metadata.append(

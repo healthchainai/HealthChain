@@ -676,9 +676,9 @@ class HealthChainAPI(FastAPI):
 
         for service in self.services.values():
             if isinstance(service, CDSHooksService):
-                for hook_type, metadata in service._handler_metadata.items():
+                for metadata in service.get_metadata():
                     if metadata.get("id") == hook_id:
-                        return hook_type
+                        return metadata.get("hook")
         return None
 
     def sandbox(

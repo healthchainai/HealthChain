@@ -237,3 +237,67 @@ def test_cdshooks_gateway_hook_invalid_hook_type():
         @gateway.hook("invalid-hook-type", id="test")
         def handle_invalid(request):
             return CDSResponse(cards=[])
+
+
+def test_cdshooks_multiple_services_same_hook_type():
+    """Two services sharing a hook type with distinct ids dispatch independently."""
+    from fastapi.testclient import TestClient
+
+    from healthchain.gateway.api.app import HealthChainAPI
+
+    app = HealthChainAPI(enable_events=False)
+    cds = CDSHooksService()
+
+    @cds.hook("patient-view", id="allergies", title="Allergies")
+    def handle_allergies(request: CDSRequest) -> CDSResponse:
+        return CDSResponse(
+            cards=[
+                Card(summary="allergies", indicator="warning", source={"label": "A"})
+            ]
+        )
+
+    @cds.hook("patient-view", id="sepsis", title="Sepsis")
+    def handle_sepsis(request: CDSRequest) -> CDSResponse:
+        return CDSResponse(
+            cards=[Card(summary="sepsis", indicator="critical", source={"label": "S"})]
+        )
+
+    app.register_service(cds)
+
+    assert app._resolve_cds_workflow("allergies") == "patient-view"
+    assert app._resolve_cds_workflow("sepsis") == "patient-view"
+
+    client = TestClient(app)
+    discovery = client.get("/cds/cds-discovery")
+    assert discovery.status_code == 200
+    service_ids = [svc["id"] for svc in discovery.json()["services"]]
+    assert service_ids == ["allergies", "sepsis"]
+
+    payload = {
+        "hook": "patient-view",
+        "hookInstance": "12345",
+        "context": {"patientId": "patient-1", "userId": "Practitioner/1"},
+    }
+
+    allergies_resp = client.post("/cds/cds-services/allergies", json=payload)
+    assert allergies_resp.status_code == 200
+    assert allergies_resp.json()["cards"][0]["summary"] == "allergies"
+
+    sepsis_resp = client.post("/cds/cds-services/sepsis", json=payload)
+    assert sepsis_resp.status_code == 200
+    assert sepsis_resp.json()["cards"][0]["summary"] == "sepsis"
+
+
+def test_cdshooks_duplicate_service_id_raises():
+    """Registering two services with the same id raises ValueError."""
+    gateway = CDSHooksService()
+
+    @gateway.hook("patient-view", id="dup-service")
+    def first(request):
+        return CDSResponse(cards=[])
+
+    with pytest.raises(ValueError, match="dup-service"):
+
+        @gateway.hook("patient-view", id="dup-service")
+        def second(request):
+            return CDSResponse(cards=[])
