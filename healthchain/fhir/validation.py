@@ -25,7 +25,7 @@ import json
 import logging
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Type, Union
 
 from pydantic import BaseModel, Field, ValidationError
 from fhir.resources.resource import Resource
@@ -216,6 +216,71 @@ def _class_version(resource_class: type) -> str:
     return FHIRVersion.R5.value
 
 
+def parse_resource(resource_class: Type[Resource], data: Dict[str, Any]) -> Resource:
+    """Build a resource of exactly ``resource_class``, raising FHIRValidationError.
+
+    Converts the model's own construction failure into a report; it never
+    retries with another schema or runs binding checks.
+    """
+    name = resource_class.__name__
+    try:
+        return resource_class.model_validate(data)
+    except ValidationError as e:
+        issues = _structural_issues(e, name)
+        error: Exception = e
+    except (KeyError, TypeError) as e:
+        # fhir.resources raises KeyError for an unknown resourceType anywhere
+        # in the tree, and TypeError for a null one
+        issues = _resource_type_issues(resource_class, data, e)
+        error = e
+    raise FHIRValidationError(
+        ValidationReport(
+            valid=False,
+            resource_type=name,
+            fhir_version=_class_version(resource_class),
+            issues=issues,
+        )
+    ) from error
+
+
+def _resource_type_issues(
+    resource_class: Type[Resource], data: Dict[str, Any], error: Exception
+) -> List[ValidationIssue]:
+    """Report an invalid resourceType, pointing at the Bundle entry when found."""
+    name = resource_class.__name__
+    issues: List[ValidationIssue] = []
+    entries = data.get("entry") if name == "Bundle" else None
+    if isinstance(entries, list):
+        for i, entry in enumerate(entries):
+            entry_resource = entry.get("resource") if isinstance(entry, dict) else None
+            entry_type = (
+                entry_resource.get("resourceType")
+                if isinstance(entry_resource, dict)
+                else None
+            )
+            if not isinstance(entry_type, str):
+                continue
+            try:
+                get_fhir_resource(entry_type, _class_version(resource_class))
+            except ValueError as e:
+                issues.append(
+                    ValidationIssue(
+                        severity="fatal",
+                        code="not-supported",
+                        diagnostics=str(e),
+                        expression=f"Bundle.entry[{i}].resource",
+                    )
+                )
+    return issues or [
+        ValidationIssue(
+            severity="fatal",
+            code="not-supported",
+            diagnostics=f"Invalid or unknown resource type: {error}",
+            expression=name,
+        )
+    ]
+
+
 def validate_resource(
     resource: Union[Dict[str, Any], Resource],
     resource_type: Optional[str] = None,
@@ -282,14 +347,9 @@ def validate_resource(
 
         fhir_version = _class_version(resource_class)
         try:
-            instance = resource_class.model_validate(resource)
-        except ValidationError as e:
-            return ValidationReport(
-                valid=False,
-                resource_type=resolved_type,
-                fhir_version=fhir_version,
-                issues=_structural_issues(e, resolved_type),
-            )
+            instance = parse_resource(resource_class, resource)
+        except FHIRValidationError as e:
+            return e.report
     elif not isinstance(resource, BaseModel):
         return ValidationReport(
             valid=False,
@@ -311,14 +371,9 @@ def validate_resource(
         fhir_version = detected.value if detected else None
         try:
             # Re-validate to catch invalid post-construction mutations
-            resource.__class__.model_validate(resource.model_dump(exclude_none=True))
-        except ValidationError as e:
-            return ValidationReport(
-                valid=False,
-                resource_type=resolved_type,
-                fhir_version=fhir_version,
-                issues=_structural_issues(e, resolved_type),
-            )
+            parse_resource(resource.__class__, resource.model_dump(exclude_none=True))
+        except FHIRValidationError as e:
+            return e.report
         instance = resource
 
     issues = _check_bindings(instance, resolved_type)
@@ -443,7 +498,7 @@ def load_bundle(
         raise FHIRValidationError(report)
 
     bundle_class = get_fhir_resource("Bundle", version)
-    return bundle_class.model_validate(data)
+    return parse_resource(bundle_class, data)
 
 
 def _parse_bundle_json(text: str) -> Dict[str, Any]:

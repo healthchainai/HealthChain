@@ -5,6 +5,7 @@ import pytest
 from fhir.resources.R4B.bundle import Bundle
 from fhir.resources.R4B.condition import Condition
 from fhir.resources.R4B.operationoutcome import OperationOutcome
+from fhir.resources.R4B.patient import Patient
 
 from healthchain.fhir import (
     FHIRValidationError,
@@ -103,14 +104,42 @@ def test_validate_resource_rejects_non_resource_input():
     assert "str" in report.issues[0].diagnostics
 
 
-def test_validate_resource_unknown_resource_type():
-    """An unknown resource type reports not-supported."""
-    report = validate_resource({"resourceType": "NotAType"})
+@pytest.mark.parametrize(
+    "resource, resource_type",
+    [
+        ({"resourceType": "NotAType"}, "NotAType"),
+        (
+            {"resourceType": "Patient", "contained": [{"resourceType": "Bogus"}]},
+            "Patient",
+        ),
+        # A built resource mutated after construction; dumping it warns
+        pytest.param(
+            Patient.model_construct(id="p1", contained=[{"resourceType": "Bogus"}]),
+            "Patient",
+            marks=pytest.mark.filterwarnings("ignore::UserWarning"),
+        ),
+        (
+            {
+                "resourceType": "Bundle",
+                "type": "collection",
+                "entry": [
+                    {"resource": {"resourceType": None}},
+                    {"resource": {"resourceType": "Bogus"}},
+                    {"resource": {"id": "no-type"}},
+                ],
+            },
+            "Bundle",
+        ),
+    ],
+)
+def test_validate_resource_unknown_resource_type(resource, resource_type):
+    """An unknown resource type, at any depth, reports not-supported."""
+    report = validate_resource(resource)
 
     assert report.valid is False
     assert report.issues[0].severity == "fatal"
     assert report.issues[0].code == "not-supported"
-    assert report.resource_type == "NotAType"
+    assert report.resource_type == resource_type
 
 
 def test_validate_resource_explicit_type_argument():
@@ -261,6 +290,21 @@ def test_load_bundle_aggregates_entry_errors():
     [
         (42, "Bundle.entry"),
         ([{"resource": "pt-1"}], "Bundle.entry[0].resource"),
+        (
+            [
+                {
+                    "resource": {
+                        "resourceType": "Patient",
+                        "contained": [{"resourceType": "Bogus"}],
+                    }
+                }
+            ],
+            "Bundle.entry[0].resource",
+        ),
+        (
+            [{"response": {"status": "200", "outcome": {"resourceType": "Bogus"}}}],
+            "Bundle",
+        ),
     ],
 )
 def test_load_bundle_reports_malformed_entries(entry, expression):
