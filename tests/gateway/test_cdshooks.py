@@ -1,6 +1,11 @@
 import pytest
 from unittest.mock import MagicMock
 
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+from pydantic import ValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
 from healthchain.gateway.cds import CDSHooksConfig
 from healthchain.gateway.cds import (
     CDSHooksService,
@@ -54,13 +59,15 @@ def test_cdshooks_service_configuration(config_args, expected_paths):
         assert getattr(gateway.config, path_name) == expected_value
 
 
-def test_cdshooks_hook_decorator_with_metadata_variants():
+def test_cdshooks_hook_decorator_with_metadata_variants(test_cds_request):
     """Hook decorator supports default and custom metadata configurations."""
     gateway = CDSHooksService()
+    calls = []
 
     # Default metadata
     @gateway.hook("patient-view", id="test-patient-view")
     def handle_patient_view_default(request):
+        calls.append("patient-view")
         return CDSResponse(cards=[])
 
     # Custom metadata
@@ -72,6 +79,7 @@ def test_cdshooks_hook_decorator_with_metadata_variants():
         usage_requirements="Requires patient context",
     )
     def handle_order_select_custom(request):
+        calls.append("order-select")
         return CDSResponse(cards=[])
 
     # Verify both handlers registered correctly
@@ -90,6 +98,15 @@ def test_cdshooks_hook_decorator_with_metadata_variants():
     assert custom_meta["title"] == "Custom Title"
     assert custom_meta["description"] == "Custom description"
     assert custom_meta["usage_requirements"] == "Requires patient context"
+
+    # A request for another hook type is rejected by this route, even when served elsewhere
+    app = FastAPI()
+    app.include_router(gateway)
+    body = test_cds_request.model_dump(mode="json", exclude_none=True)
+    body["hook"] = "order-select"
+    response = TestClient(app).post("/cds/cds-services/test-patient-view", json=body)
+    assert response.status_code == 400
+    assert calls == []
 
 
 def test_cdshooks_gateway_handle_request(test_cds_request):
@@ -112,6 +129,70 @@ def test_cdshooks_gateway_handle_request(test_cds_request):
     assert isinstance(result, CDSResponse)
     assert len(result.cards) == 1
     assert result.cards[0].summary == "Test response"
+
+    # Direct callers see errors instead of empty cards
+    with pytest.raises(ValidationError):
+        gateway.dispatch("patient-view", context={})
+    with pytest.raises(ValueError, match="No handler registered"):
+        gateway.dispatch("order-sign", request=test_cds_request)
+
+
+def _raise(exc):
+    raise exc
+
+
+@pytest.mark.parametrize(
+    "outcome,expected_status,expected_detail",
+    [
+        (
+            lambda: _raise(ValueError("secret-patient-123")),
+            500,
+            "CDS service 'test-patient-view' failed: ValueError",
+        ),
+        (
+            lambda: _raise(StarletteHTTPException(412, "missing prefetch")),
+            412,
+            "missing prefetch",
+        ),
+        (lambda: CDSResponse(cards=[]), 200, None),
+        (
+            lambda: None,
+            500,
+            "CDS service 'test-patient-view' failed: TypeError",
+        ),
+        (
+            lambda: {"cards": [{}]},
+            500,
+            "CDS service 'test-patient-view' failed: ValidationError",
+        ),
+    ],
+    ids=["raises", "http-412", "no-cards", "returns-none", "invalid-dict"],
+)
+def test_cdshooks_http_status_for_handler_outcomes(
+    test_cds_request, outcome, expected_status, expected_detail
+):
+    """Hook route maps handler outcomes to HTTP status without HealthChainAPI."""
+    gateway = CDSHooksService()
+
+    @gateway.hook("patient-view", id="test-patient-view")
+    def handle_patient_view(request):
+        return outcome()
+
+    app = FastAPI()
+    app.include_router(gateway)
+    client = TestClient(app, raise_server_exceptions=False)
+
+    response = client.post(
+        "/cds/cds-services/test-patient-view",
+        json=test_cds_request.model_dump(mode="json", exclude_none=True),
+    )
+
+    assert response.status_code == expected_status
+    if expected_detail is None:
+        assert response.json() == {"cards": []}
+    else:
+        assert response.json()["detail"] == expected_detail
+    assert "secret-patient-123" not in response.text
 
 
 def test_cdshooks_gateway_handle_discovery():
