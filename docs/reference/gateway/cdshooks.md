@@ -95,6 +95,30 @@ When registered with HealthChainAPI, the following endpoints are automatically c
 }
 ```
 
+## Errors
+
+A handler that has no advice should return `CDSResponse(cards=[])`. The client gets 200 with `{"cards": []}`.
+
+If a handler raises, or returns something other than a `CDSResponse` or a dict with `cards`, the client gets 500. The `detail` names the service id and the exception type, for example `"CDS service 'allergy-alerts' failed: ValueError"`. The exception message and traceback go to the server log only, because they can contain patient data.
+
+A request whose `hook` doesn't match the service's hook type gets 400, and the handler doesn't run.
+
+To return a different status, raise `fastapi.HTTPException` from the handler. It passes through unchanged. The CDS Hooks spec uses 412 Precondition Failed when the service can't get the FHIR data it needs, through either prefetch or FHIR server access:
+
+```python
+from fastapi import HTTPException
+from healthchain.gateway import CDSHooksService
+from healthchain.models import CDSRequest, CDSResponse
+
+cds = CDSHooksService()
+
+@cds.hook("patient-view", id="allergy-alerts")
+def check_allergies(request: CDSRequest) -> CDSResponse:
+    if not request.prefetch or "patient" not in request.prefetch:
+        raise HTTPException(status_code=412, detail="Patient prefetch required")
+    return CDSResponse(cards=[...])
+```
+
 ## Supported FHIR Resources
 
 - `Patient`

@@ -1,9 +1,10 @@
 import logging
 
-from typing import Any, Callable, Dict, List, Optional, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, TypeVar
 
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import BaseModel
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from healthchain.gateway.base import BaseProtocolHandler
 from healthchain.gateway.cds.events import create_cds_hook_event
@@ -119,8 +120,8 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
             """CDS Hooks discovery endpoint."""
             return cds.handle_discovery()
 
-    def _register_hook_route(self, hook_id: str):
-        """Register a route for a specific hook ID."""
+    def _register_hook_route(self, hook_type: str, hook_id: str):
+        """Register a route for a specific hook ID that serves one hook type."""
         get_self_service = self._get_service_dependency()
         service_path = self.config.service_path.lstrip("/")
         endpoint = f"/{service_path}/{hook_id}"
@@ -130,7 +131,21 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
             cds: "CDSHooksService" = Depends(get_self_service),
         ):
             """CDS Hook service endpoint."""
-            return cds.handle_request(request)
+            if request.hook != hook_type:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Service '{hook_id}' serves '{hook_type}', got '{request.hook}'",
+                )
+            try:
+                return cds.handle_request(request)
+            except StarletteHTTPException:
+                raise
+            except Exception as e:
+                logger.error(f"CDS service '{hook_id}' failed", exc_info=True)
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"CDS service '{hook_id}' failed: {type(e).__name__}",
+                ) from e
 
         self.add_api_route(
             path=endpoint,
@@ -184,7 +199,7 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
             }
 
             # Register the route for this hook
-            self._register_hook_route(id)
+            self._register_hook_route(hook_type, id)
 
             return handler
 
@@ -240,7 +255,7 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
 
         return response
 
-    def _extract_request(self, operation: str, params: Dict) -> Optional[CDSRequest]:
+    def _extract_request(self, operation: str, params: Dict) -> CDSRequest:
         """
         Extract or construct a CDSRequest from parameters.
 
@@ -249,31 +264,20 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
             params: The parameters passed to dispatch
 
         Returns:
-            CDSRequest object or None if request couldn't be constructed
+            CDSRequest object
         """
-        try:
-            # Case 1: Direct CDSRequest passed as a parameter
-            if "request" in params and isinstance(params["request"], CDSRequest):
-                return params["request"]
+        # Case 1: Direct CDSRequest passed as a parameter
+        if "request" in params and isinstance(params["request"], CDSRequest):
+            return params["request"]
 
-            # Case 2: First parameter is a CDSRequest
-            if len(params) == 1 and isinstance(next(iter(params.values())), CDSRequest):
-                return next(iter(params.values()))
+        # Case 2: First parameter is a CDSRequest
+        if len(params) == 1 and isinstance(next(iter(params.values())), CDSRequest):
+            return next(iter(params.values()))
 
-            # Case 3: Operation matches a hook type - build a CDSRequest
-            if operation in self._handlers:
-                # Build a CDSRequest from operation and params
-                return CDSRequest(**params)
+        # Case 3: Build a CDSRequest from params
+        return CDSRequest(**params)
 
-            # No valid request could be constructed
-            logger.warning(f"Unable to construct CDSRequest for hook type: {operation}")
-            return None
-
-        except Exception as e:
-            logger.warning(f"Error constructing CDSRequest: {str(e)}", exc_info=True)
-            return None
-
-    def dispatch(self, operation: str, **params) -> Union[CDSResponse, Dict]:
+    def dispatch(self, operation: str, **params) -> CDSResponse:
         """
         Process a CDS Hooks request using registered handlers.
 
@@ -283,17 +287,15 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
 
         Returns:
             CDSResponse object with the results of the operation
+
+        Raises:
+            ValueError: If no handler is registered for the hook type
         """
         if operation not in self._handlers:
-            logger.warning(f"No handler registered for hook type: {operation}")
-            return CDSResponse(cards=[])
+            raise ValueError(f"No handler registered for hook type: {operation}")
 
-        # Handle direct CDSRequest objects
         request = self._extract_request(operation, params)
-        if not request:
-            return CDSResponse(cards=[])
 
-        # Execute the handler with the request
         return self._execute_handler(request)
 
     def _execute_handler(self, request: CDSRequest) -> CDSResponse:
@@ -308,19 +310,12 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
         """
         hook_type = request.hook
 
-        try:
-            # Call the registered handler with the request model directly
-            logger.debug(f"Calling handler for hook type: {hook_type}")
-            handler = self._handlers[hook_type]
+        logger.debug(f"Calling handler for hook type: {hook_type}")
+        handler = self._handlers[hook_type]
 
-            result = handler(request)
+        result = handler(request)
 
-            # Process the result
-            return self._process_result(result)
-
-        except Exception as e:
-            logger.error(f"Error in CDS hook handler: {str(e)}", exc_info=True)
-            return CDSResponse(cards=[])
+        return self._process_result(result)
 
     def _process_result(self, result: Any) -> CDSResponse:
         """
@@ -331,20 +326,20 @@ class CDSHooksService(BaseProtocolHandler[CDSRequest, CDSResponse], APIRouter):
 
         Returns:
             CDSResponse object
+
+        Raises:
+            TypeError: If the result is not a CDSResponse or a dict with 'cards'
         """
-        # If the result is already a CDSResponse, return it
         if isinstance(result, CDSResponse):
             return result
 
-        try:
-            # Otherwise, create a CDSResponse from the result
-            if isinstance(result, dict) and "cards" in result:
-                return CDSResponse(**result)
-            logger.warning(f"Unexpected result type from handler: {type(result)}")
-            return CDSResponse(cards=[])
-        except Exception as e:
-            logger.error(f"Error processing result to CDSResponse: {str(e)}")
-            return CDSResponse(cards=[])
+        if isinstance(result, dict) and "cards" in result:
+            return CDSResponse(**result)
+
+        raise TypeError(
+            "CDS hook handler must return CDSResponse or a dict with 'cards', "
+            f"got {type(result).__name__}"
+        )
 
     def _emit_hook_event(
         self, hook_type: str, request: CDSRequest, response: CDSResponse
